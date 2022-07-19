@@ -19,7 +19,7 @@
 #include <mach-o/dyld.h>
 #endif
 
-#define APP_VERSION "0.1.0"
+#define APP_VERSION "0.1.2"
 
 using namespace TCLAP;
 using namespace std;
