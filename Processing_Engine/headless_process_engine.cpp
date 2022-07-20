@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     std::string appDir;
     std::string cfgDir;
     AppSettings appSettings;
-    CmdLine cmd("Data Flow Processing Engine", ' ', APP_VERSION);
+    CmdLine cmd("FlowCV Processing Engine", ' ', APP_VERSION);
     ValueArg<std::string> flow_file_arg("f", "flow", "Flow File", true, "", "string");
     ValueArg<std::string> cfg_file_arg("c", "cfg", "Custom Config File", false, "", "string");
     cmd.add(flow_file_arg);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     cmd.parse(argc, argv);
 
     cout << endl;
-    cout << "Data Flow Processing Engine - v" << APP_VERSION << endl;
+    cout << "FlowCV Processing Engine - v" << APP_VERSION << endl;
     cout << endl;
 
     FlowCV::FlowCV_Manager flowMan;
