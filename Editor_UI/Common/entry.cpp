@@ -6,9 +6,12 @@
 #include <fstream>
 #include <filesystem>
 #include <ImGuiFileBrowser.h>
+#include <tclap/CmdLine.h>
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
+
+using namespace TCLAP;
 
 ApplicationGlobals* GetApplicationGlobals()
 {
@@ -158,6 +161,12 @@ int main(int argc, char *argv[])
     appSettings.flowBufferCount = 1;
     appSettings.showFPS = false;
 
+    CmdLine cmd("FlowCV Node Editor", ' ', FLOWCV_EDITOR_VERSION_STR);
+    ValueArg<std::string> cfg_file_arg("c", "cfg", "Default Config File Override", false, "", "string");
+    cmd.add(cfg_file_arg);
+
+    cmd.parse(argc, argv);
+
     // Load App Settings
 #ifdef __linux__
     char result[PATH_MAX];
@@ -199,9 +208,14 @@ int main(int argc, char *argv[])
         appDir = std::filesystem::current_path().string();
     cfgDir = appDir;
 #endif
-    configFile = cfgDir;
-    configFile += std::filesystem::path::preferred_separator;
-    configFile += "flowcv_editor.cfg";
+    if (cfg_file_arg.getValue().empty()) {
+        configFile = cfgDir;
+        configFile += std::filesystem::path::preferred_separator;
+        configFile += "flowcv_editor.cfg";
+    }
+    else
+        configFile = cfg_file_arg.getValue();
+
     appSettings.configPath = configFile;
     ApplicationLoadSettings(appSettings);
 

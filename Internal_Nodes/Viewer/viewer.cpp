@@ -36,7 +36,7 @@ namespace DSPatch::DSPatchables
 
     void Viewer::UpdateGui(void *context, int interface)
     {
-        std::lock_guard<std::mutex> lck (io_mutex_);
+        std::lock_guard<std::mutex> lck(io_mutex_);
         auto *imCurContext = (ImGuiContext *)context;
         ImGui::SetCurrentContext(imCurContext);
 
@@ -52,22 +52,21 @@ namespace DSPatch::DSPatchables
         }
     }
 
-    void Viewer::Process_( SignalBus const& inputs, SignalBus& outputs )
-    {
+    void Viewer::Process_( SignalBus const& inputs, SignalBus& outputs ) {
         if (!IsEnabled())
             SetEnabled(true);
 
-        std::lock_guard<std::mutex> lck (io_mutex_);
-        auto in1 = inputs.GetValue<cv::Mat>( 0 );
-        if ( !in1 )
-        {
+        std::lock_guard<std::mutex> lck(io_mutex_);
+        auto in1 = inputs.GetValue<cv::Mat>(0);
+        if (!in1) {
             return;
         }
 
-        // Do something with Input
-        if (!in1->empty()) {
-            in1->copyTo(frame_);
+        try {
+            if (!in1->empty())
+                in1->copyTo(frame_);
         }
+        catch (const std::exception& e) { std::cout << e.what() << std::endl; }
     }
 
     std::string Viewer::GetState()

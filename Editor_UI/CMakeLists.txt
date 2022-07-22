@@ -2,6 +2,7 @@ project(FlowCV_Editor)
 
 include_directories(${CMAKE_SOURCE_DIR}/Internal_Nodes)
 include_directories(${CMAKE_SOURCE_DIR}/Managers)
+include_directories("${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/tclap/include")
 
 file(GLOB_RECURSE INTERNAL_SRC ${CMAKE_SOURCE_DIR}/Internal_Nodes/*.cpp)
 file(GLOB_RECURSE MANAGER_SRC ${CMAKE_SOURCE_DIR}/Managers/*.cpp)
