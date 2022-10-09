@@ -16,7 +16,6 @@ CTestTestfile.cmake
 _deps
 .vs/
 *.pdb
-*.lib
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
