@@ -13,7 +13,7 @@ if (WIN32)
 endif()
 
 if (UNIX AND NOT APPLE)
-    add_link_options(-fno-pie -no-pie)
+    add_link_options(-fno-pie -no-pie -Wl,--disable-new-dtags)
     set(STB_IMAGE_LIB stb_image)
     FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Node_Editor_Resource)
     FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Node_Editor/AppIcon.png DESTINATION ${CMAKE_BINARY_DIR}/Node_Editor_Resource/)
@@ -47,7 +47,23 @@ else()
             )
 endif()
 
-set_target_properties(${PROJECT_NAME}
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-        )
+if(WIN32)
+    set_target_properties(${PROJECT_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(${PROJECT_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            INSTALL_RPATH ${ORIGIN};./Plugins/OpenVino;./Plugins/RealSense;./Plugins/NDI
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(${PROJECT_NAME}
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            INSTALL_NAME_DIR ${ORIGIN};./Plugins/OpenVino;./Plugins/RealSense;./Plugins/NDI
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()
