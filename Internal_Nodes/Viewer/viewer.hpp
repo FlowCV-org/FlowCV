@@ -27,6 +27,7 @@ class Viewer final : public Component
 
   private:
     cv::Mat frame_;
+    bool has_update_;
     ImGuiOpenCvWindow viewer_;
     std::mutex io_mutex_;
 };

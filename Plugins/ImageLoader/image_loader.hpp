@@ -36,6 +36,11 @@ class DLLEXPORT ImageLoader final : public Component
     bool show_file_dialog_;
     std::string image_file_;
     imgui_addons::ImGuiFileBrowser file_dialog_;
+    int fps_;
+    int fps_index_;
+    float fps_time_{};
+    std::chrono::steady_clock::time_point last_time_;
+    std::mutex io_mutex_;
 };
 
 EXPORT_PLUGIN( ImageLoader )

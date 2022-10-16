@@ -29,6 +29,14 @@ class RndNoise final : public Component
     int width_;
     int height_;
     int mode_;
+    int tmp_width_;
+    int tmp_height_;
+    int tmp_mode_;
+    int fps_;
+    int fps_index_;
+    bool change_settings_;
+    float fps_time_{};
+    std::chrono::steady_clock::time_point last_time_;
     std::mutex io_mutex_;
 
 };
