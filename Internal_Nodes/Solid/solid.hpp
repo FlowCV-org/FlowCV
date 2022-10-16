@@ -1,9 +1,9 @@
 //
-// Plugin RndNoise
+// Plugin Solid
 //
 
-#ifndef FLOWCV_PLUGIN_RND_NOISE_HPP_
-#define FLOWCV_PLUGIN_RND_NOISE_HPP_
+#ifndef FLOWCV_PLUGIN_SOLID_HPP_
+#define FLOWCV_PLUGIN_SOLID_HPP_
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
 #include "imgui_wrapper.hpp"
@@ -13,10 +13,10 @@
 namespace DSPatch::DSPatchables
 {
 
-class RndNoise final : public Component
+class Solid final : public Component
 {
   public:
-    RndNoise();
+    Solid();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
@@ -26,21 +26,19 @@ class RndNoise final : public Component
     void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
 
   private:
-    int width_;
-    int height_;
-    int mode_;
-    int tmp_width_;
-    int tmp_height_;
-    int tmp_mode_;
+    std::mutex io_mutex_;
+    int width_{};
+    int height_{};
+    ImVec4 color_;
+    int grey_value_;
     int fps_;
     int fps_index_;
-    bool change_settings_;
     float fps_time_{};
     std::chrono::steady_clock::time_point last_time_;
-    std::mutex io_mutex_;
-
+    bool is_color_;
+    bool has_alpha_;
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_RND_NOISE_HPP_
+#endif //FLOWCV_PLUGIN_SOLID_HPP_

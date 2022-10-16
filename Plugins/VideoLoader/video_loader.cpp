@@ -59,72 +59,76 @@ void VideoLoader::Process_( SignalBus const& inputs, SignalBus& outputs )
     if (!IsEnabled())
         SetEnabled(true);
 
-    if (load_new_file_) {
-        load_new_file_ = false;
-        OpenSource();
-    }
+    std::lock_guard<std::mutex> lk(io_mutex_);
+        if (load_new_file_) {
+            load_new_file_ = false;
+            OpenSource();
+        }
 
-    std::lock_guard<std::mutex> lck(io_mutex_);
-    if (cap_.isOpened()) {
-        cv::Mat frame;
-        bool load_next_frame = false;
+        if (cap_.isOpened()) {
+            cv::Mat frame;
+            bool load_next_frame = false;
 
-        current_time_ = std::chrono::steady_clock::now();
-        auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
-        if (loop_) {
-            if (cur_frame_ >= frame_count_) {
-                cap_.set(cv::CAP_PROP_POS_FRAMES, 0);
-                cur_frame_ = 0;
-                start_ = true;
-                last_frame_ = 0;
-            }
-        }
-        else {
-            if (cur_frame_ == frame_count_ - 1) {
-                play_mode_ = Play_Mode_Stopped;
-            }
-        }
-        if (use_fps_ && play_mode_ == Play_Mode_Playing) {
-            if ((float) delta >= fps_time_) {
-                load_next_frame = true;
-                last_time_ = current_time_;
-            }
-        }
-        else {
-            if (play_mode_ == Play_Mode::Play_Mode_Stopped) {
-                if ((float)delta >= 0.02f) {
-                    load_next_frame = true;
-                    last_time_ = current_time_;
+            if (loop_) {
+                if (cur_frame_ >= frame_count_) {
+                    cap_.set(cv::CAP_PROP_POS_FRAMES, 0);
+                    cur_frame_ = 0;
+                    start_ = true;
+                    last_frame_ = 0;
+                }
+            } else {
+                if (cur_frame_ == frame_count_ - 1) {
+                    play_mode_ = Play_Mode_Stopped;
                 }
             }
-            else
+            if (use_fps_ && play_mode_ == Play_Mode_Playing) {
+                bool should_wait = true;
+                while(should_wait) {
+                    current_time_ = std::chrono::steady_clock::now();
+                    auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
+                    if (delta >= (uint32_t)fps_time_)
+                        should_wait = false;
+                }
                 load_next_frame = true;
-        }
-        if (load_next_frame) {
-            if (cur_frame_ == 0 || cur_frame_ == 1)
-                start_ = true;
-            else
-                start_ = false;
-            switch (play_mode_) {
-                case (int)Play_Mode_Playing:
-                    cap_.read(frame);
-                    cur_frame_ = (int) cap_.get(cv::CAP_PROP_POS_FRAMES);
-                    last_frame_ = cur_frame_;
-                    break;
-                case (int)Play_Mode_Stopped:
-                    cap_.set(cv::CAP_PROP_POS_FRAMES, last_frame_ - 1);
-                    cap_.read(frame);
-                    cur_frame_ = (int) cap_.get(cv::CAP_PROP_POS_FRAMES);
-                    break;
+                last_time_ = current_time_;
+            } else {
+
+                bool should_wait = true;
+                while(should_wait) {
+                    current_time_ = std::chrono::steady_clock::now();
+                    auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
+                    if (delta >= 16) // limit to 60 FPS when stopped and not using video FPS
+                        should_wait = false;
+                }
+                load_next_frame = true;
+                last_time_ = current_time_;
+
             }
-            if (!frame.empty()) {
-                outputs.SetValue(0, frame);
-                outputs.SetValue(1, start_);
-                outputs.SetValue(2, cur_frame_);
-                outputs.SetValue(3, fps_);
+            if (load_next_frame) {
+                if (cur_frame_ == 0 || cur_frame_ == 1)
+                    start_ = true;
+                else
+                    start_ = false;
+                switch (play_mode_) {
+                    case (int) Play_Mode_Playing:
+                        cap_.read(frame);
+                        cur_frame_ = (int) cap_.get(cv::CAP_PROP_POS_FRAMES);
+                        last_frame_ = cur_frame_;
+                        break;
+                    case (int) Play_Mode_Stopped:
+                        cap_.set(cv::CAP_PROP_POS_FRAMES, last_frame_ - 1);
+                        cap_.read(frame);
+                        cur_frame_ = (int) cap_.get(cv::CAP_PROP_POS_FRAMES);
+                        break;
+                }
+                if (!frame.empty()) {
+                    outputs.SetValue(0, frame);
+                    outputs.SetValue(1, start_);
+                    outputs.SetValue(2, cur_frame_);
+                    outputs.SetValue(3, fps_);
+                }
             }
         }
-    }
 
 }
 
@@ -139,7 +143,6 @@ bool VideoLoader::HasGui(int interface)
 
 void VideoLoader::OpenSource()
 {
-    std::lock_guard<std::mutex> lck(io_mutex_);
     if (cap_.isOpened())
         cap_.release();
 
@@ -188,7 +191,12 @@ void VideoLoader::UpdateGui(void *context, int interface)
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.35f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.7f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.8f));
-        if (ImGui::Button(CreateControlString("|<", GetInstanceName()).c_str(), ImVec2(32, 32))) { last_frame_ = 1; cap_.set(cv::CAP_PROP_POS_FRAMES, last_frame_); }
+        if (ImGui::Button(CreateControlString("|<", GetInstanceName()).c_str(), ImVec2(32, 32)))
+        {
+            std::lock_guard<std::mutex> lk(io_mutex_);
+            last_frame_ = 1;
+            cap_.set(cv::CAP_PROP_POS_FRAMES, last_frame_);
+        }
         ImGui::PopStyleColor(3);
         ImGui::SameLine();
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.35f));

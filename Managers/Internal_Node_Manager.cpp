@@ -165,6 +165,9 @@ InternalNodeManager::InternalNodeManager() {
     // Hough Lines
     node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::HoughLines>(DSPatch::DSPatchables::HoughLines()));
 
+    // Solid
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Solid>(DSPatch::DSPatchables::Solid()));
+
     // ...
 
     // Sort Nodes
@@ -403,6 +406,10 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
             // Hough Lines
             if (p.name == "Hough_Lines")
                 return std::make_shared<DSPatch::DSPatchables::HoughLines>();
+
+            // Solid
+            if (p.name == "Solid")
+                return std::make_shared<DSPatch::DSPatchables::Solid>();
 
             // ...
 
