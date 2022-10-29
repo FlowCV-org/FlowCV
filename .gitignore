@@ -1,6 +1,5 @@
-Build/
-cmake-build-release/
-cmake-build-debug/
+?uild/
+cmake-build*/
 FlowCV_SDK/third-party/opencv/
 .idea/
 CMakeLists.txt.user
@@ -24,4 +23,4 @@ _deps
 *.tlog
 *.recipe
 x64/
-Debug/
+?ebug/
