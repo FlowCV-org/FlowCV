@@ -549,7 +549,7 @@ void Application_Frame(FlowCV::FlowCV_Manager& flowMan, const AppSettings &setti
     //
     // Handle Keyboard Input
     static bool setTabFocusOnce = false;
-    if (appGlobals->allowEditorKeys && ImGui::GetActiveID() == 0) { // Fix to avoid shorcut keys triggering in other controls
+    if (appGlobals->allowEditorKeys && ImGui::GetActiveID() == 0 && ImGui::GetHoveredID() != 0) { // Fix to avoid shorcut keys triggering in other controls
         for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) {
             if (ImGui::IsKeyPressed(i)) {
                 if (!edGlobals->g_ShowTabSearchWin) {
