@@ -46,15 +46,19 @@ namespace DSPatch::DSPatchables
 
             std::string title = "Viewer_" + std::to_string(GetInstanceCount());
             if (!frame_.empty() && has_update_) {
-                io_mutex_.lock();
                 cv::Mat frame;
+                io_mutex_.lock();
                 frame_.copyTo(frame);
                 has_update_ = false;
                 io_mutex_.unlock();
                 viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
             }
             else {
-                viewer_.Update(title.c_str(), frame_, ImOpenCvWindowAspectFlag_LockH);
+                cv::Mat frame;
+                io_mutex_.lock();
+                frame_.copyTo(frame);
+                io_mutex_.unlock();
+                viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
             }
 
         }
