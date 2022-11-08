@@ -49,6 +49,9 @@
 #include "DepthViewer3d/depth_viewer_3D.hpp"
 #include "HoughLines/hough_lines.hpp"
 #include "Solid/solid.hpp"
+#include "LineIntersect/line_intersect.hpp"
+#include "PerspectiveWarp/perspective_warp.hpp"
+#include "Sharpen/sharpen.hpp"
 
 
 #endif //FLOWCV_INTERNAL_NODES_HPP_

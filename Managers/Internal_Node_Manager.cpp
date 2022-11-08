@@ -168,6 +168,15 @@ InternalNodeManager::InternalNodeManager() {
     // Solid
     node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Solid>(DSPatch::DSPatchables::Solid()));
 
+    // Line Intersect
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::LineIntersect>(DSPatch::DSPatchables::LineIntersect()));
+
+    // Perspective Warp
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::PerspectiveWarp>(DSPatch::DSPatchables::PerspectiveWarp()));
+
+    // Sharpen
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Sharpen>(DSPatch::DSPatchables::Sharpen()));
+
     // ...
 
     // Sort Nodes
@@ -410,6 +419,18 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
             // Solid
             if (p.name == "Solid")
                 return std::make_shared<DSPatch::DSPatchables::Solid>();
+
+            // Line Intersect
+            if (p.name == "Line_Intersections")
+                return std::make_shared<DSPatch::DSPatchables::LineIntersect>();
+
+            // Perspective Warp
+            if (p.name == "Perspective_Warp")
+                return std::make_shared<DSPatch::DSPatchables::PerspectiveWarp>();
+
+            // Sharpen
+            if (p.name == "Sharpen")
+                return std::make_shared<DSPatch::DSPatchables::Sharpen>();
 
             // ...
 
