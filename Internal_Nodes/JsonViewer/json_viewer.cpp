@@ -76,8 +76,15 @@ void JsonViewer::UpdateGui(void *context, int interface)
         ImGui::Begin(CreateControlString(title.c_str(), GetInstanceName()).c_str());
         ImGui::Checkbox(CreateControlString("Show Raw Data", GetInstanceName()).c_str(), &show_raw_out_);
         if (show_raw_out_) {
-            if (!json_data_.empty())
+            if (!json_data_.empty()) {
                 ImGui::TextUnformatted(json_data_.dump(4).c_str());
+                if (ImGui::BeginPopupContextItem("Copy Json")) {
+                    if (ImGui::Selectable("Copy JSON to Clipboard")) {
+                        ImGui::SetClipboardText(json_data_.dump(4).c_str());
+                    }
+                    ImGui::EndPopup();
+                }
+            }
         }
         else {
             if (!json_data_.empty()) {

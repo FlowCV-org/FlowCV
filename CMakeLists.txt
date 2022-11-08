@@ -22,7 +22,7 @@ include(${CMAKE_SOURCE_DIR}/CMake/DSPatchConfig.cmake)
 include(${CMAKE_SOURCE_DIR}/CMake/FlowCVConfig.cmake)
 
 # JSON
-include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/json)
+include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/nlohmann)
 
 if (BUILD_PLUGINS)
     # FlowCV Plugin Modules

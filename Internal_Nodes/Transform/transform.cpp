@@ -51,25 +51,21 @@ Transform::Transform()
 
 void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
 {
-    //std::lock_guard<std::mutex> lck (io_mutex_);
     // Input 1 Handler
     auto in1 = inputs.GetValue<cv::Mat>( 0 );
     if ( !in1 ) {
         return;
     }
 
-    // Do Something with Input
-    // For Example
     if (!in1->empty()) {
 
         if (IsEnabled()) {
             // Process Image
             cv::Mat frame_;
             in1->copyTo(frame_);
-
             frame_res_.x = frame_.cols;
             frame_res_.y = frame_.rows;
-            aspect_ratio_ = (float)frame_res_.y / (float)frame_res_.x;
+            aspect_ratio_ = (float) frame_res_.y / (float) frame_res_.x;
 
             // Flip
             if (flip_mode_ == 1)
@@ -147,11 +143,9 @@ void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
 
         } else {
             // Copy Original to Output (pass thru)
-            outputs.SetValue(0, in1);
+            outputs.SetValue(0, *in1);
         }
-
     }
-
 }
 
 bool Transform::HasGui(int interface)
@@ -167,7 +161,6 @@ bool Transform::HasGui(int interface)
 
 void Transform::UpdateGui(void *context, int interface)
 {
-    std::lock_guard<std::mutex> lck (io_mutex_);
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
 
@@ -221,12 +214,11 @@ void Transform::UpdateGui(void *context, int interface)
             scale_.y = scale_.x * aspect_ratio_;
         }
         else if (aspect_mode_ == 2) {
-            if (aspect_ratio_ > 0.0f)
+            if (aspect_ratio_ > 0.0f) {
                 scale_.x = scale_.y / aspect_ratio_;
+            }
         }
-
     }
-
 }
 
 std::string Transform::GetState()

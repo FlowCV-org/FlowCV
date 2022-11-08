@@ -16,7 +16,7 @@ struct Line
     cv::Point end;
 };
 
-std::optional<cv::Point> GetLineIntersection(const Line& l1, const Line& l2)
+static std::optional<cv::Point> GetLineIntersection(const Line& l1, const Line& l2)
 {
     cv::Point pInter = {0, 0};
 
@@ -40,7 +40,7 @@ std::optional<cv::Point> GetLineIntersection(const Line& l1, const Line& l2)
     return std::nullopt;
 }
 
-std::optional<Line> GetInsideLine(const Line& l1, int width, int height)
+static std::optional<Line> GetInsideLine(const Line& l1, int width, int height)
 {
     Line innerLine;
 
@@ -311,6 +311,7 @@ std::string HoughLines::GetState()
     lineColor["G"] = line_color_.y;
     lineColor["B"] = line_color_.z;
     state["line_color"] = lineColor;
+    state["line_thickness"] = line_thickness_;
 
     std::string stateSerialized = state.dump(4);
 
@@ -344,6 +345,8 @@ void HoughLines::SetState(std::string &&json_serialized)
         line_color_.y = state["line_color"]["G"].get<float>();
         line_color_.z = state["line_color"]["B"].get<float>();
     }
+    if (state.contains("line_thickness"))
+        line_thickness_ = state["line_thickness"].get<int>();
 
 }
 
