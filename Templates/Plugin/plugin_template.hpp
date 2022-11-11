@@ -6,6 +6,7 @@
 #define FLOWCV_PLUGIN_TEMPLATE_HPP_
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
+#include "FlowCV_Properties.hpp"
 #include "imgui_wrapper.hpp"
 #include "imgui_opencv.hpp"
 #include "json.hpp"
@@ -31,6 +32,7 @@ class DLLEXPORT PluginName final : public Component
 
   private:
     std::unique_ptr<internal::PluginName> p;
+    FlowCV::FlowCV_Properties props_;
 
 };
 
