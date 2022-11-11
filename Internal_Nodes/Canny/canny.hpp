@@ -6,6 +6,7 @@
 #define FLOWCV_PLUGIN_CANNY_HPP_
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
+#include "FlowCV_Properties.hpp"
 #include "imgui_wrapper.hpp"
 #include "imgui_opencv.hpp"
 #include "json.hpp"
@@ -26,12 +27,7 @@ class CannyFilter final : public Component
     void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
 
   private:
-    int kernel_size_;
-    int thresh_mode_;
-    int norm_type_;
-    float low_thresh_;
-    float high_thresh_;
-
+    FlowCV::FlowCV_Properties props_;
 };
 
 }  // namespace DSPatch::DSPatchables

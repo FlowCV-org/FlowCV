@@ -29,14 +29,13 @@ CannyFilter::CannyFilter()
     // 1 outputs
     SetOutputCount_( 1, {"out"}, {DSPatch::IoType::Io_Type_CvMat} );
 
-    thresh_mode_ = 0;
-    norm_type_ = 0;
-    low_thresh_ = 50;
-    high_thresh_ = 150;
-    kernel_size_ = 3;
+    props_.AddInt("kernel_size", "Sobel Apt Size", 3, 3, 7, 2.0f);
+    props_.AddOption("thresh_mode", "Threshold Mode", 0, {"Fixed", "Automatic"});
+    props_.AddOption("norm_type", "Gradient Mode", 0, {"L1 Norm", "L2 Norm"});
+    props_.AddFloat("low_thresh", "Low Threshold", 50.0f, 1.0f, 5000.0f, 0.1f);
+    props_.AddFloat("high_thresh", "High Threshold", 150.0f, 1.0f, 5000.0f, 0.1f);
 
     SetEnabled(true);
-
 }
 
 void CannyFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
@@ -49,6 +48,8 @@ void CannyFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
 
     if (!in1->empty()) {
         if (IsEnabled()) {
+            props_.Sync();
+
             // Process Image
             cv::Mat tmp, frame;
             if (in1->channels() > 1)
@@ -56,13 +57,15 @@ void CannyFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
             else
                 tmp = *in1;
 
-            if (thresh_mode_ == 1) {
+            auto low_thresh = props_.Get<float>("low_thresh");
+            auto high_thresh = props_.Get<float>("high_thresh");
+            if (props_.Get<int>("thresh_mode") == 1) {
                 cv::Scalar mean, dev;
                 cv::meanStdDev(tmp, mean, dev);
-                low_thresh_ = (float)(mean[0] - dev[0]);
-                high_thresh_ = (float)(mean[0] + dev[0]);
+                low_thresh = (float)(mean[0] - dev[0]);
+                high_thresh = (float)(mean[0] + dev[0]);
             }
-            cv::Canny(tmp, frame, low_thresh_, high_thresh_, kernel_size_, (bool)norm_type_);
+            cv::Canny(tmp, frame, low_thresh, high_thresh, props_.Get<int>("kernel_size"), (bool)props_.Get<int>("norm_type"));
             if (!frame.empty())
                 outputs.SetValue(0, frame);
 
@@ -89,24 +92,28 @@ void CannyFilter::UpdateGui(void *context, int interface)
     ImGui::SetCurrentContext(imCurContext);
 
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        ImGui::SetNextItemWidth(120);
-        if (ImGui::InputInt(CreateControlString("Sobel Apt Size", GetInstanceName()).c_str(), &kernel_size_, 2)) {
-            if (kernel_size_ < 3)
-                kernel_size_ = 3;
-            if ((kernel_size_ % 2) == 0)
-                kernel_size_++;
-            if (kernel_size_ > 7)
-                kernel_size_ = 7;
-        }
-        ImGui::SetNextItemWidth(120);
-        ImGui::Combo(CreateControlString("Threshold Mode", GetInstanceName()).c_str(), &thresh_mode_, "Fixed\0Automatic\0\0");
-        ImGui::SetNextItemWidth(120);
-        ImGui::Combo(CreateControlString("Gradient Mode", GetInstanceName()).c_str(), &norm_type_, "L1 Norm\0L2 Norm\0\0");
-        ImGui::SetNextItemWidth(120);
-        ImGui::DragFloat(CreateControlString("Low Threshold", GetInstanceName()).c_str(), &low_thresh_, 0.1f, 1.0f, 5000.0f, "%.2f" );
-        ImGui::SetNextItemWidth(120);
-        ImGui::DragFloat(CreateControlString("High Threshold", GetInstanceName()).c_str(), &high_thresh_, 0.1f, 1.0f, 5000.0f, "%.2f" );
+        props_.DrawUi(GetInstanceName());
 
+        // Show/Hide Low, High depending on mode
+        if (props_.Get<int>("thresh_mode") == 0) {
+            props_.SetVisibility("low_thresh", true);
+            props_.SetVisibility("high_thresh", true);
+        }
+        else {
+            props_.SetVisibility("low_thresh", false);
+            props_.SetVisibility("high_thresh", false);
+        }
+
+        // Ensure odd number kernel size
+        if (props_.Changed("kernel_size")) {
+            int ks = props_.GetW<int>("kernel_size");
+            if ((ks % 2) == 0) {
+                ks++;
+                if (ks > props_.GetMax<int>("kernel_size"))
+                    ks = props_.GetMax<int>("kernel_size");
+            }
+            props_.Set("kernel_size", ks);
+        }
     }
 
 }
@@ -117,11 +124,7 @@ std::string CannyFilter::GetState()
 
     json state;
 
-    state["kernel_size"] = kernel_size_;
-    state["thresh_mode"] = thresh_mode_;
-    state["norm_type"] = norm_type_;
-    state["low_thresh"] = low_thresh_;
-    state["high_thresh"] = high_thresh_;
+    props_.ToJson(state);
 
     std::string stateSerialized = state.dump(4);
 
@@ -134,31 +137,7 @@ void CannyFilter::SetState(std::string &&json_serialized)
 
     json state = json::parse(json_serialized);
 
-    if (state.contains("kernel_size")) {
-        if (state["kernel_size"].is_number()) {
-            kernel_size_ = state["kernel_size"].get<int>();
-        }
-    }
-    if (state.contains("thresh_mode")) {
-        if (state["thresh_mode"].is_number()) {
-            thresh_mode_ = state["thresh_mode"].get<int>();
-        }
-    }
-    if (state.contains("norm_type")) {
-        if (state["norm_type"].is_number()) {
-            norm_type_ = state["norm_type"].get<int>();
-        }
-    }
-    if (state.contains("low_thresh")) {
-        if (state["low_thresh"].is_number()) {
-            low_thresh_ = state["low_thresh"].get<float>();
-        }
-    }
-    if (state.contains("high_thresh")) {
-        if (state["high_thresh"].is_number()) {
-            high_thresh_ = state["high_thresh"].get<float>();
-        }
-    }
+    props_.FromJson(state);
 
 }
 

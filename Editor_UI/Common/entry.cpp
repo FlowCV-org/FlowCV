@@ -339,6 +339,7 @@ int main(int argc, char *argv[])
                 if (ImGui::BeginMenu("Load Recent")) {
                     for (auto path = appSettings.recentFiles.rbegin(); path != appSettings.recentFiles.rend(); ++path) {
                         if (ImGui::MenuItem(path->c_str())) {
+                            flowMan.StopAutoTick();
                             appGlobals->firstLoad = true;
                             std::fstream i(*path);
                             currently_opened_flow_file = *path;
@@ -351,6 +352,7 @@ int main(int argc, char *argv[])
                             appTitle += currently_opened_flow_file;
                             imgui.SetWindowTitle(appTitle.c_str());
                             appGlobals->stateHasChanged = false;
+                            flowMan.StartAutoTick();
                         }
                     }
                     ImGui::EndMenu();
@@ -459,6 +461,7 @@ int main(int argc, char *argv[])
 
         if(file_dialog.showFileDialog("Open File", imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310), ".flow", &appGlobals->showLoadDialog))
         {
+            flowMan.StopAutoTick();
             appGlobals->firstLoad = true;
             printf("OPEN[%s]\n", file_dialog.selected_path.c_str());
             AddFileToRecent(appSettings, file_dialog.selected_path);
@@ -480,9 +483,11 @@ int main(int argc, char *argv[])
             imgui.SetWindowTitle(appTitle.c_str());
             appGlobals->stateHasChanged = false;
             appGlobals->allowEditorKeys = true;
+            flowMan.StartAutoTick();
         }
 
         if (file_dialog.showFileDialog("Save As...", imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), ".flow", &appGlobals->showSaveDialog)) {
+            flowMan.StopAutoTick();
             if (file_dialog.selected_path.find(".flow") == std::string::npos)
                 file_dialog.selected_path += ".flow";
             printf("SAVE[%s]\n", file_dialog.selected_path.c_str());
@@ -490,6 +495,7 @@ int main(int argc, char *argv[])
             AddFileToRecent(appSettings, file_dialog.selected_path);
             appTitle = SaveFlowFile(imgui, flowMan, currently_opened_flow_file);
             appGlobals->allowEditorKeys = true;
+            flowMan.StartAutoTick();
         }
 
         if (!appGlobals->showSaveDialog && !appGlobals->showLoadDialog)
