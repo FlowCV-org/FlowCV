@@ -63,7 +63,6 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
 
     if (!in1->empty()) {
         if (IsEnabled()) {
-
             if (in1->channels() >= 3) {
                 // Check Mask
                 cv::Mat matMask;
@@ -71,7 +70,7 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                     matMask = cv::Mat(in1->rows, in1->cols, CV_8UC1, 255);
                 } else {
                     if (in1->size() != inMask->size()) {
-                        cv::resize(*inMask, matMask, in1->size());
+                        cv::resize(*inMask, matMask, cv::Size(in1->cols, in1->rows));
                     } else {
                         inMask->copyTo(matMask);
                     }
@@ -83,43 +82,65 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                 float high[3] = {color_range_high_.z, color_range_high_.y, color_range_high_.x};
                 for (int y = 0; y < in1->rows; y++) {
                     for (int x = 0; x < in1->cols; x++) {
-                        cv::Vec3b rgb = in1->at<cv::Vec3b>(y, x);
-                        float lum = ((float)(rgb[0] + rgb[1] + rgb[2]) / 3.0f) / 255.0f;
-                        for (int c = 0; c < 3; c++) {
-                            float val = (float)in1->at<cv::Vec3b>(y, x)[c] / 255.0f;
-                            if (matMask.at<uchar>(y, x) == 255) {
+                        cv::Vec3b rgb;
+                        cv::Vec4b rgba;
+                        float lum = 0.0f;
+                        if (matFrame.type() == CV_8UC3) {
+                            rgb = in1->at<cv::Vec3b>(y, x);
+                            lum = ((float)(rgb[0] + rgb[1] + rgb[2]) / 3.0f) / 255.0f;
+                        }
+                        else if (matFrame.type() == CV_8UC4) {
+                            rgba = in1->at<cv::Vec4b>(y, x);
+                            lum = ((float)(rgba[0] + rgba[1] + rgba[2]) / 3.0f) / 255.0f;
+                        }
+                        for (int c = 0; c < matFrame.channels(); c++) {
+                            float val = 0.0f;
+                            if (c < 3) {
+                                if (matFrame.type() == CV_8UC3)
+                                    val = (float) in1->at<cv::Vec3b>(y, x)[c] / 255.0f;
+                                else if (matFrame.type() == CV_8UC4)
+                                    val = (float) in1->at<cv::Vec4b>(y, x)[c] / 255.0f;
+                                if (matMask.at<uchar>(y, x) == 255) {
+                                    if (val >= low[c] && val <= high[c]) {
+                                        // Saturation
+                                        if (saturation_ > 1.0f || saturation_ < 1.0f)
+                                            val = (1.0f - saturation_) * lum + saturation_ * val;
 
-                                if (val >= low[c] && val <= high[c]) {
-                                    // Saturation
-                                    if (saturation_ > 1.0f || saturation_ < 1.0f)
-                                        val = (1.0f - saturation_) * lum + saturation_ * val;
+                                        // Gamma
+                                        if (gamma_ > 1.0f || gamma_ < 1.0f) {
+                                            // Use Cached LUT for faster calculation
+                                            uint8_t tmpVal = cv::saturate_cast<uchar>(val * 255.0f);
+                                            val = (float) lut_cache_[tmpVal] / 255.0f;
+                                        }
 
-                                    // Gamma
-                                    if (gamma_ > 1.0f || gamma_ < 1.0f) {
-                                        // Use Cached LUT for faster calculation
-                                        uint8_t tmpVal = cv::saturate_cast<uchar>(val * 255.0f);
-                                        val = (float) lut_cache_[tmpVal] / 255.0f;
+                                        // Contrast
+                                        if (contrast_ > 1.0f || contrast_ < 1.0f)
+                                            val = contrast_ * (val - 0.5f) + 0.5f;
+
+                                        // Gain
+                                        if (gain_ > 1.0f || gain_ < 1.0f)
+                                            val *= gain_;
+
+                                        // Brightness
+                                        if (brightness_ > 0.0f || brightness_ < 0.0f)
+                                            val += brightness_;
                                     }
-
-                                    // Contrast
-                                    if (contrast_ > 1.0f || contrast_ < 1.0f)
-                                        val = contrast_ * (val - 0.5f) + 0.5f;
-
-                                    // Gain
-                                    if (gain_ > 1.0f || gain_ < 1.0f)
-                                        val *= gain_;
-
-                                    // Brightness
-                                    if (brightness_ > 0.0f || brightness_ < 0.0f)
-                                        val += brightness_;
                                 }
+                                if (matFrame.type() == CV_8UC3)
+                                    matFrame.at<cv::Vec3b>(y, x)[c] = cv::saturate_cast<uchar>(val * 255.0f);
+                                else if (matFrame.type() == CV_8UC4)
+                                    matFrame.at<cv::Vec4b>(y, x)[c] = cv::saturate_cast<uchar>(val * 255.0f);
                             }
-                            matFrame.at<cv::Vec3b>(y, x)[c] = cv::saturate_cast<uchar>(val * 255.0f);
+                            else {
+                                matFrame.at<cv::Vec4b>(y, x)[c] = in1->at<cv::Vec4b>(y, x)[c];
+                            }
                         }
                     }
                 }
                 if (!matFrame.empty())
                     outputs.SetValue(0, matFrame);
+            } else {
+                outputs.SetValue(0, *in1);
             }
         } else {
             outputs.SetValue(0, *in1);

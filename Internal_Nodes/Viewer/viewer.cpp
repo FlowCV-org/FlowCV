@@ -28,6 +28,41 @@ namespace DSPatch::DSPatchables
         SetEnabled(true);
     }
 
+    void Viewer::Process_( SignalBus const& inputs, SignalBus& outputs ) {
+        if (!IsEnabled())
+            SetEnabled(true);
+
+        auto in1 = inputs.GetValue<cv::Mat>(0);
+        if (io_mutex_.try_lock()) {
+            if (!in1) {
+                std::chrono::steady_clock::time_point current_time_ = std::chrono::steady_clock::now();
+                auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_input_update_).count();
+                if (delta > 500) {
+                    if (!frame_.empty()) {
+                        frame_.setTo(cv::Scalar(0));
+                    }
+                    else {
+                        frame_ = cv::Mat(480, 640, CV_8UC3, cv::Scalar(0, 0, 0));
+                    }
+                    has_update_ = true;
+                    io_mutex_.unlock();
+                    return;
+                }
+            }
+            else {
+                try {
+                    if (!in1->empty()) {
+                        in1->copyTo(frame_);
+                        has_update_ = true;
+                        last_input_update_ = std::chrono::steady_clock::now();
+                    }
+                }
+                catch (const std::exception &e) { std::cout << e.what() << std::endl; }
+            }
+            io_mutex_.unlock();
+        }
+    }
+
     bool Viewer::HasGui(int interface)
     {
         if (interface == (int)FlowCV::GuiInterfaceType_Main) {
@@ -54,37 +89,8 @@ namespace DSPatch::DSPatchables
                 viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
             }
             else {
-                cv::Mat frame;
-                io_mutex_.lock();
-                frame_.copyTo(frame);
-                io_mutex_.unlock();
-                viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
+                viewer_.Update(title.c_str(), frame_, ImOpenCvWindowAspectFlag_LockH);
             }
-
-        }
-    }
-
-    void Viewer::Process_( SignalBus const& inputs, SignalBus& outputs ) {
-        if (!IsEnabled())
-            SetEnabled(true);
-
-        if (io_mutex_.try_lock()) {
-            auto in1 = inputs.GetValue<cv::Mat>(0);
-            if (!in1) {
-                frame_ = cv::Mat(480, 640, CV_8UC3, cv::Scalar(0, 0, 0));
-                has_update_ = true;
-                io_mutex_.unlock();
-                return;
-            }
-
-            try {
-                if (!in1->empty()) {
-                    in1->copyTo(frame_);
-                    has_update_ = true;
-                }
-            }
-            catch (const std::exception &e) { std::cout << e.what() << std::endl; }
-            io_mutex_.unlock();
         }
     }
 

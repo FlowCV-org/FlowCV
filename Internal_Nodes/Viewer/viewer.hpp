@@ -30,6 +30,7 @@ class Viewer final : public Component
     bool has_update_;
     ImGuiOpenCvWindow viewer_;
     std::mutex io_mutex_;
+    std::chrono::steady_clock::time_point last_input_update_;
 };
 
 }  // namespace DSPatch::DSPatchables
