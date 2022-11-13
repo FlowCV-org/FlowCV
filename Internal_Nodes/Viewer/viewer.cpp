@@ -38,13 +38,10 @@ namespace DSPatch::DSPatchables
                 std::chrono::steady_clock::time_point current_time_ = std::chrono::steady_clock::now();
                 auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_input_update_).count();
                 if (delta > 500) {
-                    if (!frame_.empty()) {
+                    if (!frame_.empty())
                         frame_.setTo(cv::Scalar(0));
-                    }
-                    else {
+                    else
                         frame_ = cv::Mat(480, 640, CV_8UC3, cv::Scalar(0, 0, 0));
-                    }
-                    has_update_ = true;
                     io_mutex_.unlock();
                     return;
                 }
@@ -89,6 +86,10 @@ namespace DSPatch::DSPatchables
                 viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
             }
             else {
+                cv::Mat frame;
+                io_mutex_.lock();
+                frame_.copyTo(frame);
+                io_mutex_.unlock();
                 viewer_.Update(title.c_str(), frame_, ImOpenCvWindowAspectFlag_LockH);
             }
         }
