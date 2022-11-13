@@ -29,56 +29,51 @@ Blur::Blur()
     // 1 output
     SetOutputCount_(1, {"out"}, {DSPatch::IoType::Io_Type_CvMat});
 
-    blur_amt_h_ = 1.0f;
-    blur_amt_v_ = 1.0f;
-    lock_h_v_ = false;
-    blur_mode_ = 0;
+    props_.AddOption("blur_mode", "Blur Type", 0, {"Box", "Gaussian", "Median", "Bilateral"});
+    props_.AddBool("lock_h_v", "Lock H & V", false);
+    props_.AddFloat("blur_amt_h", "Blur Amount H", 1.0f, 1.0f, 100.0f, 0.1f);
+    props_.AddFloat("blur_amt_v", "Blur Amount V", 1.0f, 1.0f, 100.0f, 0.1f);
 
     SetEnabled(true);
 }
 
-void Blur::Process_(SignalBus const &inputs, SignalBus &outputs) {
-
-    if (lock_h_v_)
-        blur_amt_v_ = blur_amt_h_;
+void Blur::Process_(SignalBus const &inputs, SignalBus &outputs)
+{
+    // Blur is multithreaded, it's better to wait and not process more than one call at a time
+    std::lock_guard<std::mutex> lck(mutex_lock_);
 
     auto in1 = inputs.GetValue<cv::Mat>(0);
     if (!in1) {
         return;
     }
 
-    // Do something with Input
     if (!in1->empty()) {
         if (IsEnabled()) {
+            props_.Sync();
+
             cv::Mat frame;
-            if (blur_mode_ == 0) {
-                if ((int)blur_amt_h_ <= 0)
-                    blur_amt_h_ = 1.0f;
-                if ((int)blur_amt_v_ <= 0)
-                    blur_amt_v_ = 1.0f;
-                cv::blur( *in1, frame, cv::Size( (int)blur_amt_h_, (int)blur_amt_v_ ), cv::Point(-1,-1) );
-            }
-            else if (blur_mode_ == 1) {
-                cv::GaussianBlur(*in1, frame, cv::Size(0, 0), blur_amt_h_, blur_amt_v_);
-            }
-            else if (blur_mode_ == 2) {
-                int kSize = (int)blur_amt_h_;
+            auto bh = props_.Get<float>("blur_amt_h");
+            auto bv = props_.Get<float>("blur_amt_v");
+            auto bm = props_.Get<int>("blur_mode");
+            if (props_.Get<bool>("lock_h_v"))
+                bv = bh;
+            if (bm == 0) {
+                cv::blur(*in1, frame, cv::Size((int)bh, (int)bv), cv::Point(-1, -1));
+            } else if (bm == 1) {
+                cv::GaussianBlur(*in1, frame, cv::Size(0, 0), bh, bv);
+            } else if (bm == 2) {
+                int kSize = (int)bh;
                 if ((kSize % 2) == 0)
                     kSize++;
-                cv::medianBlur(*in1, frame, kSize );
-            }
-            else if (blur_mode_ == 3) {
-                bilateralFilter(*in1, frame, (int)blur_amt_h_, blur_amt_h_*2, blur_amt_v_/2 );
+                cv::medianBlur(*in1, frame, kSize);
+            } else if (bm == 3) {
+                bilateralFilter(*in1, frame, (int)bh, bh * 2, bv / 2);
             }
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-        }
-        else
+        } else
             outputs.SetValue(0, *in1);
-
-
     }
-
 }
 
 bool Blur::HasGui(int interface) {
@@ -94,31 +89,37 @@ void Blur::UpdateGui(void *context, int interface) {
     ImGui::SetCurrentContext(imCurContext);
 
     if (interface == (int) FlowCV::GuiInterfaceType_Controls) {
-        ImGui::SetNextItemWidth(150);
-        ImGui::Combo(CreateControlString("Blur Type", GetInstanceName()).c_str(), &blur_mode_, "Box\0Gaussian\0Median\0Bilateral\0\0");
-        ImGui::Checkbox(CreateControlString("Lock H & V", GetInstanceName()).c_str(), &lock_h_v_);
-        if (blur_mode_ != 3) {
-            if (blur_mode_ != 2)
-                ImGui::Text("Amt H:");
+        // Draw properties (in order added)
+        props_.DrawUi(GetInstanceName());
+
+        // Additional UI logic
+        if (props_.GetW<int>("blur_mode") < 2) {
+            props_.SetDescription("blur_amt_h", "Blur Amount H");
+            props_.SetDescription("blur_amt_v", "Blur Amount V");
+            props_.SetVisibility("lock_h_v", true);
+            if (props_.GetW<bool>("lock_h_v"))
+                props_.SetVisibility("blur_amt_v", false);
             else
-                ImGui::Text("Amt:");
+                props_.SetVisibility("blur_amt_v", true);
+        } else if (props_.GetW<int>("blur_mode") == 2) {
+            props_.SetDescription("blur_amt_h", "Blur Amount");
+            props_.SetVisibility("blur_amt_v", false);
+            props_.Set("lock_h_v", false);
+            props_.SetVisibility("lock_h_v", false);
+        } else if (props_.GetW<int>("blur_mode") == 3) {
+            props_.SetDescription("blur_amt_h", "Color");
+            props_.SetDescription("blur_amt_v", "Space");
+            props_.Set("lock_h_v", false);
+            props_.SetVisibility("lock_h_v", false);
+            props_.SetVisibility("blur_amt_v", true);
         }
-        else
-            ImGui::Text("Color:");
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(150);
-        ImGui::SliderFloat(CreateControlString("H", GetInstanceName()).c_str(), &blur_amt_h_, 0.001f, 100.0f);
-        if (blur_mode_ != 2) {
-            if (blur_mode_ != 3)
-                ImGui::Text("Amt V:");
+        if (props_.GetW<int>("blur_mode") != 2) {
+            if (props_.GetW<bool>("lock_h_v"))
+                props_.SetVisibility("blur_amt_v", false);
             else
-                ImGui::Text("Space:");
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(150);
-            ImGui::SliderFloat(CreateControlString("V", GetInstanceName()).c_str(), &blur_amt_v_, 0.001f, 100.0f);
+                props_.SetVisibility("blur_amt_v", true);
         }
     }
-
 }
 
 std::string Blur::GetState() {
@@ -126,10 +127,7 @@ std::string Blur::GetState() {
 
     json state;
 
-    state["blur_amt_h"] = blur_amt_h_;
-    state["blur_amt_v"] = blur_amt_v_;
-    state["blur_mode"] = blur_mode_;
-    state["lock_h_v"] = lock_h_v_;
+    props_.ToJson(state);
 
     std::string stateSerialized = state.dump(4);
 
@@ -141,26 +139,7 @@ void Blur::SetState(std::string &&json_serialized) {
 
     json state = json::parse(json_serialized);
 
-    if (state.contains("blur_amt_h")) {
-        if (state["blur_amt_h"].is_number_float()) {
-            blur_amt_h_ = state["blur_amt_h"].get<float>();
-        }
-    }
-    if (state.contains("blur_amt_v")) {
-        if (state["blur_amt_v"].is_number_float()) {
-            blur_amt_v_ = state["blur_amt_v"].get<float>();
-        }
-    }
-    if (state.contains("blur_mode")) {
-        if (state["blur_mode"].is_number()) {
-            blur_mode_ = state["blur_mode"].get<int>();
-        }
-    }
-    if (state.contains("lock_h_v")) {
-        if (state["lock_h_v"].is_boolean()) {
-            lock_h_v_ = state["lock_h_v"].get<bool>();
-        }
-    }
+    props_.FromJson(state);
 
 }
 

@@ -63,6 +63,7 @@ class FlowCV_Properties
     void SetMax(std::string &&key, float value);
     void SetStep(std::string &&key, float value);
     void SetVisibility(std::string &&key, bool show);
+    void SetDescription(std::string &&key, std::string&& desc);
     void SetToDefault(std::string &&key);
     void SetAllToDefault();
     bool Exists(const std::string &key);

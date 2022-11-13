@@ -6,6 +6,7 @@
 #define FLOWCV_BLUR_HPP_
 #include <DSPatch.h>
 #include <FlowCV_Types.hpp>
+#include <FlowCV_Properties.hpp>
 #include "imgui_wrapper.hpp"
 #include "imgui_opencv.hpp"
 #include "json.hpp"
@@ -26,10 +27,9 @@ class Blur final : public Component
     void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
 
   private:
-    float blur_amt_h_;
-    float blur_amt_v_;
-    bool lock_h_v_;
-    int blur_mode_;
+    std::mutex mutex_lock_;
+    FlowCV::FlowCV_Properties props_;
+
 };
 
 }  // namespace DSPatch::DSPatchables

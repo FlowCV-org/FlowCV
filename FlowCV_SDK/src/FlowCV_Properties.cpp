@@ -284,6 +284,13 @@ void FlowCV_Properties::SetVisibility(std::string &&key, bool show)
     }
 }
 
+void FlowCV_Properties::SetDescription(std::string &&key, std::string&& desc)
+{
+    if (prop_idx.find(key) != prop_idx.end()) {
+        props_->at(prop_idx.at(key)).desc = desc;
+    }
+}
+
 void FlowCV_Properties::SetToDefault(std::string &&key)
 {
     if (prop_idx.find(key) != prop_idx.end()) {
