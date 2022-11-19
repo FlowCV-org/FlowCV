@@ -158,7 +158,7 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
         return;
     }
 
-    std::lock_guard<std::mutex> lck (io_mutex_);
+    std::lock_guard<std::mutex> lck(io_mutex_);
     if (!inDepth->empty()) {
 
         cv::flip(*inDepth, depth_frame_, 1);

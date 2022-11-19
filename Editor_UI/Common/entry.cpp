@@ -66,6 +66,12 @@ void ApplicationSettingsDialog(AppSettings &settings, bool &windowState)
         if (settings.flowBufferCount < 1)
             settings.flowBufferCount = 1;
     }
+    if (ImGui::Checkbox("Use VSync", &settings.useVSync)) {
+        if (settings.useVSync)
+            glfwSwapInterval(1);
+        else
+            glfwSwapInterval(0);
+    }
     ImGui::Checkbox("Show FPS", &settings.showFPS);
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -160,6 +166,7 @@ int main(int argc, char *argv[])
     appSettings.recentListSize = 8;
     appSettings.flowBufferCount = 1;
     appSettings.showFPS = false;
+    appSettings.useVSync = false;
 
     CmdLine cmd("FlowCV Node Editor", ' ', FLOWCV_EDITOR_VERSION_STR);
     ValueArg<std::string> cfg_file_arg("c", "cfg", "Default Config File Override", false, "", "string");
@@ -266,6 +273,12 @@ int main(int argc, char *argv[])
     appGlobals->selectedId = 0;
 
     std::string currently_opened_flow_file;
+
+    io.DeltaTime = 0.008333; // Default FPS = 120
+    if (appSettings.useVSync)
+        glfwSwapInterval(1);
+    else
+        glfwSwapInterval(0);
 
     // Main loop
     bool closeOnceGood = false;
@@ -395,7 +408,7 @@ int main(int argc, char *argv[])
                     system(op.c_str());
                 }
                 ImGui::Separator();
-                ImGui::MenuItem("About", NULL, &showAboutDialog);
+                ImGui::MenuItem("About", nullptr, &showAboutDialog);
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();

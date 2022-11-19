@@ -90,7 +90,7 @@ namespace DSPatch::DSPatchables
                 io_mutex_.lock();
                 frame_.copyTo(frame);
                 io_mutex_.unlock();
-                viewer_.Update(title.c_str(), frame_, ImOpenCvWindowAspectFlag_LockH);
+                viewer_.Update(title.c_str(), frame, ImOpenCvWindowAspectFlag_LockH);
             }
         }
     }
