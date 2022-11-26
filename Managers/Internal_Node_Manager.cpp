@@ -177,6 +177,12 @@ InternalNodeManager::InternalNodeManager() {
     // Sharpen
     node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Sharpen>(DSPatch::DSPatchables::Sharpen()));
 
+    // Split
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Split>(DSPatch::DSPatchables::Split()));
+
+    // Combine
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Combine>(DSPatch::DSPatchables::Combine()));
+
     // ...
 
     // Sort Nodes
@@ -431,6 +437,14 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
             // Sharpen
             if (p.name == "Sharpen")
                 return std::make_shared<DSPatch::DSPatchables::Sharpen>();
+
+            // Split
+            if (p.name == "Split")
+                return std::make_shared<DSPatch::DSPatchables::Split>();
+
+            // Combine
+            if (p.name == "Combine")
+                return std::make_shared<DSPatch::DSPatchables::Combine>();
 
             // ...
 

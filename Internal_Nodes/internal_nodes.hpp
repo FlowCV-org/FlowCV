@@ -52,6 +52,8 @@
 #include "LineIntersect/line_intersect.hpp"
 #include "PerspectiveWarp/perspective_warp.hpp"
 #include "Sharpen/sharpen.hpp"
+#include "Split/split.hpp"
+#include "Combine/combine.hpp"
 
 
 #endif //FLOWCV_INTERNAL_NODES_HPP_
