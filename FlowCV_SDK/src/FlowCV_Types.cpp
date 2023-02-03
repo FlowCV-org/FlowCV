@@ -18,7 +18,7 @@ namespace DSPatch
             {Category::Category_Transform, "Transform"},
             {Category::Category_Views, "Views"},
             {Category::Category_Feature_Detection, "Feature Detection"},
-            {Category::Category_Object_Detection, "Object Detection"},
+            {Category::Category_DNN, "DNN"},
             {Category::Category_OpenVino, "OpenVino"},
             {Category::Category_Utility, "Utility"},
             {Category::Category_Other, "Other"},

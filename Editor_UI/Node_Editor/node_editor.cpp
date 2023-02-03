@@ -63,7 +63,7 @@ bool FindStringCaseInsensitive(const std::string & str, const std::string & strS
 
 const char* Application_GetName()
 {
-    return "FlowCV - Node Editor";
+    return "FlowCV - Node Editor (Beta)";
 }
 
 void Application_Initialize(std::string& appPath)
@@ -343,7 +343,7 @@ ImU32 GetNodeColor(DSPatch::Category cat)
         case DSPatch::Category::Category_Transform:             return IM_COL32(179, 76, 25, 128);
         case DSPatch::Category::Category_Views:                 return IM_COL32(76, 128, 51, 128);
         case DSPatch::Category::Category_Feature_Detection:     return IM_COL32(204, 128, 76, 128);
-        case DSPatch::Category::Category_Object_Detection:      return IM_COL32(187, 119, 255, 128);
+        case DSPatch::Category::Category_DNN:                   return IM_COL32(187, 119, 255, 128);
         case DSPatch::Category::Category_OpenVino:              return IM_COL32(74, 196, 202, 128);
         case DSPatch::Category::Category_Utility:              return IM_COL32(111, 46, 158, 128);
         case DSPatch::Category::Category_Other:                 return IM_COL32(191, 191, 191, 128);

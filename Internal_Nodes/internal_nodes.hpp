@@ -54,6 +54,12 @@
 #include "Sharpen/sharpen.hpp"
 #include "Split/split.hpp"
 #include "Combine/combine.hpp"
-
+#include "DNN/dnn_image_classification.hpp"
+#include "DNN/dnn_object_detection.hpp"
+#include "DNN/dnn_segmentation.hpp"
+#include "DNN/dnn_human_pose.hpp"
+#include "DNN/dnn_text_detection.hpp"
+#include "DNN/dnn_text_recognition.hpp"
+#include "DNN/dnn_image_processing.hpp"
 
 #endif //FLOWCV_INTERNAL_NODES_HPP_

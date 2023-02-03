@@ -98,7 +98,10 @@ void internal::Plugin::LoadPlugin( std::string const& pluginPath )
 {
     // open library
 #ifdef _WIN32
-    handle = LoadLibraryEx(pluginPath.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    handle = LoadLibraryEx(pluginPath.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+    if (handle == nullptr) {
+        handle = LoadLibraryEx(pluginPath.c_str(), nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR);
+    }
 #else
     handle = dlopen( pluginPath.c_str(), RTLD_NOW );
 #endif
