@@ -1,4 +1,4 @@
-?uild/
+?uild*/
 cmake-build*/
 FlowCV_SDK/third-party/opencv/
 .idea/
@@ -14,6 +14,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 .vs/
+.vscode/
 *.pdb
 *.vcxproj
 *.vcxproj.filters

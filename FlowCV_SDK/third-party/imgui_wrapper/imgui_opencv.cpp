@@ -13,7 +13,7 @@ ImGuiOpenCvWindow::ImGuiOpenCvWindow()
     set_once_ = true;
     channel_select_ = 0;
     color_map_select_ = 2;
-    color_scale_ = 0.15;
+    color_scale_ = 0.15f;
     window_flags_ = ImOpenCvWindowAspectFlag_LockW;
 }
 
@@ -268,7 +268,7 @@ void ImGuiOpenCvWindow::Update(const char *title, cv::Mat &frame, ImOpenCvWindow
     ImGui::Image((ImTextureID)image_texture_, ImVec2((float)winWidth, (float)winHeight));
 
     // Color Inspector Tooltip Overlay
-    ImGui:ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     if (io.KeyCtrl) {
         ImVec2 rect_min = ImGui::GetItemRectMin();
         ImVec2 mouse_uv_coord = io.MousePos;
