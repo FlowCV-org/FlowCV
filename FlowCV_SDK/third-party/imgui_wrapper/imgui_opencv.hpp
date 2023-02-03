@@ -38,7 +38,7 @@ class ImGuiOpenCvWindow
 
   private:
     ImGuiOpencvWindowData window_data_{};
-    GLuint image_texture_{};
+    unsigned int image_texture_{};
     cv::Mat frame_;
     bool keep_aspect_{};
     bool init_texture_once_{};
