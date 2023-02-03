@@ -16,6 +16,7 @@ endif()
 add_executable(${PROJECT_NAME} headless_process_engine.cpp
         ${CMAKE_SOURCE_DIR}/Editor_UI/Common/app_settings.cpp
         ${IMGUI_SRC}
+        ${FlowCV_SRC}
         ${DSPatch_SRC}
         ${IMGUI_WRAPPER_SRC}
         ${IMGUI_OPENCV_SRC}
