@@ -1,0 +1,19 @@
+---
+BasedOnStyle: Google
+IndentWidth: 4
+---
+Language: Cpp
+AccessModifierOffset: -2
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+# BreakBeforeBraces: Mozilla
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+# ColumnLimit: 100
+DerivePointerAlignment: false
+DisableFormat: false
+PointerAlignment: Right
+SortIncludes: true
+UseTab: Never
