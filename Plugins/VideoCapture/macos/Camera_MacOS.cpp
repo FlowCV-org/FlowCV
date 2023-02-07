@@ -29,7 +29,6 @@ namespace cam_macos {
             return deviceMap;
         }
 
-        int camIndex = -1;
         int camCount = 0;
 
         while ((device = IOIteratorNext(iter)))
@@ -44,7 +43,6 @@ namespace cam_macos {
             }
             IOObjectRelease(device);
         }
-        //std::cout << camCount << std::endl;
 
         matchingDict = IOServiceMatching(kIOUSBDeviceClassName);
         kr = IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, &iter);
