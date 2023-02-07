@@ -48,12 +48,29 @@ target_link_libraries(
         ${IMGUI_LIBS}
         ${OpenCV_LIBS}
 )
-set_target_properties(
-        UdpSend
+if(WIN32)
+set_target_properties(UdpSend
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         SUFFIX ".fp"
         )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(UdpSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_RPATH "${ORIGIN}"
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(UdpSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_NAME_DIR "${ORIGIN}"
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()
 
 # TCP Send
 add_library(
@@ -70,12 +87,29 @@ target_link_libraries(
         ${IMGUI_LIBS}
         ${OpenCV_LIBS}
 )
-set_target_properties(
-        TcpSend
+if(WIN32)
+set_target_properties(TcpSend
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         SUFFIX ".fp"
         )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(TcpSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_RPATH "${ORIGIN}"
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(TcpSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_NAME_DIR "${ORIGIN}"
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()
 
 # Serial Send
 add_library(
@@ -106,12 +140,29 @@ target_link_libraries(
         ${SER_ENUM_LIB}
 )
 endif()
-set_target_properties(
-        SerialSend
+if(WIN32)
+set_target_properties(SerialSend
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         SUFFIX ".fp"
-)
+        )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(SerialSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_RPATH "${ORIGIN}"
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(SerialSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_NAME_DIR "${ORIGIN}"
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()
 
 # OSC Send
 add_library(
@@ -129,12 +180,29 @@ target_link_libraries(
         ${IMGUI_LIBS}
         ${OpenCV_LIBS}
 )
-set_target_properties(
-        OscSend
+if(WIN32)
+set_target_properties(OscSend
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         SUFFIX ".fp"
-)
+        )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(OscSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_RPATH "${ORIGIN}"
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(OscSend
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_NAME_DIR "${ORIGIN}"
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()
 
 # CSV File
 add_library(
@@ -151,9 +219,26 @@ target_link_libraries(
         ${IMGUI_LIBS}
         ${OpenCV_LIBS}
 )
-set_target_properties(
-        CsvFile
+if(WIN32)
+set_target_properties(CsvFile
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         SUFFIX ".fp"
-)
+        )
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(CsvFile
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_RPATH "${ORIGIN}"
+            BUILD_WITH_INSTALL_RPATH ON
+            )
+elseif(APPLE)
+    set_target_properties(CsvFile
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            SUFFIX ".fp"
+            INSTALL_NAME_DIR "${ORIGIN}"
+            BUILD_WITH_INSTALL_NAME_DIR ON
+            )
+endif()

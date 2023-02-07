@@ -19,7 +19,6 @@ namespace DSPatch
             {Category::Category_Views, "Views"},
             {Category::Category_Feature_Detection, "Feature Detection"},
             {Category::Category_DNN, "DNN"},
-            {Category::Category_OpenVino, "OpenVino"},
             {Category::Category_Utility, "Utility"},
             {Category::Category_Other, "Other"},
             {Category::Category_Experimental, "Experimental"}
