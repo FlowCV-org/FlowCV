@@ -24,6 +24,8 @@ void ApplicationLoadSettings(AppSettings &settings)
                     settings.recentFiles.emplace_back(path.get<std::string>());
                 }
             }
+            if (j.contains("use_vsync"))
+                settings.useVSync = j["use_vsync"].get<bool>();
             if (j.contains("show_fps"))
                 settings.showFPS = j["show_fps"].get<bool>();
             if (j.contains("buffer_count"))
@@ -55,6 +57,9 @@ void ApplicationSaveSettings(const AppSettings &settings)
 
     if (settings.showFPS)
         j["show_fps"] = settings.showFPS;
+
+    if (settings.useVSync)
+        j["use_vsync"] = settings.useVSync;
 
     if (settings.flowBufferCount > 1)
         j["buffer_count"] = settings.flowBufferCount;

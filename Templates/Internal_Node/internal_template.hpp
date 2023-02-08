@@ -6,6 +6,7 @@
 #define FLOWCV_PLUGIN_TEMPLATE_HPP_
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
+#include "FlowCV_Properties.hpp"
 #include "imgui_wrapper.hpp"
 #include "imgui_opencv.hpp"
 #include "json.hpp"
@@ -26,7 +27,7 @@ class PluginName final : public Component
     void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
 
   private:
-
+    FlowCV::FlowCV_Properties props_;
 };
 
 }  // namespace DSPatch::DSPatchables

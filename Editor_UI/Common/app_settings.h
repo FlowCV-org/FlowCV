@@ -18,6 +18,7 @@ struct AppSettings
     int recentListSize;
     std::deque<std::string> recentFiles;
     bool showFPS;
+    bool useVSync;
     int flowBufferCount;
 };
 

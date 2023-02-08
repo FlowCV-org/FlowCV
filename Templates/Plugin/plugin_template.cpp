@@ -34,13 +34,19 @@ PluginName::PluginName()
     // 1 outputs
     SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
 
-    SetEnabled(true);
+    // Add Props Here, Bool (checkbox), Int, Float, Options (ComboBox)
+    // Example:
+    // props_.AddInt("key", "description", init_default_value, min_value, max_value, step_value, ui_visible);
 
+    SetEnabled(true);
 }
 
 void PluginName::Process_( SignalBus const& inputs, SignalBus& outputs )
 {
     // Handle Input Code Here
+
+    // Thread safe property sync from UI
+    props_.Sync();
 
     // Handle Output Code Here
 
@@ -64,7 +70,10 @@ void PluginName::UpdateGui(void *context, int interface)
     // When Creating Strings for Controls use: CreateControlString("Text Here", GetInstanceCount()).c_str()
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
+        // Draw Property Controls (will be drawn in order added)
+        props_.DrawUi(GetInstanceName());
 
+        // Add additional UI property logic here
     }
 
 }
@@ -74,6 +83,9 @@ std::string PluginName::GetState()
     using namespace nlohmann;
 
     json state;
+
+    // Convert properties to JSON
+    props_.ToJson(state);
 
     std::string stateSerialized = state.dump(4);
 
@@ -86,5 +98,7 @@ void PluginName::SetState(std::string &&json_serialized)
 
     json state = json::parse(json_serialized);
 
+    // Set Properties from JSON
+    props_.FromJson(state);
 
 }

@@ -34,7 +34,7 @@ enum class Category
     Category_Transform,
     Category_Views,
     Category_Feature_Detection,
-    Category_Object_Detection,
+    Category_DNN,
     Category_OpenVino,
     Category_Utility,
     Category_Other,

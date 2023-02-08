@@ -29,11 +29,10 @@ Sharpen::Sharpen()
     // 1 outputs
     SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
 
-    sharpen_mode_ = 0;
-    max_amt_ = 3;
+    props_.AddOption("sharpen_mode", "Sharpen Mode", 0, {"Mode 1", "Mode 2"});
+    props_.AddInt("sharpen_amt", "Sharpen", 0, 0, 3, 0.25f);
 
     SetEnabled(true);
-
 }
 
 void Sharpen::Process_( SignalBus const& inputs, SignalBus& outputs )
@@ -48,21 +47,24 @@ void Sharpen::Process_( SignalBus const& inputs, SignalBus& outputs )
         cv::Mat frame;
 
         if (IsEnabled()) {
+            props_.Sync();
+
             // Process Image
-            if (sharpen_mode_ == 0) {
+            int amt = props_.Get<int>("sharpen_amt");
+            if (props_.Get<int>("sharpen_mode") == 0) {
                 cv::Mat kernel3 = cv::Mat_<double>(3,3);
-                if (sharpen_amt_ >= 1) {
-                    if (sharpen_amt_ == 1) {
+                if (amt >= 1) {
+                    if (amt == 1) {
                         kernel3.at<double>(0, 0) = 0.0; kernel3.at<double>(0, 1) = -1.0; kernel3.at<double>(0, 2) = 0.0;
                         kernel3.at<double>(1, 0) = -1.0; kernel3.at<double>(1, 1) = 5.0; kernel3.at<double>(1, 2) = -1.0;
                         kernel3.at<double>(2, 0) = 0.0; kernel3.at<double>(2, 1) = -1.0; kernel3.at<double>(2, 2) = 0.0;
                     }
-                    if (sharpen_amt_ == 2) {
+                    if (amt == 2) {
                         kernel3.at<double>(0, 0) = -1.0; kernel3.at<double>(0, 1) = -1.0; kernel3.at<double>(0, 2) = -1.0;
                         kernel3.at<double>(1, 0) = -1.0; kernel3.at<double>(1, 1) = 9.0; kernel3.at<double>(1, 2) = -1.0;
                         kernel3.at<double>(2, 0) = -1.0; kernel3.at<double>(2, 1) = -1.0; kernel3.at<double>(2, 2) = -1.0;
                     }
-                    if (sharpen_amt_ == 3) {
+                    if (amt == 3) {
                         kernel3.at<double>(0, 0) = -2.0; kernel3.at<double>(0, 1) = -2.0; kernel3.at<double>(0, 2) = -2.0;
                         kernel3.at<double>(1, 0) = -2.0; kernel3.at<double>(1, 1) = 17.0; kernel3.at<double>(1, 2) = -2.0;
                         kernel3.at<double>(2, 0) = -2.0; kernel3.at<double>(2, 1) = -2.0; kernel3.at<double>(2, 2) = -2.0;
@@ -78,14 +80,14 @@ void Sharpen::Process_( SignalBus const& inputs, SignalBus& outputs )
                 cv::Mat lapFrame;
                 if (in1->channels() > 1) {
                     cv::cvtColor(*in1, tmp_frame, cv::COLOR_BGR2GRAY);
-                    cv::Laplacian(tmp_frame, tmp_frame, -1, 3, (float) -sharpen_amt_, 0.0, cv::BORDER_DEFAULT);
+                    cv::Laplacian(tmp_frame, tmp_frame, -1, 3, (float) -amt, 0.0, cv::BORDER_DEFAULT);
                 }
                 else {
-                    cv::Laplacian(*in1, tmp_frame, -1, 3, (float) -sharpen_amt_, 0.0, cv::BORDER_DEFAULT);
+                    cv::Laplacian(*in1, tmp_frame, -1, 3, (float) -amt, 0.0, cv::BORDER_DEFAULT);
                 }
                 cv::Mat to_color;
                 cv::cvtColor(tmp_frame, to_color, cv::COLOR_GRAY2BGR);
-                cv::addWeighted(*in1, 1.0, to_color, (float)sharpen_amt_, 0.0, frame);
+                cv::addWeighted(*in1, 1.0, to_color, (float)amt, 0.0, frame);
             }
         } else {
             in1->copyTo(frame);
@@ -113,22 +115,15 @@ void Sharpen::UpdateGui(void *context, int interface)
     ImGui::SetCurrentContext(imCurContext);
 
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        ImGui::SetNextItemWidth(120);
-        if (ImGui::Combo(CreateControlString("Sharpen Mode", GetInstanceName()).c_str(), &sharpen_mode_, "Mode 1\0Mode 2\0\0")) {
-            if (sharpen_mode_ == 0)
-                max_amt_ = 3;
-            else
-                max_amt_ = 5;
-            if (sharpen_amt_ > max_amt_)
-                sharpen_amt_ = max_amt_;
+        props_.DrawUi(GetInstanceName());
+
+        if (props_.GetW<int>("sharpen_mode") == 0) {
+            props_.SetMax("sharpen_amt", 3);
+            if (props_.GetW<int>("sharpen_amt") > props_.GetMax<int>("sharpen_amt"))
+                props_.Set("sharpen_amt", props_.GetMax<int>("sharpen_amt"));
         }
-        ImGui::SetNextItemWidth(100);
-        if (ImGui::InputInt(CreateControlString("Sharpen", GetInstanceName()).c_str(), &sharpen_amt_, 1)) {
-            if (sharpen_amt_ < 0)
-                sharpen_amt_ = 0;
-            else if (sharpen_amt_ > max_amt_)
-                sharpen_amt_ = max_amt_;
-        }
+        else
+            props_.SetMax("sharpen_amt", 5);
     }
 }
 
@@ -138,8 +133,7 @@ std::string Sharpen::GetState()
 
     json state;
 
-    state["sharpen_mode"] = sharpen_mode_;
-    state["sharpen_amt"] = sharpen_amt_;
+    props_.ToJson(state);
 
     std::string stateSerialized = state.dump(4);
 
@@ -152,10 +146,7 @@ void Sharpen::SetState(std::string &&json_serialized)
 
     json state = json::parse(json_serialized);
 
-    if (state.contains("sharpen_mode"))
-        sharpen_mode_ = state["sharpen_mode"].get<int>();
-    if (state.contains("sharpen_amt"))
-        sharpen_amt_ = state["sharpen_amt"].get<int>();
+    props_.FromJson(state);
 
 }
 

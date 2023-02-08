@@ -177,6 +177,33 @@ InternalNodeManager::InternalNodeManager() {
     // Sharpen
     node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Sharpen>(DSPatch::DSPatchables::Sharpen()));
 
+    // Split
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Split>(DSPatch::DSPatchables::Split()));
+
+    // Combine
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Combine>(DSPatch::DSPatchables::Combine()));
+
+    // DNN - Classification
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Classification>(DSPatch::DSPatchables::Classification()));
+
+    // DNN - Object Detection
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::ObjectDetection>(DSPatch::DSPatchables::ObjectDetection()));
+
+    // DNN - Segmentation
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::Segmentation>(DSPatch::DSPatchables::Segmentation()));
+
+    // DNN - Human Pose
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::HumanPose>(DSPatch::DSPatchables::HumanPose()));
+
+    // DNN - Text Detection
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::TextDetection>(DSPatch::DSPatchables::TextDetection()));
+
+    // DNN - Text Recognition
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::TextRecognition>(DSPatch::DSPatchables::TextRecognition()));
+
+    // DNN - Image Processing
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::ImageProcessing>(DSPatch::DSPatchables::ImageProcessing()));
+
     // ...
 
     // Sort Nodes
@@ -431,6 +458,42 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
             // Sharpen
             if (p.name == "Sharpen")
                 return std::make_shared<DSPatch::DSPatchables::Sharpen>();
+
+            // Split
+            if (p.name == "Split")
+                return std::make_shared<DSPatch::DSPatchables::Split>();
+
+            // Combine
+            if (p.name == "Combine")
+                return std::make_shared<DSPatch::DSPatchables::Combine>();
+
+            // DNN - Classification
+            if (p.name == "Classification")
+                return std::make_shared<DSPatch::DSPatchables::Classification>();
+
+            // DNN - Object Detection
+            if (p.name == "Object_Detection")
+                return std::make_shared<DSPatch::DSPatchables::ObjectDetection>();
+
+            // DNN - Segmentation
+            if (p.name == "Segmentation")
+                return std::make_shared<DSPatch::DSPatchables::Segmentation>();
+
+            // DNN - Human Pose
+            if (p.name == "Human_Pose")
+                return std::make_shared<DSPatch::DSPatchables::HumanPose>();
+
+            // DNN - Text Detection
+            if (p.name == "Text_Detection")
+                return std::make_shared<DSPatch::DSPatchables::TextDetection>();
+
+            // DNN - Text Recognition
+            if (p.name == "Text_Recognition")
+                return std::make_shared<DSPatch::DSPatchables::TextRecognition>();
+
+            // DNN - Image Processing
+            if (p.name == "Image_Processing")
+                return std::make_shared<DSPatch::DSPatchables::ImageProcessing>();
 
             // ...
 
