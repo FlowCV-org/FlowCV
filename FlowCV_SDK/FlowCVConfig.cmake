@@ -10,7 +10,7 @@ set(FLOWCV_VERSION_STATUS "")
 
 set(FLOWCV_PROJ_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-option(DOWNLOAD_OPENCV_PACKAGE "Download OpenCV Package" ON)
+option(USE_LOCAL_OPENCV_PACKAGE "Use locally OpenCV Package" ON)
 
 include(${FLOWCV_PROJ_DIR}/CMake/ImGuiConfig.cmake)
 include(${FLOWCV_PROJ_DIR}/CMake/FlowCVConfig.cmake)

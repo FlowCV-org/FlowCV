@@ -4,11 +4,16 @@ project(OpenCV_Dataflow_Framework)
 set(CMAKE_CXX_STANDARD 17)
 
 # Options
-option(DOWNLOAD_OPENCV_PACKAGE "Download OpenCV Package" ON)
-option(BUILD_EXAMPLES "Build Examples" OFF)
-option(BUILD_PLUGINS "Build Plugins" OFF)
-option(BUILD_EDITOR "Build Editor" OFF)
-option(BUILD_ENGINE "Build Engine" OFF)
+option(USE_LOCAL_OPENCV_PACKAGE "Use locally OpenCV Package" ON)
+option(BUILD_EXAMPLES "Build Examples" ON)
+option(BUILD_PLUGINS "Build Plugins" ON)
+option(BUILD_EDITOR "Build Editor" ON)
+option(BUILD_ENGINE "Build Engine" ON)
+
+set(CMAKE_DEBUG_POSTFIX "d")
+set(CMAKE_RELEASE_POSTFIX "")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
+set(CMAKE_MINSIZEREL_POSTFIX "s")
 
 # Include all modules by default, modify based on your project needs
 include(${CMAKE_SOURCE_DIR}/CMake/ImGuiOpenCvConfig.cmake)
@@ -35,8 +40,6 @@ if (BUILD_PLUGINS)
     add_subdirectory(./Plugins/SimpleBlobTracker)
     add_subdirectory(./Plugins/DataOutput)
     add_subdirectory(./Plugins/ImageWriter)
-
-
 endif()
 
 if (BUILD_ENGINE)
