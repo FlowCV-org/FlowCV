@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(OpenCV_Dataflow_Framework)
 
 set(CMAKE_CXX_STANDARD 17)
