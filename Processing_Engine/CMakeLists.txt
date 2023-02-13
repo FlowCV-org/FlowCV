@@ -37,24 +37,3 @@ else()
             pthread
             )
 endif()
-
-if(WIN32)
-    set_target_properties(${PROJECT_NAME}
-            PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-            )
-elseif(UNIX AND NOT APPLE)
-    set_target_properties(${PROJECT_NAME}
-            PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-            INSTALL_RPATH "${ORIGIN};./;./Plugins/OpenVino;./Plugins/RealSense;./Plugins/NDI;./Plugins/OakCamera"
-            BUILD_WITH_INSTALL_RPATH ON
-            )
-elseif(APPLE)
-    set_target_properties(${PROJECT_NAME}
-            PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-            INSTALL_NAME_DIR "${ORIGIN};./;./Plugins/OpenVino;./Plugins/RealSense;./Plugins/NDI;./Plugins/OakCamera"
-            BUILD_WITH_INSTALL_NAME_DIR ON
-            )
-endif()
