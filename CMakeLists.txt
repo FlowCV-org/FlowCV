@@ -8,6 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 
+# When compiling with Release, the console window is not generated
+if(WIN32)
+  if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+  else()
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows")
+  endif(MSVC)
+endif(WIN32)
+
 # Options
 option(USE_LOCAL_OPENCV_PACKAGE "Use locally OpenCV Package" ON)
 option(BUILD_EXAMPLES "Build Examples" ON)
