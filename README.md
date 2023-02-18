@@ -14,7 +14,7 @@
 
 FlowCV is a free open source dataflow framework for computer vision processing workflows.
 
-![flowcv_ui](https://media.githubusercontent.com/media/FlowCV-org/FlowCV_Documentation/main/flowcv/src/images/flowcv_ui.jpg)
+[![Intro Video](https://media.githubusercontent.com/media/FlowCV-org/FlowCV_Documentation/main/flowcv/src/images/flowcv_ui.jpg)](https://www.youtube.com/watch?v=-4Yosc7vefo "Intro Video")
 
 **Key Features:**
 * Free and Open Source
