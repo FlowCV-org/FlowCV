@@ -8,21 +8,24 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 
-# When compiling with Release, the console window is not generated
-if(WIN32)
-  if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-  else()
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows")
-  endif(MSVC)
-endif(WIN32)
-
 # Options
 option(USE_LOCAL_OPENCV_PACKAGE "Use locally OpenCV Package" ON)
+option(USE_LOG_WINDOW "Use the command line window to display the log" ON)
 option(BUILD_EXAMPLES "Build Examples" ON)
 option(BUILD_PLUGINS "Build Plugins" ON)
 option(BUILD_EDITOR "Build Editor" ON)
 option(BUILD_ENGINE "Build Engine" ON)
+
+if(NOT USE_LOG_WINDOW)
+  # When compiling with Release, the console window is not generated
+  if(WIN32)
+    if(MSVC)
+      set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    else()
+      set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mwindows")
+    endif(MSVC)
+  endif(WIN32)
+endif()
 
 # Set Output Path
 include(GNUInstallDirs)
