@@ -1,7 +1,17 @@
 # OpenCV Configuration
 message(STATUS "Adding OpenCV CMake Config")
 
-if ((NOT USE_LOCAL_OPENCV_PACKAGE))
+if (USE_LOCAL_OPENCV_PACKAGE)
+    find_package(OpenCV)
+    if(OpenCV_FOUND)
+        message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}, OpenCV_DIR: ${OpenCV_DIR}")
+    else()
+        message(WARNING "Opencv Package NOT Found")
+        set(USE_LOCAL_OPENCV_PACKAGE OFF)
+    endif()
+endif()
+
+if (NOT USE_LOCAL_OPENCV_PACKAGE)
     if (WIN32)
         if (NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
             message(FATAL_ERROR "Only 64-bit supported on Windows")
@@ -46,15 +56,4 @@ if ((NOT USE_LOCAL_OPENCV_PACKAGE))
     else()
         message(FATAL_ERROR "No OpenCV Detected Please Install OpenCV System Package")
     endif()
-
-else()
-    find_package(OpenCV)
 endif()
-
-if(OpenCV_FOUND)
-    message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}, OpenCV_DIR: ${OpenCV_DIR}")
-else()
-    message(FATAL_ERROR "Opencv Package NOT Found")
-endif()
-
-# include_directories(${OpenCV_INCLUDE_DIRS}) # Not needed for CMake >= 2.8.11

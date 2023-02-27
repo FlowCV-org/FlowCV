@@ -1,7 +1,17 @@
 # OpenCV Configuration
 message(STATUS "Adding ImGUI OpenCV CMake Config")
 
-if ((NOT USE_LOCAL_OPENCV_PACKAGE))
+if (USE_LOCAL_OPENCV_PACKAGE)
+    find_package(OpenCV)
+    if(OpenCV_FOUND)
+        message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}, OpenCV_DIR: ${OpenCV_DIR}")
+    else()
+        message(WARNING "Opencv Package NOT Found")
+        set(USE_LOCAL_OPENCV_PACKAGE OFF)
+    endif()
+endif()
+
+if (NOT USE_LOCAL_OPENCV_PACKAGE)
     if (WIN32)
         if (NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
             message(FATAL_ERROR "Only 64-bit supported on Windows")
@@ -39,25 +49,14 @@ if ((NOT USE_LOCAL_OPENCV_PACKAGE))
         set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/opencv/build/cmake")
         find_package(OpenCV REQUIRED PATHS ${OpenCV_DIR})
 
-        # file(GLOB files "${OpenCV_DIR}/../bin/*.dll")
-        # foreach(file_cv ${files})
-        #     file(COPY "${file_cv}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
-        # endforeach()
+        file(GLOB files "${OpenCV_DIR}/../bin/*.dll")
+        foreach(file_cv ${files})
+            file(COPY "${file_cv}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
+        endforeach()
     else()
         message(FATAL_ERROR "No OpenCV Detected Please Install OpenCV System Package")
     endif()
-
-else()
-    find_package(OpenCV)
 endif()
-
-if(OpenCV_FOUND)
-    message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}, OpenCV_DIR: ${OpenCV_DIR}")
-else()
-    message(FATAL_ERROR "Opencv Package NOT Found")
-endif()
-
-# include_directories(${OpenCV_INCLUDE_DIRS}) # Not needed for CMake >= 2.8.11
 
 set(IMGUI_OPENCV_DIR ${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/imgui_wrapper)
 list(APPEND IMGUI_OPENCV_SRC "${IMGUI_OPENCV_DIR}/imgui_opencv.cpp")
