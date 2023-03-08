@@ -38,13 +38,13 @@ target_link_libraries(
 if(WIN32)
 set_target_properties(${PROJECT_NAME}
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
         SUFFIX ".fp"
         )
 elseif(UNIX AND NOT APPLE)
     set_target_properties(${PROJECT_NAME}
             PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
             SUFFIX ".fp"
             INSTALL_RPATH "${ORIGIN}"
             BUILD_WITH_INSTALL_RPATH ON
@@ -52,7 +52,7 @@ elseif(UNIX AND NOT APPLE)
 elseif(APPLE)
     set_target_properties(${PROJECT_NAME}
             PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Plugins"
             SUFFIX ".fp"
             INSTALL_NAME_DIR "${ORIGIN}"
             BUILD_WITH_INSTALL_NAME_DIR ON
