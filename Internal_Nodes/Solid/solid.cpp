@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Solid::Solid()
-    : Component( ProcessOrder::InOrder )
+Solid::Solid() : Component(ProcessOrder::InOrder)
 {
     // Name and Category
     SetComponentName_("Solid");
@@ -27,7 +26,7 @@ Solid::Solid()
     SetInputCount_(0);
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     width_ = 640;
     height_ = 480;
@@ -41,15 +40,14 @@ Solid::Solid()
     fps_time_ = (1.0f / (float)fps_) * 1000.0f;
 
     SetEnabled(true);
-
 }
 
-void Solid::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Solid::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
 
-    if (io_mutex_.try_lock()) { // Try lock so other threads will skip if locked instead of waiting
+    if (io_mutex_.try_lock()) {  // Try lock so other threads will skip if locked instead of waiting
         bool should_wait = true;
-        while(should_wait) {
+        while (should_wait) {
             std::chrono::steady_clock::time_point current_time_ = std::chrono::steady_clock::now();
             auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
             if (delta >= (uint32_t)fps_time_)
@@ -61,7 +59,8 @@ void Solid::Process_( SignalBus const& inputs, SignalBus& outputs )
                 frame = cv::Mat(height_, width_, CV_8UC4, cv::Scalar(color_.z * 255, color_.y * 255, color_.x * 255, color_.w * 255));
             else
                 frame = cv::Mat(height_, width_, CV_8UC3, cv::Scalar(color_.z * 255, color_.y * 255, color_.x * 255));
-        } else {
+        }
+        else {
             frame = cv::Mat(height_, width_, CV_8UC1, cv::Scalar(grey_value_));
         }
         outputs.SetValue(0, frame);
@@ -92,14 +91,14 @@ void Solid::UpdateGui(void *context, int interface)
         if (is_color_) {
             ImGui::SetNextItemWidth(100);
             ImGui::Checkbox(CreateControlString("Has Alpha", GetInstanceName()).c_str(), &has_alpha_);
-            //ImGui::SetNextItemWidth(300);
+            // ImGui::SetNextItemWidth(300);
             if (has_alpha_)
-                ImGui::ColorEdit4(CreateControlString("Solid Color", GetInstanceName()).c_str(), (float *) &color_);
+                ImGui::ColorEdit4(CreateControlString("Solid Color", GetInstanceName()).c_str(), (float *)&color_);
             else
-                ImGui::ColorEdit3(CreateControlString("Solid Color", GetInstanceName()).c_str(), (float *) &color_);
+                ImGui::ColorEdit3(CreateControlString("Solid Color", GetInstanceName()).c_str(), (float *)&color_);
         }
         else {
-            //ImGui::SetNextItemWidth(100);
+            // ImGui::SetNextItemWidth(100);
             ImGui::SliderInt(CreateControlString("Solid Value", GetInstanceName()).c_str(), &grey_value_, 0, 255);
         }
         ImGui::SetNextItemWidth(100);
@@ -119,7 +118,6 @@ void Solid::UpdateGui(void *context, int interface)
             fps_time_ = (1.0f / (float)fps_) * 1000.0f;
         }
     }
-
 }
 
 std::string Solid::GetState()
@@ -141,7 +139,6 @@ std::string Solid::GetState()
     state["fps_index"] = fps_index_;
     state["is_color"] = is_color_;
     state["has_alpha"] = has_alpha_;
-
 
     std::string stateSerialized = state.dump(4);
 
@@ -174,7 +171,6 @@ void Solid::SetState(std::string &&json_serialized)
         is_color_ = state["is_color"].get<int>();
     if (state.contains("has_alpha"))
         has_alpha_ = state["has_alpha"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

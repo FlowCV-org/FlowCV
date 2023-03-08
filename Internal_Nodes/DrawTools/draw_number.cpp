@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-DrawNumber::DrawNumber()
-    : Component( ProcessOrder::OutOfOrder )
+DrawNumber::DrawNumber() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Draw_Number");
@@ -24,10 +23,10 @@ DrawNumber::DrawNumber()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 4, {"in", "bool", "int", "float"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float} );
+    SetInputCount_(4, {"in", "bool", "int", "float"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     text_scale_ = 1.0f;
     text_pos_ = {10, 30};
@@ -36,20 +35,18 @@ DrawNumber::DrawNumber()
     text_font_ = 0;
 
     SetEnabled(true);
-
 }
 
-void DrawNumber::Process_( SignalBus const& inputs, SignalBus& outputs )
+void DrawNumber::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<bool>( 1 );
-    auto in3 = inputs.GetValue<int>( 2 );
-    auto in4 = inputs.GetValue<float>( 3 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<bool>(1);
+    auto in3 = inputs.GetValue<int>(2);
+    auto in4 = inputs.GetValue<float>(3);
+    if (!in1) {
         return;
     }
-
 
     if (!in1->empty()) {
         if (IsEnabled()) {
@@ -69,13 +66,13 @@ void DrawNumber::Process_( SignalBus const& inputs, SignalBus& outputs )
             else if (in4) {
                 outStr = std::to_string(*in4);
             }
-            cv::putText(frame, outStr, text_pos_, text_font_, text_scale_,
-                        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+            cv::putText(
+                frame, outStr, text_pos_, text_font_, text_scale_, cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
 
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -100,7 +97,7 @@ void DrawNumber::UpdateGui(void *context, int interface)
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         ImGui::Combo(CreateControlString("Font", GetInstanceName()).c_str(), &text_font_,
-                     "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
+            "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
         ImGui::Separator();
         ImGui::Text("Position:");
         ImGui::SetNextItemWidth(80);
@@ -115,9 +112,8 @@ void DrawNumber::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Thickness", GetInstanceName()).c_str(), &text_thickness_, 0.1f);
         ImGui::Separator();
-        ImGui::ColorEdit3(CreateControlString("Color", GetInstanceName()).c_str(), (float*)&text_color_);
+        ImGui::ColorEdit3(CreateControlString("Color", GetInstanceName()).c_str(), (float *)&text_color_);
     }
-
 }
 
 std::string DrawNumber::GetState()
@@ -167,4 +163,4 @@ void DrawNumber::SetState(std::string &&json_serialized)
         text_font_ = state["font"].get<int>();
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

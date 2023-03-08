@@ -23,7 +23,7 @@ class Threshold final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int thresh_method_;
@@ -34,9 +34,8 @@ class Threshold final : public Component
     int adapt_block_;
     ImVec4 hsv_low_;
     ImVec4 hsv_high_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_THRESHOLD_HPP_
+#endif  // FLOWCV_PLUGIN_THRESHOLD_HPP_

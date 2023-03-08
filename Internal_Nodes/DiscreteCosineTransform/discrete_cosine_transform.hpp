@@ -23,7 +23,7 @@ class DiscreteCosineTransform final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int mode_;
@@ -31,4 +31,4 @@ class DiscreteCosineTransform final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_DISCRETE_COSINE_TRANSFORM_HPP_
+#endif  // FLOWCV_PLUGIN_DISCRETE_COSINE_TRANSFORM_HPP_

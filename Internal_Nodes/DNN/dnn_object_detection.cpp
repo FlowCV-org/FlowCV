@@ -14,8 +14,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-ObjectDetection::ObjectDetection()
-    : Component( ProcessOrder::OutOfOrder )
+ObjectDetection::ObjectDetection() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Object_Detection");
@@ -26,10 +25,10 @@ ObjectDetection::ObjectDetection()
     global_inst_counter++;
 
     // 1 input
-    SetInputCount_( 1, {"in1"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in1"}, {IoType::Io_Type_CvMat});
 
     // 1 output
-    SetOutputCount_( 2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // Set Defaults
     text_pos_ = cv::Point2i(10, 40);
@@ -52,7 +51,6 @@ ObjectDetection::ObjectDetection()
     target_list_ = dnn_backend_helper_.GetTargetList();
 
     SetEnabled(true);
-
 }
 
 void ObjectDetection::InitDnn_()
@@ -90,7 +88,7 @@ void ObjectDetection::InitDnn_()
     needs_reinit_ = false;
 }
 
-void ObjectDetection::DrawPredictions_(int classId, float conf, cv::Rect box, cv::Mat& frame)
+void ObjectDetection::DrawPredictions_(int classId, float conf, cv::Rect box, cv::Mat &frame)
 {
     std::string label;
     if (!class_list_.empty()) {
@@ -104,22 +102,22 @@ void ObjectDetection::DrawPredictions_(int classId, float conf, cv::Rect box, cv
     }
 
     rectangle(frame, cv::Point(box.x, box.y), cv::Point(box.x + box.width, box.y + box.height),
-              cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
 
     int baseLine;
     cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, text_scale_, text_thickness_, &baseLine);
 
     box.y = cv::max(box.y, labelSize.height);
     rectangle(frame, cv::Point(box.x + text_pos_.x, (box.y - labelSize.height) + text_pos_.y),
-              cv::Point((box.x + labelSize.width) + text_pos_.x, (box.y + baseLine) + text_pos_.y), cv::Scalar::all(64), cv::FILLED);
+        cv::Point((box.x + labelSize.width) + text_pos_.x, (box.y + baseLine) + text_pos_.y), cv::Scalar::all(64), cv::FILLED);
     putText(frame, label, cv::Point(box.x + text_pos_.x, box.y + text_pos_.y), cv::FONT_HERSHEY_SIMPLEX, text_scale_,
-            cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
 }
 
-void ObjectDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ObjectDetection::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -145,7 +143,7 @@ void ObjectDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
             try {
                 cv::dnn::blobFromImage(frame, blob, 1.0, modelSize, cv::Scalar(), swap_rb_, crop_, CV_8U);
                 net_->setInput(blob, "", scale_, cv::Scalar(mean_[0], mean_[1], mean_[2]));
-                if (net_->getLayer(0)->outputNameToIndex("im_info") != -1) { // Faster-RCNN or R-FCN
+                if (net_->getLayer(0)->outputNameToIndex("im_info") != -1) {  // Faster-RCNN or R-FCN
                     cv::resize(frame, frame, modelSize);
                     cv::Mat imInfo = (cv::Mat_<float>(1, 3) << modelSize.height, modelSize.width, 1.6f);
                     net_->setInput(imInfo, "im_info");
@@ -166,8 +164,8 @@ void ObjectDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
             std::vector<cv::Rect> boxes;
 
             if (outLayerType == "Region") {
-                for (auto & out : outs) {
-                    auto data = (float*)out.data;
+                for (auto &out : outs) {
+                    auto data = (float *)out.data;
                     for (int j = 0; j < out.rows; ++j, data += out.cols) {
                         cv::Mat scores = out.row(j).colRange(5, out.cols);
                         cv::Point classIdPoint;
@@ -189,27 +187,27 @@ void ObjectDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
                 }
             }
             else if (outLayerType == "DetectionOutput") {
-                for (auto & out : outs) {
-                    auto* data = (float*)out.data;
+                for (auto &out : outs) {
+                    auto *data = (float *)out.data;
                     for (size_t i = 0; i < out.total(); i += 7) {
                         float confidence = data[i + 2];
                         if (confidence > conf_thresh_) {
-                            int left   = (int)data[i + 3];
-                            int top    = (int)data[i + 4];
-                            int right  = (int)data[i + 5];
+                            int left = (int)data[i + 3];
+                            int top = (int)data[i + 4];
+                            int right = (int)data[i + 5];
                             int bottom = (int)data[i + 6];
-                            int width  = right - left + 1;
+                            int width = right - left + 1;
                             int height = bottom - top + 1;
                             if (width <= 2 || height <= 2) {
-                                left   = (int)(data[i + 3] * (float)orig.cols);
-                                top    = (int)(data[i + 4] * (float)orig.rows);
-                                right  = (int)(data[i + 5] * (float)orig.cols);
+                                left = (int)(data[i + 3] * (float)orig.cols);
+                                top = (int)(data[i + 4] * (float)orig.rows);
+                                right = (int)(data[i + 5] * (float)orig.cols);
                                 bottom = (int)(data[i + 6] * (float)orig.rows);
-                                width  = right - left + 1;
+                                width = right - left + 1;
                                 height = bottom - top + 1;
                             }
                             if (data[i + 1] > 0) {
-                                classIds.emplace_back((int) (data[i + 1]) - 1);  // Skip 0th background class id.
+                                classIds.emplace_back((int)(data[i + 1]) - 1);  // Skip 0th background class id.
                                 boxes.emplace_back(left, top, width, height);
                                 confidences.emplace_back(confidence);
                             }
@@ -275,7 +273,8 @@ void ObjectDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
                 json_out["data"] = detected;
             outputs.SetValue(1, json_out);
             outputs.SetValue(0, orig);
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -317,11 +316,13 @@ void ObjectDetection::UpdateGui(void *context, int interface)
                 InitDnn_();
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Backend", GetInstanceName()).c_str(),
-                             &dnn_backend_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&backend_list_, (int)backend_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Backend", GetInstanceName()).c_str(), &dnn_backend_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&backend_list_, (int)backend_list_.size())) {
                 // Update and get Target List
                 current_backend_ = backend_list_.at(dnn_backend_idx_).second;
                 dnn_backend_helper_.UpdateTargetList(backend_list_.at(dnn_backend_idx_).second);
@@ -331,11 +332,13 @@ void ObjectDetection::UpdateGui(void *context, int interface)
                 needs_reinit_ = true;
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Target", GetInstanceName()).c_str(),
-                             &dnn_target_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&target_list_, (int)target_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Target", GetInstanceName()).c_str(), &dnn_target_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&target_list_, (int)target_list_.size())) {
                 current_target_ = target_list_.at(dnn_target_idx_).second;
                 needs_reinit_ = true;
             }
@@ -359,14 +362,11 @@ void ObjectDetection::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", model_path_.c_str());
 
-        if(show_model_dialog_)
+        if (show_model_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Model", GetInstanceName()).c_str());
 
-        if(model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()),
-                                        imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                        ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net",
-                                        &show_model_dialog_))
-        {
+        if (model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net", &show_model_dialog_)) {
             model_path_ = model_dialog_.selected_path;
             show_model_dialog_ = false;
             needs_reinit_ = true;
@@ -381,14 +381,11 @@ void ObjectDetection::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", config_path_.c_str());
 
-        if(show_config_dialog_)
+        if (show_config_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Config", GetInstanceName()).c_str());
 
-        if(config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()),
-                                         imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                         ImVec2(700, 310), ".prototxt,.txt,.pbtxt,.yml,.cfg,.xml",
-                                         &show_config_dialog_))
-        {
+        if (config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".prototxt,.txt,.pbtxt,.yml,.cfg,.xml", &show_config_dialog_)) {
             config_path_ = config_dialog_.selected_path;
             show_config_dialog_ = false;
             needs_reinit_ = true;
@@ -408,14 +405,11 @@ void ObjectDetection::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", classes_path_.c_str());
 
-        if(show_classes_dialog_)
+        if (show_classes_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Classes", GetInstanceName()).c_str());
 
-        if(classes_dialog_.showFileDialog(CreateControlString("Set Classes", GetInstanceName()),
-                                          imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                          ImVec2(700, 310), ".txt",
-                                          &show_classes_dialog_))
-        {
+        if (classes_dialog_.showFileDialog(CreateControlString("Set Classes", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".txt", &show_classes_dialog_)) {
             classes_path_ = classes_dialog_.selected_path;
             show_classes_dialog_ = false;
             needs_reinit_ = true;
@@ -457,10 +451,9 @@ void ObjectDetection::UpdateGui(void *context, int interface)
             ImGui::SetNextItemWidth(80);
             ImGui::DragInt(CreateControlString("Text Thickness", GetInstanceName()).c_str(), &text_thickness_, 0.1f, 1, 10);
             ImGui::Separator();
-            ImGui::ColorEdit3(CreateControlString("Text Color", GetInstanceName()).c_str(), (float *) &text_color_);
+            ImGui::ColorEdit3(CreateControlString("Text Color", GetInstanceName()).c_str(), (float *)&text_color_);
         }
     }
-
 }
 
 std::string ObjectDetection::GetState()
@@ -603,7 +596,6 @@ void ObjectDetection::SetState(std::string &&json_serialized)
         std::lock_guard<std::mutex> lk(io_mutex_);
         InitDnn_();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

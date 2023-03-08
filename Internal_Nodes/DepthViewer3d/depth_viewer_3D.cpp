@@ -10,50 +10,51 @@ using namespace DSPatchables;
 static int32_t global_inst_counter = 0;
 
 // Vertex Shader source code
-static const char* vtxShaderSource = "#version 330 core\n"
-                              "layout (location = 0) in vec3 aPos;\n"
-                              "layout (location = 1) in vec4 aColor;\n"
-                              "layout (location = 2) in vec3 aNormal;\n"
-                              "out vec4 color;\n"
-                              "out vec3 Normal;\n"
-                              "out vec3 viewDir;\n"
-                              "out float shade;\n"
-                              "uniform float isShade;\n"
-                              "uniform float size;\n"
-                              "uniform mat4 model;\n"
-                              "uniform mat4 view;\n"
-                              "uniform mat4 proj;\n"
-                              "void main()\n"
-                              "{\n"
-                              "   vec4 vd = vec4(0.0, 0.0, -1.0, 1.0) * view;\n"
-                              "   gl_Position = proj * view * model * vec4(size * aPos.x, size * aPos.y, size * aPos.z, 1.0);\n"
-                              "   color = aColor;\n"
-                              "   Normal = aNormal;\n"
-                              "   viewDir = vec3(vd.x, vd.y, vd.z);\n"
-                              "   shade = isShade;\n"
-                              "}\0";
-//Fragment Shader source code
-static const char* fragShaderSource = "#version 330 core\n"
-                               "out vec4 FragColor;\n"
-                               "in vec4 color;\n"
-                               "in vec3 Normal;\n"
-                               "in vec3 viewDir;\n"
-                               "in float shade;\n"
-                               "void main()\n"
-                               "{\n"
-                               "   float ambient = 0.10f;\n"
-                               "   vec3 norm = normalize(Normal);\n"
-                               "   vec3 lightDirection = normalize(viewDir);\n"
-                               "   float diffuse = max(dot(norm, lightDirection), 0.0f);\n"
-                               "   if (shade > 0.5) {diffuse = 1.0f; ambient = 0.0f;}\n"
-                               "   FragColor = color * (diffuse + ambient);\n"
-                               "}\n\0";
+static const char *vtxShaderSource =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec4 aColor;\n"
+    "layout (location = 2) in vec3 aNormal;\n"
+    "out vec4 color;\n"
+    "out vec3 Normal;\n"
+    "out vec3 viewDir;\n"
+    "out float shade;\n"
+    "uniform float isShade;\n"
+    "uniform float size;\n"
+    "uniform mat4 model;\n"
+    "uniform mat4 view;\n"
+    "uniform mat4 proj;\n"
+    "void main()\n"
+    "{\n"
+    "   vec4 vd = vec4(0.0, 0.0, -1.0, 1.0) * view;\n"
+    "   gl_Position = proj * view * model * vec4(size * aPos.x, size * aPos.y, size * aPos.z, 1.0);\n"
+    "   color = aColor;\n"
+    "   Normal = aNormal;\n"
+    "   viewDir = vec3(vd.x, vd.y, vd.z);\n"
+    "   shade = isShade;\n"
+    "}\0";
+// Fragment Shader source code
+static const char *fragShaderSource =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "in vec4 color;\n"
+    "in vec3 Normal;\n"
+    "in vec3 viewDir;\n"
+    "in float shade;\n"
+    "void main()\n"
+    "{\n"
+    "   float ambient = 0.10f;\n"
+    "   vec3 norm = normalize(Normal);\n"
+    "   vec3 lightDirection = normalize(viewDir);\n"
+    "   float diffuse = max(dot(norm, lightDirection), 0.0f);\n"
+    "   if (shade > 0.5) {diffuse = 1.0f; ambient = 0.0f;}\n"
+    "   FragColor = color * (diffuse + ambient);\n"
+    "}\n\0";
 
 namespace DSPatch::DSPatchables
 {
 
-DepthViewer3D::DepthViewer3D()
-    : Component( ProcessOrder::OutOfOrder )
+DepthViewer3D::DepthViewer3D() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Depth_Viewer_3D");
@@ -64,7 +65,7 @@ DepthViewer3D::DepthViewer3D()
     global_inst_counter++;
 
     // 3 inputs
-    SetInputCount_( 3, {"color", "depth", "intrin"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(3, {"color", "depth", "intrin"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -83,10 +84,10 @@ DepthViewer3D::DepthViewer3D()
     pntCloudObj = std::make_shared<ImGuiOpenGlObjectBuffer>();
     pntCloudObj->draw_point_size = 1.5f;
     pntCloudObj->obj_name = "PointCloud" + std::to_string(GetInstanceCount());
-
 }
 
-void DepthViewer3D::InitOpenGLWin_() {
+void DepthViewer3D::InitOpenGLWin_()
+{
 
     ogl_win_ = std::make_shared<ImGuiOpenGlWindow>();
 
@@ -131,30 +132,30 @@ void DepthViewer3D::InitPointCloud_()
         glUseProgram(pntCloudObj->shader);
         pntCloudObj->vao->Set();
         pntCloudObj->vao->Bind();
-        pntCloudObj->vbo->Set((GLfloat *) pntCloudVerts.data(), (GLsizei) (pntCloudVerts.size() * sizeof(colorVertNorm)), true);
+        pntCloudObj->vbo->Set((GLfloat *)pntCloudVerts.data(), (GLsizei)(pntCloudVerts.size() * sizeof(colorVertNorm)), true);
         pntCloudObj->vao->LinkAttrib(pntCloudObj->vbo, 0, 3, GL_FLOAT, 10 * sizeof(float), nullptr);
-        pntCloudObj->vao->LinkAttrib(pntCloudObj->vbo, 1, 4, GL_FLOAT, 10 * sizeof(float), (void *) (3 * sizeof(float)));
-        pntCloudObj->vao->LinkAttrib(pntCloudObj->vbo, 2, 3, GL_FLOAT, 10 * sizeof(float), (void *) (7 * sizeof(float)));
+        pntCloudObj->vao->LinkAttrib(pntCloudObj->vbo, 1, 4, GL_FLOAT, 10 * sizeof(float), (void *)(3 * sizeof(float)));
+        pntCloudObj->vao->LinkAttrib(pntCloudObj->vbo, 2, 3, GL_FLOAT, 10 * sizeof(float), (void *)(7 * sizeof(float)));
         pntCloudObj->vao->Unbind();
         pntCloudObj->vbo->Unbind();
 
         pntCloudObj->obj_type = GL_POINTS;
-        pntCloudObj->elem_size = (GLsizei) pntCloudVerts.size();
+        pntCloudObj->elem_size = (GLsizei)pntCloudVerts.size();
         ogl_win_->AddObject(pntCloudObj);
 
         pnt_init_ = true;
     }
 }
 
-void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
+void DepthViewer3D::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     if (!IsEnabled())
         SetEnabled(true);
 
-    auto inColor = inputs.GetValue<cv::Mat>( 0 );
-    auto inDepth = inputs.GetValue<cv::Mat>( 1 );
-    auto inIntrinsic = inputs.GetValue<nlohmann::json>( 2 );
-    if ( !inDepth ) {
+    auto inColor = inputs.GetValue<cv::Mat>(0);
+    auto inDepth = inputs.GetValue<cv::Mat>(1);
+    auto inIntrinsic = inputs.GetValue<nlohmann::json>(2);
+    if (!inDepth) {
         return;
     }
 
@@ -186,7 +187,7 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
         int pH = depth_frame_.rows;
         float fx, fy, ppx, ppy;
         bool found_intrinsics = false;
-        if (!intrinsic_data_.empty()) { // If intrinsic data exists fill in values
+        if (!intrinsic_data_.empty()) {  // If intrinsic data exists fill in values
             if (intrinsic_data_.contains("data")) {
                 if (!intrinsic_data_["data"].empty()) {
                     if (intrinsic_data_["data"][0].contains("intrinsics")) {
@@ -207,7 +208,7 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
         else
             has_intrinsic_ = false;
 
-        if (!has_intrinsic_) { // If no intrinsic data create best guess
+        if (!has_intrinsic_) {  // If no intrinsic data create best guess
             const float pi = 3.1415926535897932384626433832795f;
             float aspectRatio = (float)pH / (float)pW;
             float vFov = 2.0f * atan(tan((no_intrinsic_hfov_ * pi / 180.0f) / 2.0f) * aspectRatio);
@@ -221,20 +222,20 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
             if (pntCloudVerts.size() == pW * pH) {
                 for (int y = 0; y < pH; y++) {
                     for (int x = 0; x < pW; x++) {
-                        float depthValue = (float) depth_frame_.at<uint16_t>(y, x) * 0.01f;
+                        float depthValue = (float)depth_frame_.at<uint16_t>(y, x) * 0.01f;
                         if (depthValue > 0) {
                             if (y == 0) {
-                                pntCloudVerts.at((y * pW) + x).x = (((float) x - ppx) / fx) * depthValue;
-                                pntCloudVerts.at((y * pW) + x).y = -1.0f * ((((float) y - ppy) / fy) * depthValue);
+                                pntCloudVerts.at((y * pW) + x).x = (((float)x - ppx) / fx) * depthValue;
+                                pntCloudVerts.at((y * pW) + x).y = -1.0f * ((((float)y - ppy) / fy) * depthValue);
                                 pntCloudVerts.at((y * pW) + x).z = depthValue;
                                 pntCloudVerts.at((y * pW) + x).x += (-1.0f * pos_offset_.x);
                                 pntCloudVerts.at((y * pW) + x).y += (-1.0f * pos_offset_.y);
                                 pntCloudVerts.at((y * pW) + x).z += (-1.0f * pos_offset_.z);
                             }
                             if (y < (pH - 1)) {
-                                float depthValue2 = (float) depth_frame_.at<uint16_t>(y + 1, x) * 0.01f;
-                                pntCloudVerts.at(((y + 1) * pW) + x).x = (((float) x - ppx) / fx) * depthValue2;
-                                pntCloudVerts.at(((y + 1) * pW) + x).y = -1.0f * ((((float) (y + 1) - ppy) / fy) * depthValue2);
+                                float depthValue2 = (float)depth_frame_.at<uint16_t>(y + 1, x) * 0.01f;
+                                pntCloudVerts.at(((y + 1) * pW) + x).x = (((float)x - ppx) / fx) * depthValue2;
+                                pntCloudVerts.at(((y + 1) * pW) + x).y = -1.0f * ((((float)(y + 1) - ppy) / fy) * depthValue2);
                                 pntCloudVerts.at(((y + 1) * pW) + x).z = depthValue2;
                                 pntCloudVerts.at(((y + 1) * pW) + x).x += (-1.0f * pos_offset_.x);
                                 pntCloudVerts.at(((y + 1) * pW) + x).y += (-1.0f * pos_offset_.y);
@@ -242,11 +243,12 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
                             }
                             if (has_color) {
                                 cv::Vec3b val = color_frame_.at<cv::Vec3b>(y, x);
-                                pntCloudVerts.at((y * pW) + x).r = (float) val[2] / 255.0f;
-                                pntCloudVerts.at((y * pW) + x).g = (float) val[1] / 255.0f;
-                                pntCloudVerts.at((y * pW) + x).b = (float) val[0] / 255.0f;
+                                pntCloudVerts.at((y * pW) + x).r = (float)val[2] / 255.0f;
+                                pntCloudVerts.at((y * pW) + x).g = (float)val[1] / 255.0f;
+                                pntCloudVerts.at((y * pW) + x).b = (float)val[0] / 255.0f;
                                 pntCloudVerts.at((y * pW) + x).a = 1.0f;
-                            } else {
+                            }
+                            else {
                                 pntCloudVerts.at((y * pW) + x).r = diff_color_.x;
                                 pntCloudVerts.at((y * pW) + x).g = diff_color_.y;
                                 pntCloudVerts.at((y * pW) + x).b = diff_color_.z;
@@ -276,28 +278,33 @@ void DepthViewer3D::Process_( SignalBus const& inputs, SignalBus& outputs )
                                     pntCloudVerts.at(p1).nx = n1.x;
                                     pntCloudVerts.at(p1).ny = n1.y;
                                     pntCloudVerts.at(p1).nz = n1.z;
-                                } else if (y == (pH - 1)) {
+                                }
+                                else if (y == (pH - 1)) {
                                     glm::vec3 n1 = glm::cross(v1 - v2, v1 - v3);
                                     pntCloudVerts.at(p1).nx = n1.x;
                                     pntCloudVerts.at(p1).ny = n1.y;
                                     pntCloudVerts.at(p1).nz = n1.z;
-                                } else if (x == (pW - 1)) {
+                                }
+                                else if (x == (pW - 1)) {
                                     glm::vec3 n1 = glm::cross(v2 - v1, v3 - v1);
                                     pntCloudVerts.at(p1).nx = n1.x;
                                     pntCloudVerts.at(p1).ny = n1.y;
                                     pntCloudVerts.at(p1).nz = n1.z;
-                                } else {
+                                }
+                                else {
                                     glm::vec3 n1 = glm::cross(v1 - v2, v3 - v1);
                                     pntCloudVerts.at(p1).nx = n1.x;
                                     pntCloudVerts.at(p1).ny = n1.y;
                                     pntCloudVerts.at(p1).nz = n1.z;
                                 }
-                            } else {
+                            }
+                            else {
                                 pntCloudVerts.at((y * pW) + x).nx = 0.0f;
                                 pntCloudVerts.at((y * pW) + x).ny = 0.0f;
                                 pntCloudVerts.at((y * pW) + x).nz = 1.0f;
                             }
-                        } else {
+                        }
+                        else {
                             pntCloudVerts.at((y * pW) + x).x = 0.0f;
                             pntCloudVerts.at((y * pW) + x).y = 0.0f;
                             pntCloudVerts.at((y * pW) + x).z = 0.0f;
@@ -331,7 +338,7 @@ void DepthViewer3D::UpdateGui(void *context, int interface)
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
 
-    std::lock_guard<std::mutex> lck (io_mutex_);
+    std::lock_guard<std::mutex> lck(io_mutex_);
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         if (!has_intrinsic_) {
             ImGui::DragFloat(CreateControlString("H-FOV", GetInstanceName()).c_str(), &no_intrinsic_hfov_, 1.0f, 1.0f, 200.0f);
@@ -340,7 +347,7 @@ void DepthViewer3D::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(50);
         ImGui::DragFloat(CreateControlString("Point Size", GetInstanceName()).c_str(), &pntCloudObj->draw_point_size, 0.1f, 0.1f, 100.0f);
         ImGui::Checkbox(CreateControlString("Diffuse Shading", GetInstanceName()).c_str(), &diff_shading_);
-        ImGui::ColorEdit3(CreateControlString("Diffuse Color", GetInstanceName()).c_str(), (float*)&diff_color_);
+        ImGui::ColorEdit3(CreateControlString("Diffuse Color", GetInstanceName()).c_str(), (float *)&diff_color_);
         ImGui::Separator();
         ImGui::Text("Position Offset");
         ImGui::SetNextItemWidth(50);
@@ -374,7 +381,7 @@ void DepthViewer3D::UpdateGui(void *context, int interface)
                 else
                     glUniform1f(glGetUniformLocation(pntCloudObj->shader, "isShade"), 0.0f);
                 pntCloudObj->vbo->Bind();
-                glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizei) (pntCloudVerts.size() * sizeof(colorVertNorm)), (GLfloat *) pntCloudVerts.data());
+                glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizei)(pntCloudVerts.size() * sizeof(colorVertNorm)), (GLfloat *)pntCloudVerts.data());
                 pntCloudObj->vbo->Unbind();
                 glUseProgram(0);
             }
@@ -382,7 +389,6 @@ void DepthViewer3D::UpdateGui(void *context, int interface)
             ogl_win_->Update(title.c_str());
         }
     }
-
 }
 
 std::string DepthViewer3D::GetState()
@@ -542,7 +548,6 @@ void DepthViewer3D::SetState(std::string &&json_serialized)
         if (state.contains("orbit_mode"))
             ogl_win_->SetOrbitMode(state["orbit_mode"].get<bool>());
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

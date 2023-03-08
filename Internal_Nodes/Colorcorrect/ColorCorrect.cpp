@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Colorcorrect::Colorcorrect()
-    : Component( ProcessOrder::OutOfOrder )
+Colorcorrect::Colorcorrect() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Color_Correct");
@@ -24,10 +23,10 @@ Colorcorrect::Colorcorrect()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(2, {"in", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     brightness_ = 0.0f;
     contrast_ = 1.0f;
@@ -43,21 +42,20 @@ Colorcorrect::Colorcorrect()
     UpdateLUT();
 
     SetEnabled(true);
-
 }
 
 void Colorcorrect::UpdateLUT()
 {
-    for( int i = 0; i < 256; ++i)
+    for (int i = 0; i < 256; ++i)
         lut_cache_.at(i) = cv::saturate_cast<uchar>(pow((float)i / 255.0f, 1.0f / gamma_) * 255.0f);
 }
 
-void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Colorcorrect::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto inMask = inputs.GetValue<cv::Mat>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto inMask = inputs.GetValue<cv::Mat>(1);
+    if (!in1) {
         return;
     }
 
@@ -68,10 +66,12 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                 cv::Mat matMask;
                 if (!inMask) {
                     matMask = cv::Mat(in1->rows, in1->cols, CV_8UC1, 255);
-                } else {
+                }
+                else {
                     if (in1->size() != inMask->size()) {
                         cv::resize(*inMask, matMask, cv::Size(in1->cols, in1->rows));
-                    } else {
+                    }
+                    else {
                         inMask->copyTo(matMask);
                     }
                 }
@@ -97,9 +97,9 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                             float val = 0.0f;
                             if (c < 3) {
                                 if (matFrame.type() == CV_8UC3)
-                                    val = (float) in1->at<cv::Vec3b>(y, x)[c] / 255.0f;
+                                    val = (float)in1->at<cv::Vec3b>(y, x)[c] / 255.0f;
                                 else if (matFrame.type() == CV_8UC4)
-                                    val = (float) in1->at<cv::Vec4b>(y, x)[c] / 255.0f;
+                                    val = (float)in1->at<cv::Vec4b>(y, x)[c] / 255.0f;
                                 if (matMask.at<uchar>(y, x) == 255) {
                                     if (val >= low[c] && val <= high[c]) {
                                         // Saturation
@@ -110,7 +110,7 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                                         if (gamma_ > 1.0f || gamma_ < 1.0f) {
                                             // Use Cached LUT for faster calculation
                                             uint8_t tmpVal = cv::saturate_cast<uchar>(val * 255.0f);
-                                            val = (float) lut_cache_[tmpVal] / 255.0f;
+                                            val = (float)lut_cache_[tmpVal] / 255.0f;
                                         }
 
                                         // Contrast
@@ -139,15 +139,15 @@ void Colorcorrect::Process_( SignalBus const& inputs, SignalBus& outputs )
                 }
                 if (!matFrame.empty())
                     outputs.SetValue(0, matFrame);
-            } else {
+            }
+            else {
                 outputs.SetValue(0, *in1);
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
-
     }
-
 }
 
 bool Colorcorrect::HasGui(int interface)
@@ -182,8 +182,8 @@ void Colorcorrect::UpdateGui(void *context, int interface)
             UpdateLUT();
         }
         ImGui::Separator();
-        ImGui::ColorEdit3(CreateControlString("Low Range", GetInstanceName()).c_str(), (float*)&color_range_low_);
-        ImGui::ColorEdit3(CreateControlString("High Range", GetInstanceName()).c_str(), (float*)&color_range_high_);
+        ImGui::ColorEdit3(CreateControlString("Low Range", GetInstanceName()).c_str(), (float *)&color_range_low_);
+        ImGui::ColorEdit3(CreateControlString("High Range", GetInstanceName()).c_str(), (float *)&color_range_high_);
         ImGui::Separator();
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Saturation", GetInstanceName()).c_str(), &saturation_, 0.01f, 0.0f, 4.0f);
@@ -192,13 +192,12 @@ void Colorcorrect::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Contrast", GetInstanceName()).c_str(), &contrast_, 0.01f, 0.0f, 5.0f);
         ImGui::SetNextItemWidth(100);
-        if (ImGui::DragFloat(CreateControlString("Gamma", GetInstanceName()).c_str(), &gamma_, 0.01f, 0.0f, 5.0f)){
+        if (ImGui::DragFloat(CreateControlString("Gamma", GetInstanceName()).c_str(), &gamma_, 0.01f, 0.0f, 5.0f)) {
             UpdateLUT();
         }
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Gain", GetInstanceName()).c_str(), &gain_, 0.01f, 0.0f, 5.0f);
     }
-
 }
 
 std::string Colorcorrect::GetState()
@@ -261,8 +260,6 @@ void Colorcorrect::SetState(std::string &&json_serialized)
     }
 
     UpdateLUT();
-
 }
 
-
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

@@ -14,8 +14,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-LineIntersect::LineIntersect()
-    : Component( ProcessOrder::OutOfOrder )
+LineIntersect::LineIntersect() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Line_Intersections");
@@ -26,10 +25,10 @@ LineIntersect::LineIntersect()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 2, {"in", "lines"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(2, {"in", "lines"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 1 outputs
-    SetOutputCount_( 2, {"out", "points"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "points"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     min_angle_ = 60;
     min_dist_ = 10;
@@ -42,10 +41,9 @@ LineIntersect::LineIntersect()
     point_solid_ = false;
 
     SetEnabled(true);
-
 }
 
-static cv::Point2f computeIntersect(const cv::Vec4i& a, const cv::Vec4i& b)
+static cv::Point2f computeIntersect(const cv::Vec4i &a, const cv::Vec4i &b)
 {
     cv::Point2f pInter = {-1, -1};
 
@@ -60,19 +58,19 @@ static cv::Point2f computeIntersect(const cv::Vec4i& a, const cv::Vec4i& b)
     float determinant = a1 * b2 - a2 * b1;
 
     if (determinant != 0) {
-        pInter.x = (b2*c1 - b1*c2)/determinant;
-        pInter.y = (a1*c2 - a2*c1)/determinant;
+        pInter.x = (b2 * c1 - b1 * c2) / determinant;
+        pInter.y = (a1 * c2 - a2 * c1) / determinant;
     }
 
     return pInter;
 }
 
-void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
+void LineIntersect::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input Handler
     auto in_img = inputs.GetValue<cv::Mat>(0);
     auto in_json = inputs.GetValue<nlohmann::json>(1);
-    if ( !in_json ) {
+    if (!in_json) {
         return;
     }
 
@@ -88,7 +86,7 @@ void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
 
         if (IsEnabled()) {
             if (json_lines.contains("data_type")) {
-                if(json_lines["data_type"].get<std::string>() != "lines")
+                if (json_lines["data_type"].get<std::string>() != "lines")
                     return;
             }
             if (json_lines.contains("data")) {
@@ -97,7 +95,7 @@ void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
                     return;
                 }
                 std::vector<cv::Vec4i> lines;
-                for (const auto& jLine : json_lines["data"]) {
+                for (const auto &jLine : json_lines["data"]) {
                     cv::Vec4i vIn;
                     vIn[0] = jLine["line"]["x0"].get<int>();
                     vIn[1] = jLine["line"]["y0"].get<int>();
@@ -106,8 +104,8 @@ void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
                     lines.emplace_back(vIn);
                 }
                 std::vector<cv::Point2f> intersect_points;
-                for(auto i = 0u; i < lines.size(); i++) {
-                    for (unsigned int j = i+1; j < lines.size(); j++) {
+                for (auto i = 0u; i < lines.size(); i++) {
+                    for (unsigned int j = i + 1; j < lines.size(); j++) {
                         cv::Point2f int_pnt = computeIntersect(lines[i], lines[j]);
                         if (int_pnt.x >= 0 && int_pnt.y >= 0) {
                             cv::Vec2f v1 = cv::Vec2i(lines[i][0] - lines[i][2], lines[i][1] - lines[i][3]);
@@ -131,8 +129,7 @@ void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
                                         if (point_solid_)
                                             thickness = -1;
                                         cv::circle(ref_frame, int_pnt, point_radius_,
-                                                   cv::Scalar(point_color_.z * 255, point_color_.y * 255, point_color_.x * 255),
-                                                   thickness);
+                                            cv::Scalar(point_color_.z * 255, point_color_.y * 255, point_color_.x * 255), thickness);
                                     }
                                 }
                             }
@@ -155,7 +152,8 @@ void LineIntersect::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
             if (!json_points.empty())
                 outputs.SetValue(1, json_points);
-        } else {
+        }
+        else {
             outputs.SetValue(1, json_points);
         }
     }
@@ -178,7 +176,6 @@ void LineIntersect::UpdateGui(void *context, int interface)
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
 
-
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         if (line_count_ > MAX_LINE_INTERSECT_COUNT) {
             ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Too Many Input Lines");
@@ -194,7 +191,7 @@ void LineIntersect::UpdateGui(void *context, int interface)
             ImGui::Checkbox(CreateControlString("Draw Intersection Points", GetInstanceName()).c_str(), &draw_intersections_);
             if (draw_intersections_) {
                 ImGui::SetNextItemWidth(150);
-                ImGui::ColorEdit3(CreateControlString("Point Color", GetInstanceName()).c_str(), (float*)&point_color_);
+                ImGui::ColorEdit3(CreateControlString("Point Color", GetInstanceName()).c_str(), (float *)&point_color_);
                 ImGui::SetNextItemWidth(100);
                 ImGui::Checkbox(CreateControlString("Solid Point", GetInstanceName()).c_str(), &point_solid_);
                 ImGui::SetNextItemWidth(100);
@@ -206,7 +203,6 @@ void LineIntersect::UpdateGui(void *context, int interface)
             }
         }
     }
-
 }
 
 std::string LineIntersect::GetState()
@@ -257,4 +253,4 @@ void LineIntersect::SetState(std::string &&json_serialized)
         draw_intersections_ = state["draw_points"].get<bool>();
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

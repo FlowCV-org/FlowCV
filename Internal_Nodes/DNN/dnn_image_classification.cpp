@@ -14,8 +14,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Classification::Classification()
-    : Component( ProcessOrder::OutOfOrder )
+Classification::Classification() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Classification");
@@ -26,10 +25,10 @@ Classification::Classification()
     global_inst_counter++;
 
     // 1 input
-    SetInputCount_( 1, {"in1"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in1"}, {IoType::Io_Type_CvMat});
 
     // 1 output
-    SetOutputCount_( 2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // Set Defaults
     text_pos_ = cv::Point2i(10, 40);
@@ -51,7 +50,6 @@ Classification::Classification()
     target_list_ = dnn_backend_helper_.GetTargetList();
 
     SetEnabled(true);
-
 }
 
 void Classification::InitDnn_()
@@ -85,10 +83,10 @@ void Classification::InitDnn_()
     needs_reinit_ = false;
 }
 
-void Classification::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Classification::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -125,14 +123,13 @@ void Classification::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
             int classId;
             double confidence;
-            if (needs_soft_max_)
-            {
+            if (needs_soft_max_) {
                 float maxProb = 0.0;
                 float sum = 0.0;
                 cv::Mat softmaxProb;
 
                 maxProb = *std::max_element(prob.begin<float>(), prob.end<float>());
-                cv::exp(prob-maxProb, softmaxProb);
+                cv::exp(prob - maxProb, softmaxProb);
                 sum = (float)cv::sum(softmaxProb)[0];
                 softmaxProb /= sum;
                 cv::Point classIdPoint;
@@ -157,10 +154,10 @@ void Classification::Process_( SignalBus const& inputs, SignalBus& outputs )
                     cTmp["class"] = class_list_.at(classId);
                     cTmp["conf"] = confidence;
                     if (draw_class_) {
-                        std::string label = cv::format("%s: %.4f", (class_list_.empty() ? cv::format("Class #%d", classId).c_str() : class_list_.at(classId).c_str()), confidence);
+                        std::string label = cv::format(
+                            "%s: %.4f", (class_list_.empty() ? cv::format("Class #%d", classId).c_str() : class_list_.at(classId).c_str()), confidence);
                         cv::putText(orig, label, text_pos_, cv::FONT_HERSHEY_SIMPLEX, text_scale_,
-                                    cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255),
-                                    text_thickness_);
+                            cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
                     }
                     detected.emplace_back(cTmp);
                 }
@@ -169,7 +166,8 @@ void Classification::Process_( SignalBus const& inputs, SignalBus& outputs )
                 json_out["data"] = detected;
             outputs.SetValue(1, json_out);
             outputs.SetValue(0, orig);
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -211,11 +209,13 @@ void Classification::UpdateGui(void *context, int interface)
                 InitDnn_();
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Backend", GetInstanceName()).c_str(),
-                             &dnn_backend_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&backend_list_, (int)backend_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Backend", GetInstanceName()).c_str(), &dnn_backend_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&backend_list_, (int)backend_list_.size())) {
                 // Update and get Target List
                 current_backend_ = backend_list_.at(dnn_backend_idx_).second;
                 dnn_backend_helper_.UpdateTargetList(backend_list_.at(dnn_backend_idx_).second);
@@ -225,11 +225,13 @@ void Classification::UpdateGui(void *context, int interface)
                 needs_reinit_ = true;
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Target", GetInstanceName()).c_str(),
-                             &dnn_target_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&target_list_, (int)target_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Target", GetInstanceName()).c_str(), &dnn_target_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&target_list_, (int)target_list_.size())) {
                 current_target_ = target_list_.at(dnn_target_idx_).second;
                 needs_reinit_ = true;
             }
@@ -253,14 +255,11 @@ void Classification::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", model_path_.c_str());
 
-        if(show_model_dialog_)
+        if (show_model_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Model", GetInstanceName()).c_str());
 
-        if(model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()),
-                                       imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                       ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net",
-                                       &show_model_dialog_))
-        {
+        if (model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net", &show_model_dialog_)) {
             model_path_ = model_dialog_.selected_path;
             show_model_dialog_ = false;
             needs_reinit_ = true;
@@ -275,14 +274,11 @@ void Classification::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", config_path_.c_str());
 
-        if(show_config_dialog_)
+        if (show_config_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Config", GetInstanceName()).c_str());
 
-        if(config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()),
-                                        imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                        ImVec2(700, 310), ".prototxt,.txt,.pbtxt,.yml,.cfg,.xml",
-                                        &show_config_dialog_))
-        {
+        if (config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".prototxt,.txt,.pbtxt,.yml,.cfg,.xml", &show_config_dialog_)) {
             config_path_ = config_dialog_.selected_path;
             show_config_dialog_ = false;
             needs_reinit_ = true;
@@ -297,14 +293,11 @@ void Classification::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", classes_path_.c_str());
 
-        if(show_classes_dialog_)
+        if (show_classes_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Classes", GetInstanceName()).c_str());
 
-        if(classes_dialog_.showFileDialog(CreateControlString("Set Classes", GetInstanceName()),
-                                         imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                         ImVec2(700, 310), ".txt",
-                                         &show_classes_dialog_))
-        {
+        if (classes_dialog_.showFileDialog(CreateControlString("Set Classes", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".txt", &show_classes_dialog_)) {
             classes_path_ = classes_dialog_.selected_path;
             show_classes_dialog_ = false;
             needs_reinit_ = true;
@@ -343,10 +336,9 @@ void Classification::UpdateGui(void *context, int interface)
             ImGui::SetNextItemWidth(80);
             ImGui::DragInt(CreateControlString("Text Thickness", GetInstanceName()).c_str(), &text_thickness_, 0.1f);
             ImGui::Separator();
-            ImGui::ColorEdit3(CreateControlString("Text Color", GetInstanceName()).c_str(), (float *) &text_color_);
+            ImGui::ColorEdit3(CreateControlString("Text Color", GetInstanceName()).c_str(), (float *)&text_color_);
         }
     }
-
 }
 
 std::string Classification::GetState()
@@ -500,7 +492,6 @@ void Classification::SetState(std::string &&json_serialized)
         std::lock_guard<std::mutex> lk(io_mutex_);
         InitDnn_();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

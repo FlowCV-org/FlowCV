@@ -13,23 +13,23 @@
 
 using namespace DSPatch;
 
-void PrintNodeConnectionInfo(FlowCV::FlowCV_Manager& fm)
+void PrintNodeConnectionInfo(FlowCV::FlowCV_Manager &fm)
 {
-        for (int i = 0; i < fm.GetNodeCount(); i++) {
-            FlowCV::NodeInfo ni;
-            fm.GetNodeInfoByIndex(i, ni);
-            std::cout << "--------------------------------------" << std::endl;
-            std::cout << "  Name: " << ni.desc.name << std::endl;
-            std::cout << "  ID: " << ni.id << std::endl;
-            std::vector<FlowCV::Wire> connections = fm.GetNodeConnectionsFromIndex(i);
-            std::cout << "  Connections: " << std::endl;
-            for (const auto &wire : connections) {
-                if (wire.from.id == ni.id)
-                    std::cout << "      out: " << wire.from.index << " --> in: " << wire.to.index << " ID: " << wire.to.id << std::endl;
-                if (wire.to.id == ni.id)
-                    std::cout << "      in: " << wire.to.index << " <-- out: " << wire.from.index << " ID: " << wire.from.id << std::endl;
-            }
-            std::cout << "--------------------------------------" << std::endl;
+    for (int i = 0; i < fm.GetNodeCount(); i++) {
+        FlowCV::NodeInfo ni;
+        fm.GetNodeInfoByIndex(i, ni);
+        std::cout << "--------------------------------------" << std::endl;
+        std::cout << "  Name: " << ni.desc.name << std::endl;
+        std::cout << "  ID: " << ni.id << std::endl;
+        std::vector<FlowCV::Wire> connections = fm.GetNodeConnectionsFromIndex(i);
+        std::cout << "  Connections: " << std::endl;
+        for (const auto &wire : connections) {
+            if (wire.from.id == ni.id)
+                std::cout << "      out: " << wire.from.index << " --> in: " << wire.to.index << " ID: " << wire.to.id << std::endl;
+            if (wire.to.id == ni.id)
+                std::cout << "      in: " << wire.to.index << " <-- out: " << wire.from.index << " ID: " << wire.from.id << std::endl;
+        }
+        std::cout << "--------------------------------------" << std::endl;
     }
 }
 
@@ -115,15 +115,15 @@ int main(int argc, char *argv[])
     flowMan.ConnectNodes(blurId, 0, writeId, 0);
 
     // Save State to file
-//    cm.SaveState("./simple_test.flow");
+    //    cm.SaveState("./simple_test.flow");
 
     // Load State from File
-//    cm.LoadState(pm, im, "./simple_test.flow");
+    //    cm.LoadState(pm, im, "./simple_test.flow");
 
     std::cout << "Flow Node Count: " << flowMan.GetNodeCount() << std::endl;
     PrintNodeConnectionInfo(flowMan);
-//    nlohmann::json state = flowMan.GetState();
-//    std::cout << state.dump(4) << std::endl;
+    //    nlohmann::json state = flowMan.GetState();
+    //    std::cout << state.dump(4) << std::endl;
 
     ImGuiWrapper imgui;
     imgui.Init(1280, 720, "Test GUI");
@@ -136,8 +136,8 @@ int main(int argc, char *argv[])
     flowMan.StartAutoTick();
 
     // Main loop for handling UI
-    while(!imgui.ShouldClose()) {
-        //cm.Tick();
+    while (!imgui.ShouldClose()) {
+        // cm.Tick();
         ImGuiWrapper::PollEvents();
         ImGuiWrapper::NewFrame();
 
@@ -146,32 +146,33 @@ int main(int argc, char *argv[])
 
         // Start UI
         {
-            if (!initialized)
-            {
+            if (!initialized) {
                 initialized = true;
 
-                dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
+                dock_main_id =
+                    dockspace_id;  // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
                 dock_id_prop = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
 
                 ImGui::DockBuilderFinish(dockspace_id);
             }
 
-            if (ImGui::BeginMainMenuBar())
-            {
-                if (ImGui::BeginMenu("File"))
-                {
+            if (ImGui::BeginMainMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("Load", "CTRL+L")) {
                         flowMan.StopAutoTick();
                         flowMan.LoadState("./simple_test.flow");
                         flowMan.StartAutoTick();
                     }
-                    if (ImGui::MenuItem("Save", "CTRL+S")) {flowMan.SaveState("./simple_test.flow");}
+                    if (ImGui::MenuItem("Save", "CTRL+S")) {
+                        flowMan.SaveState("./simple_test.flow");
+                    }
                     ImGui::Separator();
-                    if (ImGui::MenuItem("Exit", "CTRL+Q")) { break; }
+                    if (ImGui::MenuItem("Exit", "CTRL+Q")) {
+                        break;
+                    }
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Edit"))
-                {
+                if (ImGui::BeginMenu("Edit")) {
                     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
                     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
                     ImGui::Separator();
@@ -213,7 +214,6 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-
         }
         ImGuiWrapper::FrameEnd();
         imgui.Update();

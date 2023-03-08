@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-CannyFilter::CannyFilter()
-    : Component( ProcessOrder::OutOfOrder )
+CannyFilter::CannyFilter() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Canny");
@@ -24,10 +23,10 @@ CannyFilter::CannyFilter()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {DSPatch::IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {DSPatch::IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {DSPatch::IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {DSPatch::IoType::Io_Type_CvMat});
 
     props_.AddInt("kernel_size", "Sobel Apt Size", 3, 3, 7, 2.0f);
     props_.AddOption("thresh_mode", "Threshold Mode", 0, {"Fixed", "Automatic"});
@@ -38,11 +37,11 @@ CannyFilter::CannyFilter()
     SetEnabled(true);
 }
 
-void CannyFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void CannyFilter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -68,8 +67,8 @@ void CannyFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
             cv::Canny(tmp, frame, low_thresh, high_thresh, props_.Get<int>("kernel_size"), (bool)props_.Get<int>("norm_type"));
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -115,7 +114,6 @@ void CannyFilter::UpdateGui(void *context, int interface)
             props_.Set("kernel_size", ks);
         }
     }
-
 }
 
 std::string CannyFilter::GetState()
@@ -138,7 +136,6 @@ void CannyFilter::SetState(std::string &&json_serialized)
     json state = json::parse(json_serialized);
 
     props_.FromJson(state);
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

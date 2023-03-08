@@ -28,7 +28,7 @@ class DLLEXPORT ImageLoader final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::ImageLoader> p;
@@ -43,8 +43,8 @@ class DLLEXPORT ImageLoader final : public Component
     std::mutex io_mutex_;
 };
 
-EXPORT_PLUGIN( ImageLoader )
+EXPORT_PLUGIN(ImageLoader)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_IMAGE_LOADER_HPP_
+#endif  // FLOWCV_IMAGE_LOADER_HPP_

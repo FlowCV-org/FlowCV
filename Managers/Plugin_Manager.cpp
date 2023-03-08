@@ -6,12 +6,14 @@
 #include <filesystem>
 #include <algorithm>
 
-namespace FlowCV {
-PluginManager::~PluginManager() {
+namespace FlowCV
+{
+PluginManager::~PluginManager()
+{
     UnLoadPlugins();
 }
 
-static bool compareName(const PluginInfo& a, const PluginInfo& b)
+static bool compareName(const PluginInfo &a, const PluginInfo &b)
 {
     return a.plugin_desc.name < b.plugin_desc.name;
 }
@@ -21,7 +23,7 @@ void PluginManager::ScanDirForPlugins(const char *dir_path, bool recursive)
     namespace fs = std::filesystem;
     const std::string ext = ".fp";
 
-    for (const auto &entry: fs::directory_iterator(dir_path)) {
+    for (const auto &entry : fs::directory_iterator(dir_path)) {
         if (entry.is_directory()) {
             if (recursive)
                 ScanDirForPlugins(entry.path().string().c_str());
@@ -60,19 +62,22 @@ void PluginManager::LoadPlugins(const char *plugin_path, bool recursive)
     ScanDirForPlugins(plugin_path_.c_str());
 }
 
-void PluginManager::UnLoadPlugins() {
+void PluginManager::UnLoadPlugins()
+{
     if (!plugins_.empty()) {
-        for (auto &p: plugins_) {
+        for (auto &p : plugins_) {
             delete p.plugin_handle;
         }
     }
 }
 
-uint32_t PluginManager::PluginCount() {
+uint32_t PluginManager::PluginCount()
+{
     return plugins_.size();
 }
 
-bool PluginManager::GetPluginDescription(uint32_t index, NodeDescription &nodeDesc) {
+bool PluginManager::GetPluginDescription(uint32_t index, NodeDescription &nodeDesc)
+{
 
     if (index >= 0 && index < plugins_.size()) {
         nodeDesc.name = plugins_.at(index).plugin_desc.name;
@@ -87,9 +92,10 @@ bool PluginManager::GetPluginDescription(uint32_t index, NodeDescription &nodeDe
     return false;
 }
 
-bool PluginManager::GetPluginDescription(const char *name, NodeDescription &nodeDesc) {
+bool PluginManager::GetPluginDescription(const char *name, NodeDescription &nodeDesc)
+{
 
-    for (auto const &p: plugins_) {
+    for (auto const &p : plugins_) {
         if (p.plugin_desc.name == name) {
             nodeDesc.name = p.plugin_desc.name;
             nodeDesc.category = p.plugin_desc.category;
@@ -104,8 +110,9 @@ bool PluginManager::GetPluginDescription(const char *name, NodeDescription &node
     return false;
 }
 
-std::shared_ptr<DSPatch::Component> PluginManager::CreatePluginInstance(const char *name) {
-    for (auto const &p: plugins_) {
+std::shared_ptr<DSPatch::Component> PluginManager::CreatePluginInstance(const char *name)
+{
+    for (auto const &p : plugins_) {
         if (p.plugin_desc.name == name) {
             std::shared_ptr<DSPatch::Component> pi = p.plugin_handle->Create();
             return pi;
@@ -114,8 +121,9 @@ std::shared_ptr<DSPatch::Component> PluginManager::CreatePluginInstance(const ch
     return nullptr;
 }
 
-bool PluginManager::HasPlugin(const char *name) {
-    for (auto const &p: plugins_) {
+bool PluginManager::HasPlugin(const char *name)
+{
+    for (auto const &p : plugins_) {
         if (p.plugin_desc.name == name) {
             return true;
         }
@@ -124,4 +132,4 @@ bool PluginManager::HasPlugin(const char *name) {
     return false;
 }
 
-} // End Namespace FlowCV
+}  // End Namespace FlowCV

@@ -30,7 +30,7 @@ class DLLEXPORT VideoWriter final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void SaveSource();
 
   private:
@@ -53,11 +53,10 @@ class DLLEXPORT VideoWriter final : public Component
     bool show_file_dialog_;
     bool save_new_file_;
     bool auto_ext_;
-
 };
 
-EXPORT_PLUGIN( VideoWriter )
+EXPORT_PLUGIN(VideoWriter)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_VIDEO_WRITER_HPP_
+#endif  // FLOWCV_VIDEO_WRITER_HPP_

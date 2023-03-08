@@ -23,7 +23,7 @@ class Colorcorrect final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void UpdateLUT();
 
   private:
@@ -39,4 +39,4 @@ class Colorcorrect final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_COLORCORRECT_HPP_
+#endif  // FLOWCV_PLUGIN_COLORCORRECT_HPP_

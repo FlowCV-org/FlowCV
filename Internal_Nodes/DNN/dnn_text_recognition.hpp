@@ -24,7 +24,7 @@ class TextRecognition final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void InitDnn_();
 
   private:
@@ -61,4 +61,4 @@ class TextRecognition final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif // FLOWCV_PLUGIN_DNN_TEXT_RECOGNITION_HPP_
+#endif  // FLOWCV_PLUGIN_DNN_TEXT_RECOGNITION_HPP_

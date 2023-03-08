@@ -2,7 +2,6 @@
 // Plugin SerialSend
 //
 
-
 #include "Serial_Send.hpp"
 
 using namespace DSPatch;
@@ -15,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class SerialSend
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-SerialSend::SerialSend()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::SerialSend() )
+SerialSend::SerialSend() : Component(ProcessOrder::OutOfOrder), p(new internal::SerialSend())
 {
     // Name and Category
     SetComponentName_("Serial_Send");
@@ -30,7 +27,8 @@ SerialSend::SerialSend()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 5, {"bool", "int", "float", "str", "json"}, {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON} );
+    SetInputCount_(5, {"bool", "int", "float", "str", "json"},
+        {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -71,8 +69,7 @@ SerialSend::SerialSend()
     current_time_ = std::chrono::steady_clock::now();
     last_time_ = current_time_;
 
-    sp_->bind_init([&]()
-    {
+    sp_->bind_init([&]() {
         sp_->socket().set_option(asio::serial_port::flow_control((asio::serial_port::flow_control::type)flow_control_index_));
         sp_->socket().set_option(asio::serial_port::parity((asio::serial_port::parity::type)parity_index_));
         sp_->socket().set_option(asio::serial_port::stop_bits((asio::serial_port::stop_bits::type)stop_bits_index_));
@@ -80,7 +77,6 @@ SerialSend::SerialSend()
     });
 
     SetEnabled(true);
-
 }
 
 void SerialSend::SetEOLSeq_()
@@ -113,8 +109,7 @@ void SerialSend::SetEOLSeq_()
     }
 }
 
-template <typename T>
-std::vector<uint8_t> SerialSend::GenerateOutBuffer_(T data)
+template<typename T> std::vector<uint8_t> SerialSend::GenerateOutBuffer_(T data)
 {
     std::vector<uint8_t> outBuffer;
     if (send_as_binary_) {
@@ -140,14 +135,14 @@ std::vector<uint8_t> SerialSend::GenerateOutBuffer_(T data)
     return outBuffer;
 }
 
-void SerialSend::Process_( SignalBus const& inputs, SignalBus& outputs )
+void SerialSend::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input Handler
-    auto in1 = inputs.GetValue<bool>( 0 );
-    auto in2 = inputs.GetValue<int>( 1 );
-    auto in3 = inputs.GetValue<float>( 2 );
-    auto in4 = inputs.GetValue<std::string>( 3 );
-    auto in5 = inputs.GetValue<nlohmann::json>( 4 );
+    auto in1 = inputs.GetValue<bool>(0);
+    auto in2 = inputs.GetValue<int>(1);
+    auto in3 = inputs.GetValue<float>(2);
+    auto in4 = inputs.GetValue<std::string>(3);
+    auto in5 = inputs.GetValue<nlohmann::json>(4);
 
     if (IsEnabled()) {
         if (sp_ != nullptr) {
@@ -159,7 +154,8 @@ void SerialSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                     if (delta >= (long long)rate_val_) {
                         readyToSend = true;
                     }
-                } else
+                }
+                else
                     readyToSend = true;
 
                 if (in1) {
@@ -191,31 +187,31 @@ void SerialSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                         nlohmann::json json_in_ = *in5;
                         if (readyToSend) {
                             switch (data_pack_mode_) {
-                                case 1: // BSON
+                                case 1:  // BSON
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_bson(json_in_);
                                     sp_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 2: // CBOR
+                                case 2:  // CBOR
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_cbor(json_in_);
                                     sp_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 3: // MessagePack
+                                case 3:  // MessagePack
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_msgpack(json_in_);
                                     sp_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 4: // UBJSON
+                                case 4:  // UBJSON
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_ubjson(json_in_);
                                     sp_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                default: // None (0)
+                                default:  // None (0)
                                     std::string jsonStr = json_in_.dump();
                                     for (int i = 0; i < 2; i++) {
                                         if (eol_seq_[i] != '\0')
@@ -227,8 +223,8 @@ void SerialSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                     }
                 }
                 if (readyToSend) {
-                    float curRate = 1.0f / ((float) delta * 0.001f);
-                    //std::cout << curRate << std::endl;
+                    float curRate = 1.0f / ((float)delta * 0.001f);
+                    // std::cout << curRate << std::endl;
                     last_time_ = current_time_;
                 }
             }
@@ -274,17 +270,23 @@ void SerialSend::UpdateGui(void *context, int interface)
         }
         ImGui::Separator();
         ImGui::SetNextItemWidth(120);
-        if (ImGui::Combo(CreateControlString("Port", GetInstanceName()).c_str(), &serial_list_index_, [](void* data, int idx, const char** out_text) {
-            *out_text = ((const std::vector<std::string>*)data)->at(idx).c_str();
-            return true;
-        }, (void*)&cams, (int)cams.size())) {
+        if (ImGui::Combo(
+                CreateControlString("Port", GetInstanceName()).c_str(), &serial_list_index_,
+                [](void *data, int idx, const char **out_text) {
+                    *out_text = ((const std::vector<std::string> *)data)->at(idx).c_str();
+                    return true;
+                },
+                (void *)&cams, (int)cams.size())) {
             OpenSerialConn_();
         }
         ImGui::SetNextItemWidth(120);
-        ImGui::Combo(CreateControlString("Baud Rate", GetInstanceName()).c_str(), &baud_rate_index_, [](void* data, int idx, const char** out_text) {
-            *out_text = ((const std::vector<std::string>*)data)->at(idx).c_str();
-            return true;
-        }, (void*)&baud_rate_, (int)baud_rate_.size());
+        ImGui::Combo(
+            CreateControlString("Baud Rate", GetInstanceName()).c_str(), &baud_rate_index_,
+            [](void *data, int idx, const char **out_text) {
+                *out_text = ((const std::vector<std::string> *)data)->at(idx).c_str();
+                return true;
+            },
+            (void *)&baud_rate_, (int)baud_rate_.size());
         ImGui::SetNextItemWidth(120);
         if (ImGui::Combo(CreateControlString("Data Bits", GetInstanceName()).c_str(), &char_size_index_, " 5\0 6\0 7\0 8\0\0")) {
             OpenSerialConn_();
@@ -313,7 +315,8 @@ void SerialSend::UpdateGui(void *context, int interface)
                 rate_val_ = 0;
         }
         ImGui::Separator();
-        if (ImGui::Combo(CreateControlString("EOL Sequence", GetInstanceName()).c_str(), &eol_seq_index_, "None\0<CR>\0<LF>\0<CR><LF>\0<SPACE>\0<TAB>\0<COMMA>\0\0")) {
+        if (ImGui::Combo(
+                CreateControlString("EOL Sequence", GetInstanceName()).c_str(), &eol_seq_index_, "None\0<CR>\0<LF>\0<CR><LF>\0<SPACE>\0<TAB>\0<COMMA>\0\0")) {
             SetEOLSeq_();
         }
         ImGui::Separator();
@@ -401,7 +404,6 @@ void SerialSend::SetState(std::string &&json_serialized)
     if (se_.GetSerialCount() > 1) {
         OpenSerialConn_();
     }
-
 }
 
 void SerialSend::OpenSerialConn_()

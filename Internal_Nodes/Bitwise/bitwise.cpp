@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Bitwise::Bitwise()
-    : Component( ProcessOrder::OutOfOrder )
+Bitwise::Bitwise() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Bitwise");
@@ -24,29 +23,27 @@ Bitwise::Bitwise()
     global_inst_counter++;
 
     // 3 inputs
-    SetInputCount_( 3, {"in1", "in2", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(3, {"in1", "in2", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     bitwise_mode_ = 0;
 
     SetEnabled(true);
-
 }
 
-void Bitwise::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Bitwise::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
     // Get Optional inputs
-    auto in2 = inputs.GetValue<cv::Mat>( 1 );
-    auto inMask = inputs.GetValue<cv::Mat>( 2 );
-
+    auto in2 = inputs.GetValue<cv::Mat>(1);
+    auto inMask = inputs.GetValue<cv::Mat>(2);
 
     if (!in1->empty()) {
         if (IsEnabled()) {
@@ -90,8 +87,8 @@ void Bitwise::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
 
             outputs.SetValue(0, frame_out);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -116,7 +113,6 @@ void Bitwise::UpdateGui(void *context, int interface)
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         ImGui::Combo(CreateControlString("Bitwise Mode", GetInstanceName()).c_str(), &bitwise_mode_, "AND\0NOT\0OR\0XOR\0\0");
     }
-
 }
 
 std::string Bitwise::GetState()
@@ -140,7 +136,6 @@ void Bitwise::SetState(std::string &&json_serialized)
 
     if (state.contains("mode"))
         bitwise_mode_ = state["mode"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

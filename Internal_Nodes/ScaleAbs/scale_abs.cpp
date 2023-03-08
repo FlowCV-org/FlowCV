@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-ScaleAbs::ScaleAbs()
-    : Component( ProcessOrder::OutOfOrder )
+ScaleAbs::ScaleAbs() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Scale_Abs");
@@ -24,23 +23,22 @@ ScaleAbs::ScaleAbs()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     alpha_ = 1.0;
     beta_ = 0.0;
 
     SetEnabled(true);
-
 }
 
-void ScaleAbs::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ScaleAbs::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -51,7 +49,8 @@ void ScaleAbs::Process_( SignalBus const& inputs, SignalBus& outputs )
             cv::convertScaleAbs(*in1, frame, alpha_, beta_);
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -80,7 +79,6 @@ void ScaleAbs::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Beta", GetInstanceName()).c_str(), &beta_, 0.1f);
     }
-
 }
 
 std::string ScaleAbs::GetState()
@@ -107,7 +105,6 @@ void ScaleAbs::SetState(std::string &&json_serialized)
         alpha_ = state["alpha"].get<float>();
     if (state.contains("beta"))
         beta_ = state["beta"].get<float>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

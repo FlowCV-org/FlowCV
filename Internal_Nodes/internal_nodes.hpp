@@ -62,4 +62,4 @@
 #include "DNN/dnn_text_recognition.hpp"
 #include "DNN/dnn_image_processing.hpp"
 
-#endif //FLOWCV_INTERNAL_NODES_HPP_
+#endif  // FLOWCV_INTERNAL_NODES_HPP_

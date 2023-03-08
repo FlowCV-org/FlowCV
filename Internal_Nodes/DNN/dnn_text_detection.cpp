@@ -14,8 +14,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-TextDetection::TextDetection()
-    : Component( ProcessOrder::OutOfOrder )
+TextDetection::TextDetection() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Text_Detection");
@@ -26,10 +25,10 @@ TextDetection::TextDetection()
     global_inst_counter++;
 
     // 1 input
-    SetInputCount_( 1, {"in1"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in1"}, {IoType::Io_Type_CvMat});
 
     // 1 output
-    SetOutputCount_( 2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // Set Defaults
     bbox_color_ = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -55,7 +54,6 @@ TextDetection::TextDetection()
     target_list_ = dnn_backend_helper_.GetTargetList();
 
     SetEnabled(true);
-
 }
 
 void TextDetection::InitDnn_()
@@ -65,10 +63,7 @@ void TextDetection::InitDnn_()
         net_ = std::make_unique<cv::dnn::TextDetectionModel_DB>(model_path_);
         net_->setPreferableBackend(current_backend_);
         net_->setPreferableTarget(current_target_);
-        net_->setBinaryThreshold(bin_thresh_)
-            .setPolygonThreshold(poly_thresh_)
-            .setUnclipRatio(unclip_ratio_)
-            .setMaxCandidates(max_candidates_);
+        net_->setBinaryThreshold(bin_thresh_).setPolygonThreshold(poly_thresh_).setUnclipRatio(unclip_ratio_).setMaxCandidates(max_candidates_);
     }
     catch (...) {
         std::cerr << "DNN Initialization Error" << std::endl;
@@ -81,10 +76,10 @@ void TextDetection::InitDnn_()
     needs_reinit_ = false;
 }
 
-void TextDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
+void TextDetection::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -108,10 +103,7 @@ void TextDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
                 frame = orig;
 
             try {
-                net_->setBinaryThreshold(bin_thresh_)
-                    .setPolygonThreshold(poly_thresh_)
-                    .setUnclipRatio(unclip_ratio_)
-                    .setMaxCandidates(max_candidates_);
+                net_->setBinaryThreshold(bin_thresh_).setPolygonThreshold(poly_thresh_).setUnclipRatio(unclip_ratio_).setMaxCandidates(max_candidates_);
                 net_->setInputParams(scale_, modelSize, cv::Scalar(mean_[0], mean_[1], mean_[2]), swap_rb_, false);
                 net_->detect(frame, results);
             }
@@ -161,7 +153,8 @@ void TextDetection::Process_( SignalBus const& inputs, SignalBus& outputs )
                 json_out["data"] = detected;
             outputs.SetValue(1, json_out);
             outputs.SetValue(0, orig);
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -203,11 +196,13 @@ void TextDetection::UpdateGui(void *context, int interface)
                 InitDnn_();
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Backend", GetInstanceName()).c_str(),
-                             &dnn_backend_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&backend_list_, (int)backend_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Backend", GetInstanceName()).c_str(), &dnn_backend_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&backend_list_, (int)backend_list_.size())) {
                 // Update and get Target List
                 current_backend_ = backend_list_.at(dnn_backend_idx_).second;
                 dnn_backend_helper_.UpdateTargetList(backend_list_.at(dnn_backend_idx_).second);
@@ -217,11 +212,13 @@ void TextDetection::UpdateGui(void *context, int interface)
                 needs_reinit_ = true;
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Target", GetInstanceName()).c_str(),
-                             &dnn_target_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&target_list_, (int)target_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Target", GetInstanceName()).c_str(), &dnn_target_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&target_list_, (int)target_list_.size())) {
                 current_target_ = target_list_.at(dnn_target_idx_).second;
                 needs_reinit_ = true;
             }
@@ -243,14 +240,11 @@ void TextDetection::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", model_path_.c_str());
 
-        if(show_model_dialog_)
+        if (show_model_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Model", GetInstanceName()).c_str());
 
-        if(model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()),
-                                        imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                        ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net",
-                                        &show_model_dialog_))
-        {
+        if (model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net", &show_model_dialog_)) {
             model_path_ = model_dialog_.selected_path;
             show_model_dialog_ = false;
             needs_reinit_ = true;
@@ -286,10 +280,9 @@ void TextDetection::UpdateGui(void *context, int interface)
             ImGui::SetNextItemWidth(80);
             ImGui::DragInt(CreateControlString("BBox Thickness", GetInstanceName()).c_str(), &bbox_thickness_, 0.1f, 1, 10);
             ImGui::Separator();
-            ImGui::ColorEdit3(CreateControlString("BBox Color", GetInstanceName()).c_str(), (float *) &bbox_color_);
+            ImGui::ColorEdit3(CreateControlString("BBox Color", GetInstanceName()).c_str(), (float *)&bbox_color_);
         }
     }
-
 }
 
 std::string TextDetection::GetState()
@@ -416,7 +409,6 @@ void TextDetection::SetState(std::string &&json_serialized)
         std::lock_guard<std::mutex> lk(io_mutex_);
         InitDnn_();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

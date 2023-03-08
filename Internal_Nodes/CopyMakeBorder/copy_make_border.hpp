@@ -23,7 +23,7 @@ class CopyMakeBorder final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int add_width_;
@@ -36,4 +36,4 @@ class CopyMakeBorder final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_COPY_MAKE_BORDER_HPP_
+#endif  // FLOWCV_PLUGIN_COPY_MAKE_BORDER_HPP_

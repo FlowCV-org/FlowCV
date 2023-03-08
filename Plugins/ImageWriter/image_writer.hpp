@@ -28,7 +28,7 @@ class DLLEXPORT ImageWriter final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::ImageWriter> p;
@@ -39,8 +39,8 @@ class DLLEXPORT ImageWriter final : public Component
     imgui_addons::ImGuiFileBrowser file_dialog_;
 };
 
-EXPORT_PLUGIN( ImageWriter )
+EXPORT_PLUGIN(ImageWriter)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_IMAGE_WRITER_HPP_
+#endif  // FLOWCV_PLUGIN_IMAGE_WRITER_HPP_

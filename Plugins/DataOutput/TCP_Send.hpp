@@ -21,22 +21,22 @@ class TcpSend;
 
 class DLLEXPORT TcpSend final : public Component
 {
- public:
+  public:
     TcpSend();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     bool IsValidIP_();
     void OpenTcpConn_();
     void CloseTcpConn_();
     void SetEOLSeq_();
-    template <typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
+    template<typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
 
- private:
+  private:
     std::unique_ptr<internal::TcpSend> p;
     std::string ip_addr_;
     char tmp_ip_buf[64] = {'\0'};
@@ -48,14 +48,13 @@ class DLLEXPORT TcpSend final : public Component
     bool is_valid_ip;
     bool send_as_binary_;
     float rate_val_{};
-    int rate_selection_[9] = {0,60,30,20,15,10,5,2,1};
+    int rate_selection_[9] = {0, 60, 30, 20, 15, 10, 5, 2, 1};
     std::chrono::steady_clock::time_point current_time_;
     std::chrono::steady_clock::time_point last_time_;
     std::unique_ptr<asio2::tcp_client> client_;
-
 };
 
-EXPORT_PLUGIN( TcpSend )
+EXPORT_PLUGIN(TcpSend)
 
 }  // namespace DSPatch::DSPatchables
-#endif //FLOWCV_PLUGIN_TCP_SEND_HPP_
+#endif  // FLOWCV_PLUGIN_TCP_SEND_HPP_

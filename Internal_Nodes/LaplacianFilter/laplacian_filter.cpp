@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-LaplacianFilter::LaplacianFilter()
-    : Component( ProcessOrder::OutOfOrder )
+LaplacianFilter::LaplacianFilter() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Laplacian");
@@ -24,25 +23,24 @@ LaplacianFilter::LaplacianFilter()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
-    out_depth_ = 2; // -1/CV_16S/CV_32F/CV_64F
+    out_depth_ = 2;  // -1/CV_16S/CV_32F/CV_64F
     scale_ = 1.0f;
     delta_ = 0.0f;
     ksize_ = 3;
 
     SetEnabled(true);
-
 }
 
-void LaplacianFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void LaplacianFilter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -69,11 +67,11 @@ void LaplacianFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
             else if (out_depth_ == 3)
                 depth_mode = CV_64F;
 
-            cv::Laplacian(lapFrame, frame, depth_mode,ksize_, scale_, delta_, cv::BORDER_DEFAULT);
+            cv::Laplacian(lapFrame, frame, depth_mode, ksize_, scale_, delta_, cv::BORDER_DEFAULT);
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -97,8 +95,7 @@ void LaplacianFilter::UpdateGui(void *context, int interface)
     // When Creating Strings for Controls use: CreateControlString("Text Here", GetInstanceCount()).c_str()
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        ImGui::Combo(CreateControlString("Depth Out", GetInstanceName()).c_str(), &out_depth_,
-                     "Auto\0CV_16S\0CV_32F\0CV_64F\0\0");
+        ImGui::Combo(CreateControlString("Depth Out", GetInstanceName()).c_str(), &out_depth_, "Auto\0CV_16S\0CV_32F\0CV_64F\0\0");
         ImGui::Separator();
         ImGui::SetNextItemWidth(100);
         if (ImGui::InputInt(CreateControlString("Kernel Size", GetInstanceName()).c_str(), &ksize_, 2, 2)) {
@@ -115,7 +112,6 @@ void LaplacianFilter::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Delta", GetInstanceName()).c_str(), &delta_, 0.1f);
     }
-
 }
 
 std::string LaplacianFilter::GetState()
@@ -148,7 +144,6 @@ void LaplacianFilter::SetState(std::string &&json_serialized)
         delta_ = state["delta"].get<float>();
     if (state.contains("ksize"))
         ksize_ = state["ksize"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

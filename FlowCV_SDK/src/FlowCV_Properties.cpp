@@ -15,7 +15,6 @@ FlowCV_Properties::FlowCV_Properties()
     has_changes_ = false;
 }
 
-
 void FlowCV_Properties::AddBool(std::string &&key, std::string &&desc, bool value, bool visible)
 {
     DataStruct d;
@@ -123,34 +122,31 @@ void FlowCV_Properties::RemoveAll()
     prop_idx.clear();
 }
 
-template<typename T>
-T FlowCV_Properties::Get(const std::string &key)
+template<typename T> T FlowCV_Properties::Get(const std::string &key)
 {
     T ret{};
 
     if (prop_idx.find(key) != prop_idx.end())
-        ret = *(T*)props_->at(prop_idx.at(key)).r_val.data();
+        ret = *(T *)props_->at(prop_idx.at(key)).r_val.data();
 
     return ret;
 }
 
-template<typename T>
-T FlowCV_Properties::GetW(const std::string &key)
+template<typename T> T FlowCV_Properties::GetW(const std::string &key)
 {
     T ret{};
 
     if (prop_idx.find(key) != prop_idx.end())
-        ret = *(T*)props_->at(prop_idx.at(key)).w_val.data();
+        ret = *(T *)props_->at(prop_idx.at(key)).w_val.data();
 
     return ret;
 }
 
-template<typename T>
-T *FlowCV_Properties::GetPointer(const std::string &key)
+template<typename T> T *FlowCV_Properties::GetPointer(const std::string &key)
 {
     T *prop = nullptr;
     if (prop_idx.find(key) != prop_idx.end())
-        prop = (T*)props_->at(prop_idx.at(key)).w_val.data();
+        prop = (T *)props_->at(prop_idx.at(key)).w_val.data();
 
     return prop;
 }
@@ -175,15 +171,18 @@ void FlowCV_Properties::Sync()
 {
     if (has_changes_) {
         std::lock_guard<std::mutex> lk(mutex_lock_);
-        for (auto &prop: *props_) {
+        for (auto &prop : *props_) {
             if (prop.changed) {
                 if (prop.data_type == PropertyDataTypes::kDataTypeBool) {
                     *(bool *)prop.r_val.data() = *(bool *)prop.w_val.data();
-                } else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
+                }
+                else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
                     *(int *)prop.r_val.data() = *(int *)prop.w_val.data();
-                } else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
+                }
+                else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
                     *(float *)prop.r_val.data() = *(float *)prop.w_val.data();
-                } else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
+                }
+                else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
                     *(int *)prop.r_val.data() = *(int *)prop.w_val.data();
                 }
                 prop.changed = false;
@@ -284,7 +283,7 @@ void FlowCV_Properties::SetVisibility(std::string &&key, bool show)
     }
 }
 
-void FlowCV_Properties::SetDescription(std::string &&key, std::string&& desc)
+void FlowCV_Properties::SetDescription(std::string &&key, std::string &&desc)
 {
     if (prop_idx.find(key) != prop_idx.end()) {
         props_->at(prop_idx.at(key)).desc = desc;
@@ -318,17 +317,20 @@ void FlowCV_Properties::SetToDefault(std::string &&key)
 void FlowCV_Properties::SetAllToDefault()
 {
     std::lock_guard<std::mutex> lk(mutex_lock_);
-    for (auto &prop: *props_) {
+    for (auto &prop : *props_) {
         if (prop.data_type == PropertyDataTypes::kDataTypeBool) {
             *(bool *)prop.w_val.data() = *(bool *)prop.d_val.data();
             prop.changed = true;
-        } else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
+        }
+        else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
             *(int *)prop.w_val.data() = *(int *)prop.d_val.data();
             prop.changed = true;
-        } else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
+        }
+        else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
             *(float *)prop.w_val.data() = *(float *)prop.d_val.data();
             prop.changed = true;
-        } else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
+        }
+        else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
             *(int *)prop.w_val.data() = *(int *)prop.d_val.data();
             prop.changed = true;
         }
@@ -336,43 +338,40 @@ void FlowCV_Properties::SetAllToDefault()
     has_changes_ = true;
 }
 
-template<typename T>
-T FlowCV_Properties::GetMin(const std::string &key)
+template<typename T> T FlowCV_Properties::GetMin(const std::string &key)
 {
     T ret{};
 
     if (prop_idx.find(key) != prop_idx.end()) {
         auto &d = props_->at(prop_idx.at(key));
         if (d.data_type != PropertyDataTypes::kDataTypeBool)
-            ret = *(T*)d.range.min.data();
+            ret = *(T *)d.range.min.data();
     }
 
     return ret;
 }
 
-template<typename T>
-T FlowCV_Properties::GetMax(const std::string &key)
+template<typename T> T FlowCV_Properties::GetMax(const std::string &key)
 {
     T ret{};
 
     if (prop_idx.find(key) != prop_idx.end()) {
         auto &d = props_->at(prop_idx.at(key));
         if (d.data_type != PropertyDataTypes::kDataTypeBool)
-            ret = *(T*)d.range.max.data();
+            ret = *(T *)d.range.max.data();
     }
 
     return ret;
 }
 
-template<typename T>
-T FlowCV_Properties::GetStep(const std::string &key)
+template<typename T> T FlowCV_Properties::GetStep(const std::string &key)
 {
     T ret{};
 
     if (prop_idx.find(key) != prop_idx.end()) {
         auto &d = props_->at(prop_idx.at(key));
         if (d.data_type != PropertyDataTypes::kDataTypeBool)
-            ret = *(T*)d.range.step.data();
+            ret = *(T *)d.range.step.data();
     }
 
     return ret;
@@ -381,16 +380,19 @@ T FlowCV_Properties::GetStep(const std::string &key)
 void FlowCV_Properties::ToJson(nlohmann::json &j)
 {
     std::lock_guard<std::mutex> lk(mutex_lock_);
-    for (auto &prop: *props_) {
+    for (auto &prop : *props_) {
         if (prop.visibility) {
             if (prop.data_type == PropertyDataTypes::kDataTypeBool) {
-                j[prop.key] = *(bool *) prop.w_val.data();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
-                j[prop.key] = *(int *) prop.w_val.data();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
-                j[prop.key] = *(float *) prop.w_val.data();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
-                j[prop.key] = *(int *) prop.w_val.data();
+                j[prop.key] = *(bool *)prop.w_val.data();
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
+                j[prop.key] = *(int *)prop.w_val.data();
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
+                j[prop.key] = *(float *)prop.w_val.data();
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
+                j[prop.key] = *(int *)prop.w_val.data();
             }
         }
     }
@@ -399,18 +401,21 @@ void FlowCV_Properties::ToJson(nlohmann::json &j)
 void FlowCV_Properties::FromJson(nlohmann::json &j)
 {
     std::lock_guard<std::mutex> lk(mutex_lock_);
-    for (auto &prop: *props_) {
+    for (auto &prop : *props_) {
         if (j.contains(prop.key)) {
             if (prop.data_type == PropertyDataTypes::kDataTypeBool) {
                 *(bool *)prop.w_val.data() = j[prop.key].get<bool>();
                 *(bool *)prop.r_val.data() = j[prop.key].get<bool>();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
                 *(int *)prop.w_val.data() = j[prop.key].get<int>();
                 *(int *)prop.r_val.data() = j[prop.key].get<int>();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
                 *(float *)prop.w_val.data() = j[prop.key].get<float>();
                 *(float *)prop.r_val.data() = j[prop.key].get<float>();
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
                 *(int *)prop.w_val.data() = j[prop.key].get<int>();
                 *(int *)prop.r_val.data() = j[prop.key].get<int>();
             }
@@ -418,9 +423,9 @@ void FlowCV_Properties::FromJson(nlohmann::json &j)
     }
 }
 
-void FlowCV_Properties::DrawUi(const char* inst_id)
+void FlowCV_Properties::DrawUi(const char *inst_id)
 {
-    for (auto &prop: *props_) {
+    for (auto &prop : *props_) {
         if (prop.visibility) {
             if (prop.data_type == PropertyDataTypes::kDataTypeBool) {
                 bool val = *(bool *)prop.w_val.data();
@@ -429,14 +434,12 @@ void FlowCV_Properties::DrawUi(const char* inst_id)
                     prop.changed = true;
                     has_changes_ = true;
                 }
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeInt) {
                 int val = *(int *)prop.w_val.data();
                 ImGui::SetNextItemWidth(120);
-                if (ImGui::DragInt(CreateControlString(prop.desc.c_str(), inst_id).c_str(), &val,
-                               *(float *)prop.range.step.data(),
-                               *(int *)prop.range.min.data(),
-                               *(int *)prop.range.max.data()))
-                {
+                if (ImGui::DragInt(CreateControlString(prop.desc.c_str(), inst_id).c_str(), &val, *(float *)prop.range.step.data(),
+                        *(int *)prop.range.min.data(), *(int *)prop.range.max.data())) {
                     if (val < *(int *)prop.range.min.data())
                         val = *(int *)prop.range.min.data();
                     else if (val > *(int *)prop.range.max.data())
@@ -445,14 +448,12 @@ void FlowCV_Properties::DrawUi(const char* inst_id)
                     prop.changed = true;
                     has_changes_ = true;
                 }
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeFloat) {
                 float val = *(float *)prop.w_val.data();
                 ImGui::SetNextItemWidth(120);
-                if (ImGui::DragFloat(CreateControlString(prop.desc.c_str(), inst_id).c_str(), &val,
-                                   *(float *)prop.range.step.data(),
-                                   *(float *)prop.range.min.data(),
-                                   *(float *)prop.range.max.data()))
-                {
+                if (ImGui::DragFloat(CreateControlString(prop.desc.c_str(), inst_id).c_str(), &val, *(float *)prop.range.step.data(),
+                        *(float *)prop.range.min.data(), *(float *)prop.range.max.data())) {
                     if (val < *(float *)prop.range.min.data())
                         val = *(float *)prop.range.min.data();
                     else if (val > *(float *)prop.range.max.data())
@@ -461,14 +462,17 @@ void FlowCV_Properties::DrawUi(const char* inst_id)
                     prop.changed = true;
                     has_changes_ = true;
                 }
-            } else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
+            }
+            else if (prop.data_type == PropertyDataTypes::kDataTypeOption) {
                 int val = *(int *)prop.w_val.data();
                 ImGui::SetNextItemWidth(140);
-                if (ImGui::Combo(CreateControlString(prop.desc.c_str(), inst_id).c_str(),
-                                 &val, [](void* data, int idx, const char** out_text) {
-                        *out_text = ((const std::vector<std::string>*)data)->at(idx).c_str();
-                        return true;
-                    }, (void*)&prop.options, (int)prop.options.size())) {
+                if (ImGui::Combo(
+                        CreateControlString(prop.desc.c_str(), inst_id).c_str(), &val,
+                        [](void *data, int idx, const char **out_text) {
+                            *out_text = ((const std::vector<std::string> *)data)->at(idx).c_str();
+                            return true;
+                        },
+                        (void *)&prop.options, (int)prop.options.size())) {
                     *(int *)prop.w_val.data() = val;
                     prop.changed = true;
                     has_changes_ = true;
@@ -496,4 +500,4 @@ template bool *FlowCV_Properties::GetPointer<bool>(const std::string &key);
 template int *FlowCV_Properties::GetPointer<int>(const std::string &key);
 template float *FlowCV_Properties::GetPointer<float>(const std::string &key);
 
-} // End Namespace FlowCV
+}  // End Namespace FlowCV

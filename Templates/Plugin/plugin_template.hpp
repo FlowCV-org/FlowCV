@@ -28,16 +28,15 @@ class DLLEXPORT PluginName final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::PluginName> p;
     FlowCV::FlowCV_Properties props_;
-
 };
 
-EXPORT_PLUGIN( PluginName )
+EXPORT_PLUGIN(PluginName)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_TEMPLATE_HPP_
+#endif  // FLOWCV_PLUGIN_TEMPLATE_HPP_

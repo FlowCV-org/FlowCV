@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class ImageWriter
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-ImageWriter::ImageWriter()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::ImageWriter() )
+ImageWriter::ImageWriter() : Component(ProcessOrder::OutOfOrder), p(new internal::ImageWriter())
 {
     // Name and Category
     SetComponentName_("Image_Writer");
@@ -29,7 +27,7 @@ ImageWriter::ImageWriter()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     show_file_dialog_ = false;
     save_image_now_ = false;
@@ -38,14 +36,13 @@ ImageWriter::ImageWriter()
     SetOutputCount_(0);
 
     SetEnabled(true);
-
 }
 
-void ImageWriter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ImageWriter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -60,7 +57,6 @@ void ImageWriter::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
         }
     }
-
 }
 
 bool ImageWriter::HasGui(int interface)
@@ -94,11 +90,11 @@ void ImageWriter::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", image_file_.c_str());
 
-        if(show_file_dialog_)
+        if (show_file_dialog_)
             ImGui::OpenPopup(CreateControlString("Save Image", GetInstanceName()).c_str());
 
-        if(file_dialog_.showFileDialog(CreateControlString("Save Image", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), "*.*", &show_file_dialog_))
-        {
+        if (file_dialog_.showFileDialog(CreateControlString("Save Image", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE,
+                ImVec2(700, 310), "*.*", &show_file_dialog_)) {
             std::cout << file_dialog_.selected_path << std::endl;
             std::cout << file_dialog_.selected_fn << std::endl;
             std::cout << file_dialog_.ext << std::endl;
@@ -106,7 +102,6 @@ void ImageWriter::UpdateGui(void *context, int interface)
             show_file_dialog_ = false;
         }
     }
-
 }
 
 std::string ImageWriter::GetState()
@@ -125,6 +120,4 @@ void ImageWriter::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }

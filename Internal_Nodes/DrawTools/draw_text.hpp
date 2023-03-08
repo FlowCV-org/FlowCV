@@ -23,7 +23,7 @@ class DrawText final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     char text_[128];
@@ -37,4 +37,4 @@ class DrawText final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_DRAW_TEXT_HPP_
+#endif  // FLOWCV_PLUGIN_DRAW_TEXT_HPP_

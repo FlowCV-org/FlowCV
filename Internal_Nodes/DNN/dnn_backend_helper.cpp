@@ -7,11 +7,8 @@
 
 struct backendListCompare
 {
-    explicit backendListCompare(std::string  s) : _s(std::move(s)) { }
-    bool operator () (std::pair<std::string, cv::dnn::Backend> const& p) const
-    {
-        return (p.first == _s);
-    }
+    explicit backendListCompare(std::string s) : _s(std::move(s)) {}
+    bool operator()(std::pair<std::string, cv::dnn::Backend> const &p) const { return (p.first == _s); }
     std::string _s;
 };
 
@@ -50,9 +47,7 @@ void DnnBackendListHelper::UpdateTargetList(cv::dnn::Backend backend)
             target_list_.emplace_back(targets.at((int)t), t);
         }
     }
-    std::sort(target_list_.begin(), target_list_.end(), [](auto &left, auto &right) {
-        return left.second < right.second;
-    });
+    std::sort(target_list_.begin(), target_list_.end(), [](auto &left, auto &right) { return left.second < right.second; });
 }
 
 std::vector<std::pair<std::string, cv::dnn::Backend>> DnnBackendListHelper::GetBackEndList()

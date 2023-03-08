@@ -23,7 +23,7 @@ class HistogramViewer final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     cv::Mat frame_;
@@ -34,9 +34,8 @@ class HistogramViewer final : public Component
     std::vector<float> values_r_;
     std::vector<float> values_g_;
     std::vector<float> values_b_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_HISTOGRAM_VIEWER_HPP_
+#endif  // FLOWCV_PLUGIN_HISTOGRAM_VIEWER_HPP_

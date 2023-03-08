@@ -24,7 +24,7 @@ class Classification final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void InitDnn_();
 
   private:
@@ -64,9 +64,8 @@ class Classification final : public Component
     bool needs_soft_max_{};
     bool draw_class_{};
     bool crop_{};
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif // FLOWCV_PLUGIN_DNN_CLASSIFICATION_HPP_
+#endif  // FLOWCV_PLUGIN_DNN_CLASSIFICATION_HPP_

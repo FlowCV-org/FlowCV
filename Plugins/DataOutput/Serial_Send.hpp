@@ -21,21 +21,21 @@ class SerialSend;
 
 class DLLEXPORT SerialSend final : public Component
 {
- public:
+  public:
     SerialSend();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void OpenSerialConn_();
     void CloseSerialConn_();
     void SetEOLSeq_();
-    template <typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
+    template<typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
 
- private:
+  private:
     std::unique_ptr<internal::SerialSend> p;
     Serial_Enumerator se_;
     char eol_seq_[3] = {'\0'};
@@ -51,14 +51,13 @@ class DLLEXPORT SerialSend final : public Component
     int parity_index_;
     int stop_bits_index_;
     int char_size_index_;
-    int rate_selection_[9] = {0,60,30,20,15,10,5,2,1};
+    int rate_selection_[9] = {0, 60, 30, 20, 15, 10, 5, 2, 1};
     std::chrono::steady_clock::time_point current_time_;
     std::chrono::steady_clock::time_point last_time_;
     std::unique_ptr<asio2::serial_port> sp_;
-
 };
 
-EXPORT_PLUGIN( SerialSend )
+EXPORT_PLUGIN(SerialSend)
 
 }  // namespace DSPatch::DSPatchables
-#endif //FLOWCV_PLUGIN_SERIAL_SEND_HPP_
+#endif  // FLOWCV_PLUGIN_SERIAL_SEND_HPP_

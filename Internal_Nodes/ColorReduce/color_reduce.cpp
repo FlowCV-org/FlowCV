@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-ColorReduce::ColorReduce()
-    : Component( ProcessOrder::OutOfOrder )
+ColorReduce::ColorReduce() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Color_Reduce");
@@ -24,22 +23,21 @@ ColorReduce::ColorReduce()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     div_ = 64;
 
     SetEnabled(true);
-
 }
 
-void ColorReduce::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ColorReduce::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -55,15 +53,15 @@ void ColorReduce::Process_( SignalBus const& inputs, SignalBus& outputs )
             if (div_ < 1)
                 div_ = 1;
             for (int j = 0; j < nl; j++) {
-                uchar* data = frame.ptr<uchar>(j);
+                uchar *data = frame.ptr<uchar>(j);
                 for (int i = 0; i < nc; i++) {
                     data[i] = data[i] / div_ * div_ + div_ / 2;
                 }
             }
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -93,7 +91,6 @@ void ColorReduce::UpdateGui(void *context, int interface)
                 div_ = 1;
         }
     }
-
 }
 
 std::string ColorReduce::GetState()
@@ -112,8 +109,6 @@ void ColorReduce::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

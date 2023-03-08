@@ -22,11 +22,10 @@ struct BlobTrackingData
     uint32_t id;
     int last_size;
     uint32_t last_frame;
-
 };
 
 class SimpleBlobTracker;
-}
+}  // namespace internal
 
 class DLLEXPORT SimpleBlobTracker final : public Component
 {
@@ -38,7 +37,7 @@ class DLLEXPORT SimpleBlobTracker final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::SimpleBlobTracker> p;
@@ -55,8 +54,8 @@ class DLLEXPORT SimpleBlobTracker final : public Component
     int max_size_var_;
 };
 
-EXPORT_PLUGIN( SimpleBlobTracker )
+EXPORT_PLUGIN(SimpleBlobTracker)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SIMPLE_BLOB_TRACKER_HPP_
+#endif  // FLOWCV_PLUGIN_SIMPLE_BLOB_TRACKER_HPP_

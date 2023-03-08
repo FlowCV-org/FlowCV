@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-GetSize::GetSize()
-    : Component( ProcessOrder::OutOfOrder )
+GetSize::GetSize() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Get_Size");
@@ -24,20 +23,19 @@ GetSize::GetSize()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"size"}, {IoType::Io_Type_Int_Array} );
+    SetOutputCount_(1, {"size"}, {IoType::Io_Type_Int_Array});
 
     SetEnabled(true);
-
 }
 
-void GetSize::Process_( SignalBus const& inputs, SignalBus& outputs )
+void GetSize::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -47,7 +45,6 @@ void GetSize::Process_( SignalBus const& inputs, SignalBus& outputs )
             outputs.SetValue(0, image_size);
         }
     }
-
 }
 
 bool GetSize::HasGui(int interface)
@@ -59,8 +56,6 @@ void GetSize::UpdateGui(void *context, int interface)
 {
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
-
-
 }
 
 std::string GetSize::GetState()
@@ -79,8 +74,6 @@ void GetSize::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

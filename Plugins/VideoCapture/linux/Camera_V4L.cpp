@@ -4,7 +4,8 @@
 
 #include "Camera_V4L.hpp"
 
-namespace camv4l {
+namespace camv4l
+{
 
 std::map<int, Device> Camera_V4L_Enumerator::getVideoDevicesMap()
 {
@@ -40,7 +41,6 @@ std::map<int, Device> Camera_V4L_Enumerator::getVideoDevicesMap()
     }
 
     return deviceMap;
-
 }
 
-}// End camv4l namespace
+}  // namespace camv4l

@@ -38,7 +38,7 @@ void Camera_Enumerator::RefreshCameraList()
     camera_list_.clear();
     camera_list_.emplace_back(std::make_pair(0, "None"));
 
-    for (const auto& device : devices) {
+    for (const auto &device : devices) {
         uint32_t id = device.first + 1;
         std::string name = device.second.deviceName;
         camera_list_.emplace_back(std::make_pair(id, name));

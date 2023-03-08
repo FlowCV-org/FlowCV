@@ -23,7 +23,7 @@ class HoughLines final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int hough_mode_;
@@ -44,4 +44,4 @@ class HoughLines final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_HOUGH_LINES_HPP_
+#endif  // FLOWCV_PLUGIN_HOUGH_LINES_HPP_

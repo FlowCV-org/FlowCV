@@ -17,7 +17,6 @@ void Serial_Enumerator::RefreshSerialList()
         serial_list_.insert(serial_list_.begin(), spi);
     else
         serial_list_.emplace_back(spi);
-
 }
 
 int Serial_Enumerator::GetSerialCount()

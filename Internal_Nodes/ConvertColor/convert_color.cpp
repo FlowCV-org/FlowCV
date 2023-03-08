@@ -13,8 +13,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-ConvertColor::ConvertColor()
-    : Component( ProcessOrder::OutOfOrder )
+ConvertColor::ConvertColor() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Convert_Color");
@@ -25,23 +24,22 @@ ConvertColor::ConvertColor()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     cvt_mode_ = 0;
     channel_error_ = false;
 
     SetEnabled(true);
-
 }
 
-void ConvertColor::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ConvertColor::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -55,13 +53,13 @@ void ConvertColor::Process_( SignalBus const& inputs, SignalBus& outputs )
                 if (!frame.empty())
                     outputs.SetValue(0, frame);
             }
-            catch (const std::exception& e)
-            {
+            catch (const std::exception &e) {
                 std::cout << e.what();
                 outputs.SetValue(0, *in1);
                 channel_error_ = true;
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
             channel_error_ = false;
         }
@@ -86,15 +84,17 @@ void ConvertColor::UpdateGui(void *context, int interface)
 
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         ImGui::SetNextItemWidth(100);
-        ImGui::Combo(CreateControlString("Conversion Type", GetInstanceName()).c_str(), &cvt_mode_, [](void* data, int idx, const char** out_text) {
-            *out_text = ((const std::vector<std::string>*)data)->at(idx).c_str();
-            return true;
-        }, (void*)&ConvertColorNames, (int)ConvertColorNames.size());
+        ImGui::Combo(
+            CreateControlString("Conversion Type", GetInstanceName()).c_str(), &cvt_mode_,
+            [](void *data, int idx, const char **out_text) {
+                *out_text = ((const std::vector<std::string> *)data)->at(idx).c_str();
+                return true;
+            },
+            (void *)&ConvertColorNames, (int)ConvertColorNames.size());
         if (channel_error_) {
             ImGui::TextColored(ImVec4(1, 0, 0, 1), "Incompatible Conversion Type");
         }
     }
-
 }
 
 std::string ConvertColor::GetState()
@@ -118,7 +118,6 @@ void ConvertColor::SetState(std::string &&json_serialized)
 
     if (state.contains("conv_code"))
         cvt_mode_ = state["conv_code"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

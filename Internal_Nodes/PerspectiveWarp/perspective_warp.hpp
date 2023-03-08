@@ -23,7 +23,7 @@ class PerspectiveWarp final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int corner_count_;
@@ -33,9 +33,8 @@ class PerspectiveWarp final : public Component
     bool use_fixed_res_;
     int fixed_width_;
     int fixed_height_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_PERSPECTIVE_WARP_HPP_
+#endif  // FLOWCV_PLUGIN_PERSPECTIVE_WARP_HPP_

@@ -37,7 +37,7 @@ class DLLEXPORT ShapeColorizer final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::ShapeColorizer> p;
@@ -52,8 +52,8 @@ class DLLEXPORT ShapeColorizer final : public Component
     std::mutex io_mutex_;
 };
 
-EXPORT_PLUGIN( ShapeColorizer )
+EXPORT_PLUGIN(ShapeColorizer)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SHAPE_COLORIZER_HPP_
+#endif  // FLOWCV_PLUGIN_SHAPE_COLORIZER_HPP_

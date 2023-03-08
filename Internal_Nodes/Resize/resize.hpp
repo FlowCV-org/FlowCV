@@ -23,7 +23,7 @@ class Resize final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     bool has_size_input_;
@@ -35,4 +35,4 @@ class Resize final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_RESIZE_HPP_
+#endif  // FLOWCV_PLUGIN_RESIZE_HPP_

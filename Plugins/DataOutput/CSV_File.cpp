@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class CsvFile
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-CsvFile::CsvFile()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::CsvFile() )
+CsvFile::CsvFile() : Component(ProcessOrder::OutOfOrder), p(new internal::CsvFile())
 {
     // Name and Category
     SetComponentName_("CSV_File");
@@ -29,7 +27,7 @@ CsvFile::CsvFile()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 3, {"start", "frame", "json"}, {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_JSON} );
+    SetInputCount_(3, {"start", "frame", "json"}, {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_JSON});
 
     start_new_file_ = false;
     counter_ = 0;
@@ -43,7 +41,6 @@ CsvFile::CsvFile()
     limit_file_size_ = false;
     num_files_ = 10;
     SetEnabled(true);
-
 }
 
 CsvFile::~CsvFile()
@@ -120,7 +117,7 @@ void CsvFile::OpenCsvFile(nlohmann::json &json_data)
                                 std::string keyname = it.key();
                                 keyname += '_';
                                 keyname += std::to_string(i + 1);
-                                csv_file_ << keyname << "," ;
+                                csv_file_ << keyname << ",";
                             }
                         }
                     }
@@ -132,11 +129,11 @@ void CsvFile::OpenCsvFile(nlohmann::json &json_data)
     }
 }
 
-void CsvFile::Process_( SignalBus const& inputs, SignalBus& outputs )
+void CsvFile::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<bool>( 0 );
-    auto in2 = inputs.GetValue<int>( 1 );
-    auto in3 = inputs.GetValue<nlohmann::json>( 2 );
+    auto in1 = inputs.GetValue<bool>(0);
+    auto in2 = inputs.GetValue<int>(1);
+    auto in3 = inputs.GetValue<nlohmann::json>(2);
 
     if (!in3)
         return;
@@ -181,7 +178,8 @@ void CsvFile::Process_( SignalBus const& inputs, SignalBus& outputs )
                             if (csv_cur_file_num_ > num_files_)
                                 csv_cur_file_num_ = 0;
                             OpenCsvFile(json_in);
-                        } else { // File has reached limit, close and return
+                        }
+                        else {  // File has reached limit, close and return
                             csv_file_.flush();
                             csv_file_.close();
                             return;
@@ -212,15 +210,16 @@ void CsvFile::Process_( SignalBus const& inputs, SignalBus& outputs )
                                     csv_file_ << it->get<int>() << ",";
                                 else if (it->is_boolean()) {
                                     csv_file_ << it->get<bool>() << ",";
-                                } else if (it->is_array()) {
+                                }
+                                else if (it->is_array()) {
                                     for (int i = 0; i < it->size(); i++) {
                                         if (it->at(i).is_number_float())
                                             csv_file_ << it->at(i).get<float>() << ",";
                                         else if (it->is_number_integer())
                                             csv_file_ << it->at(i).get<int>() << ",";
                                     }
-                                } else if (it->is_object()) { // TODO: Handle Deeper Level JSON Objects
-
+                                }
+                                else if (it->is_object()) {  // TODO: Handle Deeper Level JSON Objects
                                 }
                             }
                             csv_file_ << "\n";
@@ -264,11 +263,11 @@ void CsvFile::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", csv_file_path_.c_str());
 
-        if(show_file_dialog_)
+        if (show_file_dialog_)
             ImGui::OpenPopup(CreateControlString("Save CSV", GetInstanceName()).c_str());
 
-        if(file_dialog_.showFileDialog(CreateControlString("Save CSV", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), ".csv", &show_file_dialog_))
-        {
+        if (file_dialog_.showFileDialog(CreateControlString("Save CSV", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310),
+                ".csv", &show_file_dialog_)) {
             auto loc = file_dialog_.selected_path.find_last_of('.');
             if (loc == std::string::npos) {
                 csv_file_path_ = file_dialog_.selected_path;
@@ -282,7 +281,7 @@ void CsvFile::UpdateGui(void *context, int interface)
         }
         ImGui::Separator();
         bool newFile = false;
-        if(ImGui::Checkbox(CreateControlString("Save Timestamp", GetInstanceName()).c_str(), &save_timestamp_)) {
+        if (ImGui::Checkbox(CreateControlString("Save Timestamp", GetInstanceName()).c_str(), &save_timestamp_)) {
             newFile = true;
         }
         if (ImGui::Checkbox(CreateControlString("Save Index Count", GetInstanceName()).c_str(), &save_counter_)) {
@@ -308,7 +307,6 @@ void CsvFile::UpdateGui(void *context, int interface)
         if (newFile)
             start_new_file_ = true;
     }
-
 }
 
 std::string CsvFile::GetState()
@@ -354,4 +352,3 @@ void CsvFile::SetState(std::string &&json_serialized)
     if (!csv_file_path_.empty())
         start_new_file_ = true;
 }
-

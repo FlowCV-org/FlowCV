@@ -24,7 +24,7 @@ class HumanPose final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void InitDnn_();
 
   private:
@@ -62,4 +62,4 @@ class HumanPose final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif // FLOWCV_PLUGIN_DNN_HUMAN_POSE_HPP_
+#endif  // FLOWCV_PLUGIN_DNN_HUMAN_POSE_HPP_

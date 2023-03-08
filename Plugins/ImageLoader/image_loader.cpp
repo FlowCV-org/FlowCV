@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class ImageLoader
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-ImageLoader::ImageLoader()
-    : Component( ProcessOrder::InOrder )
-    , p( new internal::ImageLoader() )
+ImageLoader::ImageLoader() : Component(ProcessOrder::InOrder), p(new internal::ImageLoader())
 {
     // Name and Category
     SetComponentName_("Image_Loader");
@@ -30,10 +28,10 @@ ImageLoader::ImageLoader()
     show_file_dialog_ = false;
 
     // 1 inputs
-    SetInputCount_( 0 );
+    SetInputCount_(0);
 
     // 1 output
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     fps_ = 30;
     fps_index_ = 7;
@@ -43,12 +41,12 @@ ImageLoader::ImageLoader()
     SetEnabled(true);
 }
 
-void ImageLoader::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ImageLoader::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     if (!IsEnabled())
         SetEnabled(true);
 
-    if (io_mutex_.try_lock()) { // Try lock so other threads will skip if locked instead of waiting
+    if (io_mutex_.try_lock()) {  // Try lock so other threads will skip if locked instead of waiting
         if (!frame_.empty()) {
             bool should_wait = true;
             while (should_wait) {
@@ -88,11 +86,11 @@ void ImageLoader::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", image_file_.c_str());
 
-        if(show_file_dialog_)
+        if (show_file_dialog_)
             ImGui::OpenPopup(CreateControlString("Load Image", GetInstanceName()).c_str());
 
-        if(file_dialog_.showFileDialog(CreateControlString("Load Image", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN, ImVec2(700, 310), ".png,.tga,.jpg,.tif", &show_file_dialog_))
-        {
+        if (file_dialog_.showFileDialog(CreateControlString("Load Image", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".png,.tga,.jpg,.tif", &show_file_dialog_)) {
             std::lock_guard<std::mutex> lk(io_mutex_);
             image_file_ = file_dialog_.selected_path;
             frame_ = cv::imread(image_file_, true);
@@ -105,7 +103,6 @@ void ImageLoader::UpdateGui(void *context, int interface)
             fps_time_ = (1.0f / (float)fps_) * 1000.0f;
         }
     }
-
 }
 
 std::string ImageLoader::GetState()
@@ -140,6 +137,4 @@ void ImageLoader::SetState(std::string &&json_serialized)
         fps_ = state["fps"].get<int>();
     if (state.contains("fps_index"))
         fps_index_ = state["fps_index"].get<int>();
-
 }
-

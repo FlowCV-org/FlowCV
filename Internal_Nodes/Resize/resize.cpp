@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Resize::Resize()
-    : Component( ProcessOrder::OutOfOrder )
+Resize::Resize() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Resize");
@@ -24,10 +23,10 @@ Resize::Resize()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 3, {"in", "ref", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array} );
+    SetInputCount_(3, {"in", "ref", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     interp_mode_ = 2;
     has_size_input_ = false;
@@ -36,15 +35,14 @@ Resize::Resize()
     height_ = 512;
 
     SetEnabled(true);
-
 }
 
-void Resize::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Resize::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<cv::Mat>( 1 );
-    auto in3 = inputs.GetValue<std::vector<int>>( 2 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<cv::Mat>(1);
+    auto in3 = inputs.GetValue<std::vector<int>>(2);
+    if (!in1) {
         return;
     }
     if (!in2) {
@@ -94,8 +92,8 @@ void Resize::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -132,9 +130,9 @@ void Resize::UpdateGui(void *context, int interface)
             }
         }
         ImGui::SetNextItemWidth(140);
-        ImGui::Combo(CreateControlString("Interpolation", GetInstanceName()).c_str(), &interp_mode_, "Nearest\0Bilinear\0BiCubic\0Area\0Lanczos\0Bilinear Exact\0\0");
+        ImGui::Combo(
+            CreateControlString("Interpolation", GetInstanceName()).c_str(), &interp_mode_, "Nearest\0Bilinear\0BiCubic\0Area\0Lanczos\0Bilinear Exact\0\0");
     }
-
 }
 
 std::string Resize::GetState()
@@ -164,7 +162,6 @@ void Resize::SetState(std::string &&json_serialized)
         height_ = state["height"].get<int>();
     if (state.contains("mode"))
         interp_mode_ = state["mode"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

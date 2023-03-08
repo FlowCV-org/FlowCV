@@ -15,17 +15,17 @@ namespace DSPatch::DSPatchables
 
 class DrawNumber final : public Component
 {
- public:
+  public:
     DrawNumber();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
- private:
+  private:
     cv::Point2i text_pos_;
     float text_scale_;
     ImVec4 text_color_;
@@ -35,4 +35,4 @@ class DrawNumber final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_DRAW_NUMBER_HPP_
+#endif  // FLOWCV_PLUGIN_DRAW_NUMBER_HPP_

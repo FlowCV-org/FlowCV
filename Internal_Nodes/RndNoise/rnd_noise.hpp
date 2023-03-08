@@ -23,7 +23,7 @@ class RndNoise final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int width_;
@@ -38,9 +38,8 @@ class RndNoise final : public Component
     float fps_time_{};
     std::chrono::steady_clock::time_point last_time_;
     std::mutex io_mutex_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_RND_NOISE_HPP_
+#endif  // FLOWCV_PLUGIN_RND_NOISE_HPP_

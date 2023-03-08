@@ -5,10 +5,11 @@
 #include "Internal_Node_Manager.hpp"
 #include "internal_nodes.hpp"
 
-namespace FlowCV {
+namespace FlowCV
+{
 
-template<class T>
-static NodeDescription GetCompInfo(T nodeClass) {
+template<class T> static NodeDescription GetCompInfo(T nodeClass)
+{
     NodeDescription nodeDesc;
     DSPatch::Component &comp = nodeClass;
     nodeDesc.name = comp.GetComponentName();
@@ -21,12 +22,13 @@ static NodeDescription GetCompInfo(T nodeClass) {
     return nodeDesc;
 }
 
-static bool compareName(const NodeDescription& a, const NodeDescription& b)
+static bool compareName(const NodeDescription &a, const NodeDescription &b)
 {
     return a.name < b.name;
 }
 
-InternalNodeManager::InternalNodeManager() {
+InternalNodeManager::InternalNodeManager()
+{
 
     // Add Internal Components Here
 
@@ -208,15 +210,16 @@ InternalNodeManager::InternalNodeManager() {
 
     // Sort Nodes
     std::sort(node_list_.begin(), node_list_.end(), compareName);
-
 }
 
-uint32_t InternalNodeManager::NodeCount() {
+uint32_t InternalNodeManager::NodeCount()
+{
     return node_list_.size();
 }
 
-bool InternalNodeManager::HasNode(const char *name) {
-    for (auto const &p: node_list_) {
+bool InternalNodeManager::HasNode(const char *name)
+{
+    for (auto const &p : node_list_) {
         if (p.name == name) {
             return true;
         }
@@ -225,7 +228,8 @@ bool InternalNodeManager::HasNode(const char *name) {
     return false;
 }
 
-bool InternalNodeManager::GetNodeDescription(uint32_t index, NodeDescription &nodeDesc) {
+bool InternalNodeManager::GetNodeDescription(uint32_t index, NodeDescription &nodeDesc)
+{
 
     if (index >= 0 && index < node_list_.size()) {
         nodeDesc.name = node_list_.at(index).name;
@@ -240,9 +244,10 @@ bool InternalNodeManager::GetNodeDescription(uint32_t index, NodeDescription &no
     return false;
 }
 
-bool InternalNodeManager::GetNodeDescription(const char *name, NodeDescription &nodeDesc) {
+bool InternalNodeManager::GetNodeDescription(const char *name, NodeDescription &nodeDesc)
+{
 
-    for (auto const &p: node_list_) {
+    for (auto const &p : node_list_) {
         if (p.name == name) {
             nodeDesc.name = p.name;
             nodeDesc.category = p.category;
@@ -257,8 +262,9 @@ bool InternalNodeManager::GetNodeDescription(const char *name, NodeDescription &
     return false;
 }
 
-std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(const char *name) {
-    for (auto const &p: node_list_) {
+std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(const char *name)
+{
+    for (auto const &p : node_list_) {
         if (p.name == name) {
 
             // Handle Instantiation of Internal Classes Here
@@ -496,10 +502,9 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
                 return std::make_shared<DSPatch::DSPatchables::ImageProcessing>();
 
             // ...
-
         }
     }
 
     return nullptr;
 }
-} // End Namespace FlowCV
+}  // End Namespace FlowCV

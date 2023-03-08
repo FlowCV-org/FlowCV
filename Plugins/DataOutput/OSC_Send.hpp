@@ -21,20 +21,20 @@ class OscSend;
 
 class DLLEXPORT OscSend final : public Component
 {
- public:
+  public:
     OscSend();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     bool IsValidIP_();
     void OpenSocket_();
     void CloseSocket_();
 
- private:
+  private:
     std::unique_ptr<internal::OscSend> p;
     std::string ip_addr_;
     char osc_addr_prefix_[64] = {'\0'};
@@ -44,16 +44,15 @@ class DLLEXPORT OscSend final : public Component
     bool is_multicast_;
     bool is_valid_ip;
     float rate_val_{};
-    int rate_selection_[9] = {0,60,30,20,15,10,5,2,1};
+    int rate_selection_[9] = {0, 60, 30, 20, 15, 10, 5, 2, 1};
     std::chrono::steady_clock::time_point current_time_;
     std::chrono::steady_clock::time_point last_time_;
     asio::io_service io_service_;
     std::unique_ptr<asio::ip::udp::socket> socket_;
     std::unique_ptr<asio::ip::udp::endpoint> remote_endpoint_;
-
 };
 
-EXPORT_PLUGIN( OscSend )
+EXPORT_PLUGIN(OscSend)
 
 }  // namespace DSPatch::DSPatchables
-#endif //FLOWCV_PLUGIN_OSC_SEND_HPP_
+#endif  // FLOWCV_PLUGIN_OSC_SEND_HPP_

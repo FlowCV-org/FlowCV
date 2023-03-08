@@ -23,12 +23,11 @@ class GetSize final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_GET_SIZE_HPP_
+#endif  // FLOWCV_PLUGIN_GET_SIZE_HPP_

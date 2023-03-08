@@ -11,13 +11,15 @@
 namespace FlowCV
 {
 
-struct PluginInfo {
+struct PluginInfo
+{
     bool is_initialized = false;
     NodeDescription plugin_desc;
     DSPatch::Plugin *plugin_handle{};
 };
 
-class PluginManager {
+class PluginManager
+{
   public:
     PluginManager() = default;
     ~PluginManager();
@@ -36,5 +38,5 @@ class PluginManager {
     std::string plugin_path_;
     std::vector<PluginInfo> plugins_;
 };
-} // End Namespace FlowCV
-#endif //FLOWCV_PLUGIN_MANAGER_HPP_
+}  // End Namespace FlowCV
+#endif  // FLOWCV_PLUGIN_MANAGER_HPP_

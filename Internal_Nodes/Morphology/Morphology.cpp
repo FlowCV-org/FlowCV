@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Morphology::Morphology()
-    : Component( ProcessOrder::OutOfOrder )
+Morphology::Morphology() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Morphology");
@@ -24,10 +23,10 @@ Morphology::Morphology()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     border_color_.x = 0;
     border_color_.y = 0;
@@ -39,14 +38,13 @@ Morphology::Morphology()
     op_ = 0;
 
     SetEnabled(true);
-
 }
 
-void Morphology::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Morphology::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -55,18 +53,18 @@ void Morphology::Process_( SignalBus const& inputs, SignalBus& outputs )
             cv::Mat frame;
             try {
                 // Process Image
-                cv::Mat element = getStructuringElement( morph_shape_, cv::Size( 2 * morph_amt_ + 1, 2 * morph_amt_ + 1 ), cv::Point( morph_amt_, morph_amt_ ));
-                morphologyEx( *in1, frame, op_, element, cv::Point(-1, -1), iterations_, border_type_,
-                              cv::Scalar(border_color_.z * 255, border_color_.y * 255, border_color_.x * 255));
+                cv::Mat element = getStructuringElement(morph_shape_, cv::Size(2 * morph_amt_ + 1, 2 * morph_amt_ + 1), cv::Point(morph_amt_, morph_amt_));
+                morphologyEx(*in1, frame, op_, element, cv::Point(-1, -1), iterations_, border_type_,
+                    cv::Scalar(border_color_.z * 255, border_color_.y * 255, border_color_.x * 255));
             }
-            catch (const std::exception& e) {
+            catch (const std::exception &e) {
                 std::cout << e.what() << std::endl;
             }
 
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -98,10 +96,10 @@ void Morphology::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Iter", GetInstanceName()).c_str(), &iterations_, 0.25f, 1, 50);
         ImGui::SetNextItemWidth(120);
-        ImGui::Combo(CreateControlString("Border Type", GetInstanceName()).c_str(), &border_type_, "Constant\0Replicate\0Reflect\0Wrap\0Default\0Transparent\0\0");
-        ImGui::ColorEdit3(CreateControlString("Border Color", GetInstanceName()).c_str(), (float*)&border_color_);
+        ImGui::Combo(
+            CreateControlString("Border Type", GetInstanceName()).c_str(), &border_type_, "Constant\0Replicate\0Reflect\0Wrap\0Default\0Transparent\0\0");
+        ImGui::ColorEdit3(CreateControlString("Border Color", GetInstanceName()).c_str(), (float *)&border_color_);
     }
-
 }
 
 std::string Morphology::GetState()
@@ -146,7 +144,6 @@ void Morphology::SetState(std::string &&json_serialized)
         border_color_.y = state["border_color"]["G"].get<float>();
         border_color_.z = state["border_color"]["B"].get<float>();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

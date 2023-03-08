@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class OscSend
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-OscSend::OscSend()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::OscSend() )
+OscSend::OscSend() : Component(ProcessOrder::OutOfOrder), p(new internal::OscSend())
 {
     // Name and Category
     SetComponentName_("OSC_Send");
@@ -29,7 +27,8 @@ OscSend::OscSend()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 5, {"bool", "int", "float", "str", "json"}, {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON} );
+    SetInputCount_(5, {"bool", "int", "float", "str", "json"},
+        {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -42,22 +41,21 @@ OscSend::OscSend()
     last_time_ = current_time_;
 
     SetEnabled(true);
-
 }
 
-void HandleNetworkWrite(const std::error_code& error, std::size_t bytes_transferred)
+void HandleNetworkWrite(const std::error_code &error, std::size_t bytes_transferred)
 {
     std::cout << "Wrote " << bytes_transferred << " bytes with " << error.message() << std::endl;
 }
 
-void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
+void OscSend::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input Handler
-    auto in1 = inputs.GetValue<bool>( 0 );
-    auto in2 = inputs.GetValue<int>( 1 );
-    auto in3 = inputs.GetValue<float>( 2 );
-    auto in4 = inputs.GetValue<std::string>( 3 );
-    auto in5 = inputs.GetValue<nlohmann::json>( 4 );
+    auto in1 = inputs.GetValue<bool>(0);
+    auto in2 = inputs.GetValue<int>(1);
+    auto in3 = inputs.GetValue<float>(2);
+    auto in4 = inputs.GetValue<std::string>(3);
+    auto in5 = inputs.GetValue<nlohmann::json>(4);
 
     if (IsEnabled()) {
         if (socket_ != nullptr) {
@@ -69,7 +67,8 @@ void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                     if (delta >= (long long)rate_val_) {
                         readyToSend = true;
                     }
-                } else
+                }
+                else
                     readyToSend = true;
 
                 if (in1) {
@@ -111,7 +110,7 @@ void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                             oscAddr += '/';
                         oscAddr += *in4;
                         oscStream << osc::BeginMessage(oscAddr.c_str());
-                        //oscStream << 0;
+                        // oscStream << 0;
                         oscStream << osc::EndMessage;
                         socket_->async_send_to(asio::buffer(oscStream.Data(), oscStream.Size()), *remote_endpoint_, HandleNetworkWrite);
                     }
@@ -154,7 +153,7 @@ void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                             if (json_in_.contains("data")) {
                                 if (!json_in_["data"].empty()) {
                                     int idx = 0;
-                                    for (auto &d: json_in_["data"]) {
+                                    for (auto &d : json_in_["data"]) {
                                         for (nlohmann::json::iterator it = d.begin(); it != d.end(); ++it) {
                                             std::string oscAddr = oscBaseAddr;
                                             oscAddr += dataType;
@@ -182,8 +181,7 @@ void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                                                         oscStream << it->at(i).get<int>();
                                                 }
                                             }
-                                            else if (it->is_object()) { // TODO: Handle Deeper Level JSON Objects
-
+                                            else if (it->is_object()) {  // TODO: Handle Deeper Level JSON Objects
                                             }
                                             oscStream << osc::EndMessage;
                                         }
@@ -197,8 +195,8 @@ void OscSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                     }
                 }
                 if (readyToSend) {
-                    float curRate = 1.0f / ((float) delta * 0.001f);
-                    //std::cout << curRate << std::endl;
+                    float curRate = 1.0f / ((float)delta * 0.001f);
+                    // std::cout << curRate << std::endl;
                     last_time_ = current_time_;
                 }
             }
@@ -298,7 +296,6 @@ void OscSend::SetState(std::string &&json_serialized)
 
     if (IsValidIP_() && port_ != 0)
         OpenSocket_();
-
 }
 
 void OscSend::OpenSocket_()
@@ -317,7 +314,8 @@ void OscSend::OpenSocket_()
             socket_->open(asio::ip::udp::v4());
             if (address.is_multicast())
                 is_multicast_ = true;
-        } else if (address.is_v6()) {
+        }
+        else if (address.is_v6()) {
             socket_->open(asio::ip::udp::v6());
             if (address.is_multicast())
                 is_multicast_ = true;
@@ -339,10 +337,11 @@ bool OscSend::IsValidIP_()
         if (ec) {
             is_valid_ip = false;
             std::cerr << ec.message() << std::endl;
-        } else {
+        }
+        else {
             if (address.is_v4()) {
                 int dotCount = 0;
-                for (auto &c: ip_addr_) {
+                for (auto &c : ip_addr_) {
                     if (c == '.')
                         dotCount++;
                 }
@@ -350,9 +349,10 @@ bool OscSend::IsValidIP_()
                     is_valid_ip = true;
                     return true;
                 }
-            } else if (address.is_v6()) {
+            }
+            else if (address.is_v6()) {
                 int dotCount = 0;
-                for (auto c: ip_addr_) {
+                for (auto c : ip_addr_) {
                     if (c == ':')
                         dotCount++;
                 }

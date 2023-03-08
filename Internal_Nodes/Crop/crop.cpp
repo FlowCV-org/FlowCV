@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Crop::Crop()
-    : Component( ProcessOrder::OutOfOrder )
+Crop::Crop() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Crop");
@@ -24,10 +23,10 @@ Crop::Crop()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "bbox"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(2, {"in", "bbox"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     crop_area_.x = 0;
     crop_area_.y = 0;
@@ -40,15 +39,14 @@ Crop::Crop()
     adjust_size_y_ = 0;
 
     SetEnabled(true);
-
 }
 
-void Crop::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Crop::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<nlohmann::json>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<nlohmann::json>(1);
+    if (!in1) {
         return;
     }
 
@@ -66,7 +64,7 @@ void Crop::Process_( SignalBus const& inputs, SignalBus& outputs )
 
                         if (calc_total_bbox_) {
                             cv::Rect totalRect = cv::Rect(frame.cols, frame.rows, 0, 0);
-                            for (auto &d: json_data["data"]) {
+                            for (auto &d : json_data["data"]) {
                                 if (d.contains("bbox")) {
                                     cv::Rect tmpRect;
                                     tmpRect.x = d["bbox"]["x"].get<int>();
@@ -89,7 +87,8 @@ void Crop::Process_( SignalBus const& inputs, SignalBus& outputs )
                                 crop_area_.width = (totalRect.width - crop_area_.x) + adjust_size_x_;
                                 crop_area_.height = (totalRect.height - crop_area_.y) + adjust_size_y_;
                             }
-                        } else {
+                        }
+                        else {
                             if (json_bbox_index_ < json_data["data"].size()) {
                                 if (json_data["data"].at(json_bbox_index_).contains("bbox")) {
                                     crop_area_.x = json_data["data"].at(json_bbox_index_)["bbox"]["x"].get<int>();
@@ -112,7 +111,6 @@ void Crop::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
             else
                 has_json_data_ = false;
-
 
             // Process Image
             if (crop_area_.x < 0)
@@ -138,8 +136,8 @@ void Crop::Process_( SignalBus const& inputs, SignalBus& outputs )
             cv::Mat crop_frame = frame(crop_area_);
             if (!crop_frame.empty())
                 outputs.SetValue(0, crop_frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -187,7 +185,6 @@ void Crop::UpdateGui(void *context, int interface)
             ImGui::DragInt(CreateControlString("Padding Y", GetInstanceName()).c_str(), &adjust_size_y_, 0.25f);
         }
     }
-
 }
 
 std::string Crop::GetState()
@@ -232,7 +229,6 @@ void Crop::SetState(std::string &&json_serialized)
         adjust_size_x_ = state["adjust_size_x"].get<int>();
     if (state.contains("adjust_size_y"))
         adjust_size_y_ = state["adjust_size_y"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

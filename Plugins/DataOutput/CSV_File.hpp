@@ -23,7 +23,7 @@ class CsvFile;
 
 class DLLEXPORT CsvFile final : public Component
 {
- public:
+  public:
     CsvFile();
     ~CsvFile() override;
     void UpdateGui(void *context, int interface) override;
@@ -31,12 +31,12 @@ class DLLEXPORT CsvFile final : public Component
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void OpenCsvFile(nlohmann::json &json_data);
     std::string GetRotateFilePath();
 
- private:
+  private:
     std::unique_ptr<internal::CsvFile> p;
     bool start_new_file_;
     int counter_;
@@ -52,10 +52,9 @@ class DLLEXPORT CsvFile final : public Component
     imgui_addons::ImGuiFileBrowser file_dialog_;
     bool rotating_files_;
     int num_files_;
-
 };
 
-EXPORT_PLUGIN( CsvFile )
+EXPORT_PLUGIN(CsvFile)
 
 }  // namespace DSPatch::DSPatchables
-#endif //FLOWCV_PLUGIN_CSV_FILE_HPP_
+#endif  // FLOWCV_PLUGIN_CSV_FILE_HPP_

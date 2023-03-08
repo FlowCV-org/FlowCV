@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Threshold::Threshold()
-    : Component( ProcessOrder::OutOfOrder )
+Threshold::Threshold() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Threshold");
@@ -24,10 +23,10 @@ Threshold::Threshold()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     thresh_method_ = 0;
     thresh_type_ = 0;
@@ -39,14 +38,13 @@ Threshold::Threshold()
     hsv_high_ = ImVec4(1, 1, 1, 0);
 
     SetEnabled(true);
-
 }
 
-void Threshold::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Threshold::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -54,10 +52,10 @@ void Threshold::Process_( SignalBus const& inputs, SignalBus& outputs )
         if (IsEnabled()) {
             cv::Mat frame;
             // Process Image
-            if (thresh_method_ == 0) { // Simple
+            if (thresh_method_ == 0) {  // Simple
                 cv::threshold(*in1, frame, thresh_amt_, 255, thresh_type_);
             }
-            else if (thresh_method_ == 1) { // Color Range
+            else if (thresh_method_ == 1) {  // Color Range
                 ImVec4 hsv1, hsv2;
                 ImGui::ColorConvertRGBtoHSV(hsv_low_.x, hsv_low_.y, hsv_low_.z, hsv1.x, hsv1.y, hsv1.z);
                 ImGui::ColorConvertRGBtoHSV(hsv_high_.x, hsv_high_.y, hsv_high_.z, hsv2.x, hsv2.y, hsv2.z);
@@ -70,7 +68,7 @@ void Threshold::Process_( SignalBus const& inputs, SignalBus& outputs )
                 // OpenCV Hue is scaled to half 360 range (0 - 179)
                 cv::inRange(frame, cv::Scalar(hsv1.x * 179, hsv1.y * 255, hsv1.z * 255), cv::Scalar(hsv2.x * 179, hsv2.y * 255, hsv2.z * 255), frame);
             }
-            else if (thresh_method_ == 2) { // Adaptive
+            else if (thresh_method_ == 2) {  // Adaptive
                 if (in1->channels() > 1)
                     cv::cvtColor(*in1, frame, cv::COLOR_BGR2GRAY);
                 else
@@ -81,7 +79,7 @@ void Threshold::Process_( SignalBus const& inputs, SignalBus& outputs )
                     aThreshType = 1;
                 cv::adaptiveThreshold(frame, frame, 255, adapt_type_, aThreshType, adapt_block_, adapt_thresh_);
             }
-            else if (thresh_method_ == 3) { // Otsu
+            else if (thresh_method_ == 3) {  // Otsu
                 if (in1->channels() > 1)
                     cv::cvtColor(*in1, frame, cv::COLOR_BGR2GRAY);
                 else
@@ -91,8 +89,8 @@ void Threshold::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -126,8 +124,8 @@ void Threshold::UpdateGui(void *context, int interface)
         }
         else if (thresh_method_ == 1) {
             ImGui::Separator();
-            ImGui::ColorEdit3(CreateControlString("Low", GetInstanceName()).c_str(), (float*)&hsv_low_);
-            ImGui::ColorEdit3(CreateControlString("High", GetInstanceName()).c_str(), (float*)&hsv_high_);
+            ImGui::ColorEdit3(CreateControlString("Low", GetInstanceName()).c_str(), (float *)&hsv_low_);
+            ImGui::ColorEdit3(CreateControlString("High", GetInstanceName()).c_str(), (float *)&hsv_high_);
         }
         else if (thresh_method_ == 2) {
             ImGui::Separator();
@@ -144,7 +142,6 @@ void Threshold::UpdateGui(void *context, int interface)
             }
         }
     }
-
 }
 
 std::string Threshold::GetState()
@@ -203,7 +200,6 @@ void Threshold::SetState(std::string &&json_serialized)
         adapt_thresh_ = state["adapt_thresh"].get<int>();
     if (state.contains("adapt_block"))
         adapt_block_ = state["adapt_block"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

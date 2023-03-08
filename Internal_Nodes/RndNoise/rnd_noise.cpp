@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-RndNoise::RndNoise()
-    : Component( ProcessOrder::OutOfOrder )
+RndNoise::RndNoise() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Rnd_Noise");
@@ -27,7 +26,7 @@ RndNoise::RndNoise()
     SetInputCount_(0);
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     width_ = 1280;
     height_ = 720;
@@ -42,15 +41,14 @@ RndNoise::RndNoise()
     change_settings_ = false;
 
     SetEnabled(true);
-
 }
 
-void RndNoise::Process_( SignalBus const& inputs, SignalBus& outputs )
+void RndNoise::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
 
-    if (io_mutex_.try_lock()) { // Try lock so other threads will skip if locked instead of waiting
+    if (io_mutex_.try_lock()) {  // Try lock so other threads will skip if locked instead of waiting
         bool should_wait = true;
-        while(should_wait) {
+        while (should_wait) {
             std::chrono::steady_clock::time_point current_time_ = std::chrono::steady_clock::now();
             auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
             if (delta >= (uint32_t)fps_time_)
@@ -113,7 +111,6 @@ void RndNoise::UpdateGui(void *context, int interface)
             fps_time_ = (1.0f / (float)fps_) * 1000.0f;
         }
     }
-
 }
 
 std::string RndNoise::GetState()
@@ -150,7 +147,6 @@ void RndNoise::SetState(std::string &&json_serialized)
     if (state.contains("fps_index"))
         fps_index_ = state["fps_index"].get<int>();
     change_settings_ = true;
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

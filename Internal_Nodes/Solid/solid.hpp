@@ -23,7 +23,7 @@ class Solid final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::mutex io_mutex_;
@@ -41,4 +41,4 @@ class Solid final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SOLID_HPP_
+#endif  // FLOWCV_PLUGIN_SOLID_HPP_

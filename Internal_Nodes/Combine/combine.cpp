@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Combine::Combine()
-    : Component( ProcessOrder::OutOfOrder )
+Combine::Combine() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Combine");
@@ -24,25 +23,25 @@ Combine::Combine()
     global_inst_counter++;
 
     // 4 inputs
-    SetInputCount_( 4, {"r", "g", "b", "a"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(4, {"r", "g", "b", "a"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     SetEnabled(true);
 }
 
-void Combine::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Combine::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     if (!IsEnabled())
         SetEnabled(true);
 
     // Input 1 Handler
-    auto r = inputs.GetValue<cv::Mat>( 0 );
-    auto g = inputs.GetValue<cv::Mat>( 1 );
-    auto b = inputs.GetValue<cv::Mat>( 2 );
-    auto a = inputs.GetValue<cv::Mat>( 3 );
-    if ( !r || !g || !b ) {
+    auto r = inputs.GetValue<cv::Mat>(0);
+    auto g = inputs.GetValue<cv::Mat>(1);
+    auto b = inputs.GetValue<cv::Mat>(2);
+    auto a = inputs.GetValue<cv::Mat>(3);
+    if (!r || !g || !b) {
         return;
     }
 
@@ -91,7 +90,6 @@ void Combine::UpdateGui(void *context, int interface)
 {
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
-
 }
 
 std::string Combine::GetState()
@@ -110,8 +108,6 @@ void Combine::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

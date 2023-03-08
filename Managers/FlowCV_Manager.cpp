@@ -4,10 +4,11 @@
 
 #include "FlowCV_Manager.hpp"
 
+namespace FlowCV
+{
 
-namespace FlowCV {
-
-FlowCV_Manager::FlowCV_Manager() {
+FlowCV_Manager::FlowCV_Manager()
+{
     id_counter_ = 1001;
     wire_id_counter_ = 500;
     circuit_ = std::make_shared<DSPatch::Circuit>();
@@ -15,15 +16,17 @@ FlowCV_Manager::FlowCV_Manager() {
     internal_node_manager_ = std::make_shared<InternalNodeManager>();
 }
 
-FlowCV_Manager::~FlowCV_Manager() {
+FlowCV_Manager::~FlowCV_Manager()
+{
     nodes_.clear();
     circuit_->RemoveAllComponents();
 }
 
-uint64_t FlowCV_Manager::GetNextId() {
+uint64_t FlowCV_Manager::GetNextId()
+{
     uint64_t nextId = id_counter_;
 
-    for (const auto &node: nodes_) {
+    for (const auto &node : nodes_) {
         if (node.id >= nextId)
             nextId = node.id + 1000;
     }
@@ -33,7 +36,8 @@ uint64_t FlowCV_Manager::GetNextId() {
     return nextId;
 }
 
-uint64_t FlowCV_Manager::AddNewNodeInstance(const char *name, bool ext, uint64_t id) {
+uint64_t FlowCV_Manager::AddNewNodeInstance(const char *name, bool ext, uint64_t id)
+{
     NodeInfo ni;
     uint64_t ret_id = 0;
 
@@ -53,9 +57,10 @@ uint64_t FlowCV_Manager::AddNewNodeInstance(const char *name, bool ext, uint64_t
         ni.input_conn_map.resize(ni.desc.input_count);
         if (id == 0) {
             ni.id = GetNextId();
-        } else {
+        }
+        else {
             ni.id = id;
-            //GetNextId();
+            // GetNextId();
         }
 
         int res = circuit_->AddComponent(ni.node_ptr);
@@ -76,7 +81,6 @@ uint64_t FlowCV_Manager::CreateNewNodeInstance(const char *name)
 
     if (plugin_manager_->HasPlugin(name)) {
         return AddNewNodeInstance(name, true);
-
     }
     else if (internal_node_manager_->HasNode(name)) {
         return AddNewNodeInstance(name, false);
@@ -85,17 +89,20 @@ uint64_t FlowCV_Manager::CreateNewNodeInstance(const char *name)
     return 0;
 }
 
-void FlowCV_Manager::SetBufferCount(uint32_t num_buffers) {
+void FlowCV_Manager::SetBufferCount(uint32_t num_buffers)
+{
     circuit_->SetBufferCount(num_buffers);
 }
 
-int FlowCV_Manager::GetBufferCount() {
+int FlowCV_Manager::GetBufferCount()
+{
     return circuit_->GetBufferCount();
 }
 
-void FlowCV_Manager::CheckInstCountValue(NodeInfo &ni) {
+void FlowCV_Manager::CheckInstCountValue(NodeInfo &ni)
+{
     int cur_num = ni.node_ptr->GetInstanceCount();
-    for (const auto &node: nodes_) {
+    for (const auto &node : nodes_) {
         if (ni.desc.name == node.desc.name && ni.id != node.id) {
             if (cur_num <= node.node_ptr->GetInstanceCount()) {
                 cur_num = node.node_ptr->GetInstanceCount() + 1;
@@ -105,11 +112,13 @@ void FlowCV_Manager::CheckInstCountValue(NodeInfo &ni) {
     ni.node_ptr->SetInstanceCount(cur_num);
 }
 
-uint64_t FlowCV_Manager::GetNodeCount() {
-    return (uint64_t) nodes_.size();
+uint64_t FlowCV_Manager::GetNodeCount()
+{
+    return (uint64_t)nodes_.size();
 }
 
-bool FlowCV_Manager::GetNodeInfoByIndex(uint64_t index, NodeInfo &nInfo) {
+bool FlowCV_Manager::GetNodeInfoByIndex(uint64_t index, NodeInfo &nInfo)
+{
 
     if (index >= 0 && index < nodes_.size()) {
         nInfo.showControlUI = nodes_.at(index).showControlUI;
@@ -128,11 +137,13 @@ bool FlowCV_Manager::GetNodeInfoByIndex(uint64_t index, NodeInfo &nInfo) {
     return false;
 }
 
-bool FlowCV_Manager::GetNodeInfoById(uint64_t id, NodeInfo &nInfo) {
+bool FlowCV_Manager::GetNodeInfoById(uint64_t id, NodeInfo &nInfo)
+{
     return GetNodeInfoByIndex(GetNodeIndexFromId(id), nInfo);
 }
 
-int FlowCV_Manager::GetNodeIndexFromId(uint64_t id) {
+int FlowCV_Manager::GetNodeIndexFromId(uint64_t id)
+{
 
     for (int i = 0; i < nodes_.size(); i++) {
         if (nodes_.at(i).id == id) {
@@ -142,20 +153,22 @@ int FlowCV_Manager::GetNodeIndexFromId(uint64_t id) {
     return 0;
 }
 
-uint64_t FlowCV_Manager::GetNodeIdFromIndex(uint64_t index) {
+uint64_t FlowCV_Manager::GetNodeIdFromIndex(uint64_t index)
+{
     if (index >= 0 && index < nodes_.size()) {
         return nodes_.at(index).id;
     }
     return 0;
 }
 
-nlohmann::json FlowCV_Manager::GetState() {
+nlohmann::json FlowCV_Manager::GetState()
+{
     using namespace nlohmann;
     json state;
     json nodes;
     json connections;
 
-    for (const auto &node: nodes_) {
+    for (const auto &node : nodes_) {
         json n;
         n["name"] = node.desc.name;
         n["id"] = node.id;
@@ -170,7 +183,7 @@ nlohmann::json FlowCV_Manager::GetState() {
     }
     state["nodes"] = nodes;
 
-    for (const auto &wire: wiring_) {
+    for (const auto &wire : wiring_) {
         json w;
         w["from_id"] = wire.from.id;
         w["from_idx"] = wire.from.index;
@@ -183,7 +196,8 @@ nlohmann::json FlowCV_Manager::GetState() {
     return std::move(state);
 }
 
-bool FlowCV_Manager::SetState(nlohmann::json &state) {
+bool FlowCV_Manager::SetState(nlohmann::json &state)
+{
     bool res = true;
 
     try {
@@ -191,7 +205,7 @@ bool FlowCV_Manager::SetState(nlohmann::json &state) {
         NewState();
 
         if (state.contains("nodes")) {
-            for (const auto &node: state["nodes"]) {
+            for (const auto &node : state["nodes"]) {
                 auto id = node["id"].get<uint64_t>();
                 auto name = node["name"].get<std::string>();
                 auto inst_num = node["num"].get<uint32_t>();
@@ -205,11 +219,12 @@ bool FlowCV_Manager::SetState(nlohmann::json &state) {
                     ni.node_ptr->SetInstanceCount(inst_num);
                     ni.node_ptr->SetEnabled(enabled);
                     CheckInstCountValue(ni);
-                    //std::cout << "Adding Node Instance (Plugin): " << name << ", " << id << std::endl;
+                    // std::cout << "Adding Node Instance (Plugin): " << name << ", " << id << std::endl;
                     if (node.contains("params")) {
                         ni.node_ptr->SetState(node["params"].dump());
                     }
-                } else {
+                }
+                else {
                     if (internal_node_manager_->HasNode(name.c_str())) {
                         uint64_t new_node_id = AddNewNodeInstance(name.c_str(), false, id);
                         NodeInfo ni;
@@ -217,12 +232,13 @@ bool FlowCV_Manager::SetState(nlohmann::json &state) {
                         ni.node_ptr->SetInstanceCount(inst_num);
                         ni.node_ptr->SetEnabled(enabled);
                         CheckInstCountValue(ni);
-                        //std::cout << "Adding Node Instance (Internal): " << name << ", " << id << std::endl;
+                        // std::cout << "Adding Node Instance (Internal): " << name << ", " << id << std::endl;
                         if (node.contains("params")) {
                             ni.node_ptr->SetState(node["params"].dump());
                         }
-                    } else {
-                        //std::cout << "Node Name: " << name.c_str() << " Not Found" << std::endl;
+                    }
+                    else {
+                        // std::cout << "Node Name: " << name.c_str() << " Not Found" << std::endl;
                         res = false;
                     }
                 }
@@ -230,7 +246,7 @@ bool FlowCV_Manager::SetState(nlohmann::json &state) {
         }
 
         if (state.contains("connections")) {
-            for (const auto &conn: state["connections"]) {
+            for (const auto &conn : state["connections"]) {
                 auto to_id = conn["to_id"].get<uint64_t>();
                 auto to_idx = conn["to_idx"].get<uint32_t>();
                 auto from_id = conn["from_id"].get<uint64_t>();
@@ -247,13 +263,15 @@ bool FlowCV_Manager::SetState(nlohmann::json &state) {
     return res;
 }
 
-void FlowCV_Manager::NewState() {
+void FlowCV_Manager::NewState()
+{
     circuit_->RemoveAllComponents();
     wiring_.clear();
     nodes_.clear();
 }
 
-bool FlowCV_Manager::LoadState(const char *filepath) {
+bool FlowCV_Manager::LoadState(const char *filepath)
+{
     try {
         std::fstream i(filepath);
         nlohmann::json state;
@@ -261,7 +279,6 @@ bool FlowCV_Manager::LoadState(const char *filepath) {
         i.close();
 
         return SetState(state);
-
     }
     catch (const std::exception &e) {
         std::cerr << e.what();
@@ -270,7 +287,8 @@ bool FlowCV_Manager::LoadState(const char *filepath) {
     return false;
 }
 
-bool FlowCV_Manager::SaveState(const char *filepath) {
+bool FlowCV_Manager::SaveState(const char *filepath)
+{
     try {
         nlohmann::json state = GetState();
         std::ofstream o(filepath);
@@ -285,7 +303,8 @@ bool FlowCV_Manager::SaveState(const char *filepath) {
     return false;
 }
 
-bool FlowCV_Manager::NodeHasUI(uint64_t index, GuiInterfaceType interface) {
+bool FlowCV_Manager::NodeHasUI(uint64_t index, GuiInterfaceType interface)
+{
     if (index >= 0 && index < nodes_.size()) {
         return nodes_.at(index).node_ptr->HasGui((int)interface);
     }
@@ -293,7 +312,8 @@ bool FlowCV_Manager::NodeHasUI(uint64_t index, GuiInterfaceType interface) {
     return false;
 }
 
-bool *FlowCV_Manager::GetShowUiPtr(uint64_t index) {
+bool *FlowCV_Manager::GetShowUiPtr(uint64_t index)
+{
     if (index >= 0 && index < nodes_.size()) {
         return &nodes_.at(index).showControlUI;
     }
@@ -301,19 +321,22 @@ bool *FlowCV_Manager::GetShowUiPtr(uint64_t index) {
     return nullptr;
 }
 
-void FlowCV_Manager::SetShowUI(uint64_t index, bool show) {
+void FlowCV_Manager::SetShowUI(uint64_t index, bool show)
+{
     if (index >= 0 && index < nodes_.size()) {
         nodes_.at(index).showControlUI = show;
     }
 }
 
-void FlowCV_Manager::ProcessNodeUI(uint64_t index, void *context, GuiInterfaceType interface) {
+void FlowCV_Manager::ProcessNodeUI(uint64_t index, void *context, GuiInterfaceType interface)
+{
     if (index >= 0 && index < nodes_.size()) {
-        return nodes_.at(index).node_ptr->UpdateGui(context, (int) interface);
+        return nodes_.at(index).node_ptr->UpdateGui(context, (int)interface);
     }
 }
 
-bool FlowCV_Manager::ConnectNodes(uint64_t from_id, uint32_t from_out_idx, uint64_t to_id, uint32_t to_in_idx) {
+bool FlowCV_Manager::ConnectNodes(uint64_t from_id, uint32_t from_out_idx, uint64_t to_id, uint32_t to_in_idx)
+{
     bool res = false;
 
     uint64_t from_index = GetNodeIndexFromId(from_id);
@@ -338,11 +361,10 @@ bool FlowCV_Manager::ConnectNodes(uint64_t from_id, uint32_t from_out_idx, uint6
     return res;
 }
 
-bool FlowCV_Manager::DisconnectNodes(uint64_t from_id, uint32_t from_out_idx, uint64_t to_id, uint32_t to_in_idx) {
+bool FlowCV_Manager::DisconnectNodes(uint64_t from_id, uint32_t from_out_idx, uint64_t to_id, uint32_t to_in_idx)
+{
     for (int i = 0; i < wiring_.size(); i++) {
-        if (wiring_.at(i).from.id == from_id &&
-            wiring_.at(i).from.index == from_out_idx &&
-            wiring_.at(i).to.id == to_id &&
+        if (wiring_.at(i).from.id == from_id && wiring_.at(i).from.index == from_out_idx && wiring_.at(i).to.id == to_id &&
             wiring_.at(i).to.index == to_in_idx) {
             wiring_.erase(wiring_.begin() + i);
             uint64_t node_idx = GetNodeIndexFromId(to_id);
@@ -354,7 +376,8 @@ bool FlowCV_Manager::DisconnectNodes(uint64_t from_id, uint32_t from_out_idx, ui
     return false;
 }
 
-bool FlowCV_Manager::DisconnectNodeInput(uint64_t node_id, uint32_t in_index) {
+bool FlowCV_Manager::DisconnectNodeInput(uint64_t node_id, uint32_t in_index)
+{
     int node_idx = GetNodeIndexFromId(node_id);
     NodeInfo ni;
     if (GetNodeInfoById(node_id, ni)) {
@@ -377,7 +400,8 @@ bool FlowCV_Manager::DisconnectNodeInput(uint64_t node_id, uint32_t in_index) {
     return false;
 }
 
-bool FlowCV_Manager::RemoveNodeInstance(uint64_t node_id) {
+bool FlowCV_Manager::RemoveNodeInstance(uint64_t node_id)
+{
     bool res = false;
 
     int node_idx = GetNodeIndexFromId(node_id);
@@ -400,24 +424,28 @@ bool FlowCV_Manager::RemoveNodeInstance(uint64_t node_id) {
     return res;
 }
 
-void FlowCV_Manager::Tick(DSPatch::Component::TickMode mode) {
+void FlowCV_Manager::Tick(DSPatch::Component::TickMode mode)
+{
     circuit_->Tick(mode);
 }
 
-void FlowCV_Manager::StartAutoTick(DSPatch::Component::TickMode mode) {
+void FlowCV_Manager::StartAutoTick(DSPatch::Component::TickMode mode)
+{
     circuit_->StartAutoTick(mode);
 }
 
-void FlowCV_Manager::StopAutoTick() {
+void FlowCV_Manager::StopAutoTick()
+{
     circuit_->StopAutoTick();
 }
 
-std::vector<Wire> FlowCV_Manager::GetNodeConnectionsFromIndex(uint64_t index) {
+std::vector<Wire> FlowCV_Manager::GetNodeConnectionsFromIndex(uint64_t index)
+{
     std::vector<Wire> connections;
     if (index >= 0 && index < nodes_.size()) {
         NodeInfo ni;
         if (GetNodeInfoByIndex(index, ni)) {
-            for (const auto &wire: wiring_) {
+            for (const auto &wire : wiring_) {
                 if (wire.to.id == ni.id)
                     connections.emplace_back(wire);
 
@@ -430,17 +458,20 @@ std::vector<Wire> FlowCV_Manager::GetNodeConnectionsFromIndex(uint64_t index) {
     return connections;
 }
 
-std::vector<Wire> FlowCV_Manager::GetNodeConnectionsFromId(uint64_t id) {
+std::vector<Wire> FlowCV_Manager::GetNodeConnectionsFromId(uint64_t id)
+{
     int node_index = GetNodeIndexFromId(id);
 
     return GetNodeConnectionsFromIndex(node_index);
 }
 
-uint64_t FlowCV_Manager::GetWireCount() {
-    return (uint64_t) wiring_.size();
+uint64_t FlowCV_Manager::GetWireCount()
+{
+    return (uint64_t)wiring_.size();
 }
 
-Wire FlowCV_Manager::GetWireInfoFromIndex(uint64_t index) {
+Wire FlowCV_Manager::GetWireInfoFromIndex(uint64_t index)
+{
     Wire w;
 
     if (index >= 0 && index < wiring_.size()) {
@@ -454,15 +485,17 @@ Wire FlowCV_Manager::GetWireInfoFromIndex(uint64_t index) {
     return w;
 }
 
-uint64_t FlowCV_Manager::GetWireIdFromIndex(uint64_t index) {
+uint64_t FlowCV_Manager::GetWireIdFromIndex(uint64_t index)
+{
     if (index >= 0 && index < wiring_.size()) {
         return wiring_.at(index).id;
     }
     return 0;
 }
 
-void FlowCV_Manager::RemoveWireById(uint64_t id) {
-    for (auto & wire : wiring_) {
+void FlowCV_Manager::RemoveWireById(uint64_t id)
+{
+    for (auto &wire : wiring_) {
         if (wire.id == id) {
             DisconnectNodeInput(wire.to.id, wire.to.index);
             return;
@@ -470,21 +503,11 @@ void FlowCV_Manager::RemoveWireById(uint64_t id) {
     }
 }
 
-void FlowCV_Manager::RemoveWireByIndex(uint64_t index) {
+void FlowCV_Manager::RemoveWireByIndex(uint64_t index)
+{
     if (index >= 0 && index < wiring_.size()) {
         DisconnectNodeInput(wiring_.at(index).to.id, wiring_.at(index).to.index);
     }
 }
 
-} // End Namespace FlowCV
-
-
-
-
-
-
-
-
-
-
-
+}  // End Namespace FlowCV

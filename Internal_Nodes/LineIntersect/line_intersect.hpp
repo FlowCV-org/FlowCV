@@ -23,7 +23,7 @@ class LineIntersect final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     float min_angle_;
@@ -39,4 +39,4 @@ class LineIntersect final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_LINE_INTERSECT_HPP_
+#endif  // FLOWCV_PLUGIN_LINE_INTERSECT_HPP_

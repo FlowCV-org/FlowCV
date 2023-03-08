@@ -23,7 +23,7 @@ class GetOptimalDft final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     bool has_size_input_;
@@ -34,4 +34,4 @@ class GetOptimalDft final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_GET_OPTIMAL_DFT_HPP_
+#endif  // FLOWCV_PLUGIN_GET_OPTIMAL_DFT_HPP_
