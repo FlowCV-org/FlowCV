@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class TcpSend
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-TcpSend::TcpSend()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::TcpSend() )
+TcpSend::TcpSend() : Component(ProcessOrder::OutOfOrder), p(new internal::TcpSend())
 {
     // Name and Category
     SetComponentName_("TCP_Send");
@@ -29,7 +27,8 @@ TcpSend::TcpSend()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 5, {"bool", "int", "float", "str", "json"}, {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON} );
+    SetInputCount_(5, {"bool", "int", "float", "str", "json"},
+        {IoType::Io_Type_Bool, IoType::Io_Type_Int, IoType::Io_Type_Float, IoType::Io_Type_String, IoType::Io_Type_JSON});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -44,19 +43,17 @@ TcpSend::TcpSend()
     last_time_ = current_time_;
     client_ = std::make_unique<asio2::tcp_client>();
     client_->auto_reconnect(true, std::chrono::milliseconds(1000));
-    client_->bind_connect([&]() {
-        if (asio2::get_last_error())
-            printf("connect failure : %d %s\n", asio2::last_error_val(), asio2::last_error_msg().c_str());
-        else
-            printf("connect success : %s %u\n", client_->local_address().c_str(), client_->local_port());
-    }).bind_disconnect([&]()
-       {
-           printf("disconnect : %d %s\n", asio2::last_error_val(), asio2::last_error_msg().c_str());
-       });
+    client_
+        ->bind_connect([&]() {
+            if (asio2::get_last_error())
+                printf("connect failure : %d %s\n", asio2::last_error_val(), asio2::last_error_msg().c_str());
+            else
+                printf("connect success : %s %u\n", client_->local_address().c_str(), client_->local_port());
+        })
+        .bind_disconnect([&]() { printf("disconnect : %d %s\n", asio2::last_error_val(), asio2::last_error_msg().c_str()); });
     client_->reuse_address(true);
 
     SetEnabled(true);
-
 }
 
 void TcpSend::SetEOLSeq_()
@@ -89,8 +86,7 @@ void TcpSend::SetEOLSeq_()
     }
 }
 
-template <typename T>
-std::vector<uint8_t> TcpSend::GenerateOutBuffer_(T data)
+template<typename T> std::vector<uint8_t> TcpSend::GenerateOutBuffer_(T data)
 {
     std::vector<uint8_t> outBuffer;
     if (send_as_binary_) {
@@ -116,14 +112,14 @@ std::vector<uint8_t> TcpSend::GenerateOutBuffer_(T data)
     return outBuffer;
 }
 
-void TcpSend::Process_( SignalBus const& inputs, SignalBus& outputs )
+void TcpSend::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input Handler
-    auto in1 = inputs.GetValue<bool>( 0 );
-    auto in2 = inputs.GetValue<int>( 1 );
-    auto in3 = inputs.GetValue<float>( 2 );
-    auto in4 = inputs.GetValue<std::string>( 3 );
-    auto in5 = inputs.GetValue<nlohmann::json>( 4 );
+    auto in1 = inputs.GetValue<bool>(0);
+    auto in2 = inputs.GetValue<int>(1);
+    auto in3 = inputs.GetValue<float>(2);
+    auto in4 = inputs.GetValue<std::string>(3);
+    auto in5 = inputs.GetValue<nlohmann::json>(4);
 
     if (IsEnabled()) {
         if (client_ != nullptr) {
@@ -135,7 +131,8 @@ void TcpSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                     if (delta >= (long long)rate_val_) {
                         readyToSend = true;
                     }
-                } else
+                }
+                else
                     readyToSend = true;
 
                 if (in1) {
@@ -167,31 +164,31 @@ void TcpSend::Process_( SignalBus const& inputs, SignalBus& outputs )
                         nlohmann::json json_in_ = *in5;
                         if (readyToSend) {
                             switch (data_pack_mode_) {
-                                case 1: // BSON
+                                case 1:  // BSON
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_bson(json_in_);
                                     client_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 2: // CBOR
+                                case 2:  // CBOR
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_cbor(json_in_);
                                     client_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 3: // MessagePack
+                                case 3:  // MessagePack
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_msgpack(json_in_);
                                     client_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                case 4: // UBJSON
+                                case 4:  // UBJSON
                                 {
                                     std::vector<uint8_t> msg = nlohmann::json::to_ubjson(json_in_);
                                     client_->send(asio::buffer(msg.data(), msg.size()));
                                     break;
                                 }
-                                default: // None (0)
+                                default:  // None (0)
                                     std::string jsonStr = json_in_.dump();
                                     for (int i = 0; i < 2; i++) {
                                         if (eol_seq_[i] != '\0')
@@ -254,13 +251,13 @@ void TcpSend::UpdateGui(void *context, int interface)
                 rate_val_ = 0;
         }
         ImGui::Separator();
-        if (ImGui::Combo(CreateControlString("EOL Sequence", GetInstanceName()).c_str(), &eol_seq_index_, "None\0<CR>\0<LF>\0<CR><LF>\0<SPACE>\0<TAB>\0<COMMA>\0\0")) {
+        if (ImGui::Combo(
+                CreateControlString("EOL Sequence", GetInstanceName()).c_str(), &eol_seq_index_, "None\0<CR>\0<LF>\0<CR><LF>\0<SPACE>\0<TAB>\0<COMMA>\0\0")) {
             SetEOLSeq_();
         }
         ImGui::Separator();
         ImGui::TextUnformatted("Non-JSON Data Type Sending Options");
         ImGui::Checkbox(CreateControlString("Send As Binary", GetInstanceName()).c_str(), &send_as_binary_);
-
     }
 }
 
@@ -312,7 +309,6 @@ void TcpSend::SetState(std::string &&json_serialized)
 
     if (IsValidIP_() && port_ != 0)
         OpenTcpConn_();
-
 }
 
 void TcpSend::OpenTcpConn_()
@@ -340,10 +336,11 @@ bool TcpSend::IsValidIP_()
         if (ec) {
             is_valid_ip = false;
             std::cerr << ec.message() << std::endl;
-        } else {
+        }
+        else {
             if (address.is_v4()) {
                 int dotCount = 0;
-                for (auto &c: ip_addr_) {
+                for (auto &c : ip_addr_) {
                     if (c == '.')
                         dotCount++;
                 }
@@ -351,9 +348,10 @@ bool TcpSend::IsValidIP_()
                     is_valid_ip = true;
                     return true;
                 }
-            } else if (address.is_v6()) {
+            }
+            else if (address.is_v6()) {
                 int dotCount = 0;
-                for (auto c: ip_addr_) {
+                for (auto c : ip_addr_) {
                     if (c == ':')
                         dotCount++;
                 }
@@ -368,5 +366,3 @@ bool TcpSend::IsValidIP_()
     is_valid_ip = false;
     return false;
 }
-
-

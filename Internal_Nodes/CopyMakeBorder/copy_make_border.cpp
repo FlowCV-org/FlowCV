@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-CopyMakeBorder::CopyMakeBorder()
-    : Component( ProcessOrder::OutOfOrder )
+CopyMakeBorder::CopyMakeBorder() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Copy_Make_Border");
@@ -24,10 +23,10 @@ CopyMakeBorder::CopyMakeBorder()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array} );
+    SetInputCount_(2, {"in", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     add_width_ = 0;
     add_height_ = 0;
@@ -37,15 +36,14 @@ CopyMakeBorder::CopyMakeBorder()
     center_ = true;
 
     SetEnabled(true);
-
 }
 
-void CopyMakeBorder::Process_( SignalBus const& inputs, SignalBus& outputs )
+void CopyMakeBorder::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<std::vector<int>>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<std::vector<int>>(1);
+    if (!in1) {
         return;
     }
     if (!in2)
@@ -85,15 +83,15 @@ void CopyMakeBorder::Process_( SignalBus const& inputs, SignalBus& outputs )
             if (borderAmtX >= 0 && borderAmtY >= 0) {
                 cv::Mat dst;
                 copyMakeBorder(*in1, dst, top, borderAmtY, left, borderAmtX, border_type_,
-                               cv::Scalar(border_color_.z * 255, border_color_.y * 255, border_color_.x * 255));
+                    cv::Scalar(border_color_.z * 255, border_color_.y * 255, border_color_.x * 255));
                 if (!dst.empty())
                     outputs.SetValue(0, dst);
             }
             else {
                 outputs.SetValue(0, *in1);
             }
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -125,10 +123,9 @@ void CopyMakeBorder::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(120);
         ImGui::Combo(CreateControlString("Border Type", GetInstanceName()).c_str(), &border_type_, "Constant\0Replicate\0Reflect\0Wrap\0Default\0\0");
         if (border_type_ == 0) {
-            ImGui::ColorEdit3(CreateControlString("Border Color", GetInstanceName()).c_str(), (float *) &border_color_);
+            ImGui::ColorEdit3(CreateControlString("Border Color", GetInstanceName()).c_str(), (float *)&border_color_);
         }
     }
-
 }
 
 std::string CopyMakeBorder::GetState()
@@ -171,7 +168,6 @@ void CopyMakeBorder::SetState(std::string &&json_serialized)
         border_color_.y = state["border_color"]["G"].get<float>();
         border_color_.z = state["border_color"]["B"].get<float>();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

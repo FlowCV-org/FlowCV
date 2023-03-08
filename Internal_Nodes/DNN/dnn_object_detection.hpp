@@ -24,9 +24,9 @@ class ObjectDetection final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void InitDnn_();
-    void DrawPredictions_(int classId, float conf, cv::Rect box, cv::Mat& frame);
+    void DrawPredictions_(int classId, float conf, cv::Rect box, cv::Mat &frame);
 
   private:
     DnnBackendListHelper dnn_backend_helper_;
@@ -65,9 +65,8 @@ class ObjectDetection final : public Component
     bool swap_rb_{};
     bool draw_class_{};
     bool crop_{};
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif // FLOWCV_PLUGIN_DNN_OBJECT_DETECTION_HPP_
+#endif  // FLOWCV_PLUGIN_DNN_OBJECT_DETECTION_HPP_

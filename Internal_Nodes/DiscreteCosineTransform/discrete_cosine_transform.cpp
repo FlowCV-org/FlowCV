@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-DiscreteCosineTransform::DiscreteCosineTransform()
-    : Component( ProcessOrder::OutOfOrder )
+DiscreteCosineTransform::DiscreteCosineTransform() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("DCT");
@@ -24,22 +23,21 @@ DiscreteCosineTransform::DiscreteCosineTransform()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     mode_ = 0;
 
     SetEnabled(true);
-
 }
 
-void DiscreteCosineTransform::Process_( SignalBus const& inputs, SignalBus& outputs )
+void DiscreteCosineTransform::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -62,7 +60,7 @@ void DiscreteCosineTransform::Process_( SignalBus const& inputs, SignalBus& outp
             }
 
             if (dctFrame.type() != CV_32F)
-                dctFrame.convertTo(dctFrame, CV_32F, 1.0/255);
+                dctFrame.convertTo(dctFrame, CV_32F, 1.0 / 255);
 
             cv::dct(dctFrame, frame, dft_mode);
 
@@ -90,10 +88,8 @@ void DiscreteCosineTransform::UpdateGui(void *context, int interface)
     // When Creating Strings for Controls use: CreateControlString("Text Here", GetInstanceCount()).c_str()
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        ImGui::Combo(CreateControlString("Operation", GetInstanceName()).c_str(), &mode_,
-                     "Default\0Inverse\0Rows\0\0");
+        ImGui::Combo(CreateControlString("Operation", GetInstanceName()).c_str(), &mode_, "Default\0Inverse\0Rows\0\0");
     }
-
 }
 
 std::string DiscreteCosineTransform::GetState()
@@ -112,8 +108,6 @@ void DiscreteCosineTransform::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

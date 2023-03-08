@@ -12,11 +12,10 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-static void HelpMarker(const char* desc)
+static void HelpMarker(const char *desc)
 {
     ImGui::TextDisabled("(?)");
-    if (ImGui::IsItemHovered())
-    {
+    if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 50.0f);
         ImGui::TextUnformatted(desc);
@@ -25,8 +24,7 @@ static void HelpMarker(const char* desc)
     }
 }
 
-DrawJson::DrawJson()
-    : Component( ProcessOrder::OutOfOrder )
+DrawJson::DrawJson() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Draw_JSON");
@@ -37,10 +35,10 @@ DrawJson::DrawJson()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 2, {"in", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(2, {"in", "json"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     text_scale_ = 1.0f;
     text_pos_ = {10, 30};
@@ -51,7 +49,6 @@ DrawJson::DrawJson()
     float_draw_precision_ = 3;
 
     SetEnabled(true);
-
 }
 
 std::string DrawJson::JsonTreeToStringList_(const nlohmann::json::iterator &it, std::string &curDepth)
@@ -85,12 +82,12 @@ bool DrawJson::IsInList_(const std::string &key_path)
     return false;
 }
 
-void DrawJson::Process_( SignalBus const& inputs, SignalBus& outputs )
+void DrawJson::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<nlohmann::json>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<nlohmann::json>(1);
+    if (!in1) {
         return;
     }
 
@@ -123,7 +120,8 @@ void DrawJson::Process_( SignalBus const& inputs, SignalBus& outputs )
                                                     out.precision(float_draw_precision_);
                                                     out << std::fixed << j.at(item.out_item_index).get<float>();
                                                     outStr += out.str();
-                                                } else {
+                                                }
+                                                else {
                                                     outStr += to_string(j.at(item.out_item_index));
                                                 }
                                             }
@@ -135,13 +133,14 @@ void DrawJson::Process_( SignalBus const& inputs, SignalBus& outputs )
                                                 out.precision(float_draw_precision_);
                                                 out << std::fixed << j.get<float>();
                                                 outStr += out.str();
-                                            } else {
+                                            }
+                                            else {
                                                 outStr += to_string(j);
                                             }
                                         }
 
                                         cv::putText(frame, outStr, start_pos, text_font_, text_scale_,
-                                                    cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+                                            cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
                                         int baseline = 0;
                                         cv::Size txtSize = cv::getTextSize(outStr, text_font_, text_scale_, text_thickness_, &baseline);
                                         start_pos.y += txtSize.height + txt_offset;
@@ -154,7 +153,8 @@ void DrawJson::Process_( SignalBus const& inputs, SignalBus& outputs )
                         outputs.SetValue(0, frame);
                 }
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -178,9 +178,9 @@ void DrawJson::UpdateGui(void *context, int interface)
     // When Creating Strings for Controls use: CreateControlString("Text Here", GetInstanceName()).c_str()
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        std::lock_guard<std::mutex> lck (io_mutex_);
+        std::lock_guard<std::mutex> lck(io_mutex_);
         ImGui::Combo(CreateControlString("Font", GetInstanceName()).c_str(), &text_font_,
-                     "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
+            "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
         ImGui::Separator();
         ImGui::Text("Position:");
         ImGui::SetNextItemWidth(80);
@@ -195,7 +195,7 @@ void DrawJson::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Thickness", GetInstanceName()).c_str(), &text_thickness_, 0.1f, 1, 100);
         ImGui::Separator();
-        ImGui::ColorEdit3(CreateControlString("Color", GetInstanceName()).c_str(), (float*)&text_color_);
+        ImGui::ColorEdit3(CreateControlString("Color", GetInstanceName()).c_str(), (float *)&text_color_);
         ImGui::Separator();
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Decimal Places", GetInstanceName()).c_str(), &float_draw_precision_, 0.5f, 1, 10);
@@ -218,7 +218,8 @@ void DrawJson::UpdateGui(void *context, int interface)
                     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 57, 77, 100));
                     // Create Tree List
                     json_tree_list_.clear();
-                    for (nlohmann::json::iterator it = json_data_["data"].at(json_data_index_).begin(); it != json_data_["data"].at(json_data_index_).end(); ++it) {
+                    for (nlohmann::json::iterator it = json_data_["data"].at(json_data_index_).begin(); it != json_data_["data"].at(json_data_index_).end();
+                         ++it) {
                         std::string curDepth = "/";
                         std::string strPath = JsonTreeToStringList_(it, curDepth);
                     }
@@ -233,7 +234,7 @@ void DrawJson::UpdateGui(void *context, int interface)
                         nlohmann::json::json_pointer jPtr(s);
                         auto j = json_data_["data"].at(json_data_index_).at(jPtr);
                         if (j.is_array()) {
-                            const std::string& label = s;
+                            const std::string &label = s;
                             if (ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
                                 if (ImGui::IsMouseDoubleClicked(0)) {
                                     JsonOutItem tmp;
@@ -244,7 +245,7 @@ void DrawJson::UpdateGui(void *context, int interface)
                             }
                         }
                         else if (!j.is_array() && !j.is_object()) {
-                            const std::string& label = s;
+                            const std::string &label = s;
                             if (ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
                                 if (ImGui::IsMouseDoubleClicked(0)) {
                                     if (!IsInList_(s)) {
@@ -309,7 +310,6 @@ void DrawJson::UpdateGui(void *context, int interface)
             }
         }
     }
-
 }
 
 std::string DrawJson::GetState()
@@ -375,7 +375,7 @@ void DrawJson::SetState(std::string &&json_serialized)
         json_data_index_ = state["json_data_index"].get<int>();
     if (state.contains("out_list")) {
         json_out_list_.clear();
-        for(const auto &item : state["out_list"]) {
+        for (const auto &item : state["out_list"]) {
             JsonOutItem tmp;
             if (item.contains("is_array"))
                 tmp.is_array = item["is_array"].get<bool>();
@@ -392,4 +392,4 @@ void DrawJson::SetState(std::string &&json_serialized)
     }
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

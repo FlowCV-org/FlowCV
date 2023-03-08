@@ -19,17 +19,17 @@
 #include "List_Serial_Ports_Mac.hpp"
 #endif
 
-class Serial_Enumerator {
+class Serial_Enumerator
+{
 
- public:
+  public:
     void RefreshSerialList();
     int GetSerialCount();
     std::string GetSerialName(uint32_t index);
     std::string GetSerialDesc(uint32_t index);
     std::string GetSerialID(uint32_t index);
 
- private:
+  private:
     std::vector<SerialDeviceEnum::SerialPortInfo> serial_list_;
-
 };
-#endif //FLOWCV_SERIAL_ENUMERATOR_HPP_
+#endif  // FLOWCV_SERIAL_ENUMERATOR_HPP_

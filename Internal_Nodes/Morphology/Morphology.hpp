@@ -23,7 +23,7 @@ class Morphology final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int op_;
@@ -36,4 +36,4 @@ class Morphology final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_MORPHOLOGY_HPP_
+#endif  // FLOWCV_PLUGIN_MORPHOLOGY_HPP_

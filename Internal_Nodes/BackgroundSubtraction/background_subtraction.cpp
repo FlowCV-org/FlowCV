@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-BackgroundSubtraction::BackgroundSubtraction()
-    : Component( ProcessOrder::OutOfOrder )
+BackgroundSubtraction::BackgroundSubtraction() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Background_Subtraction");
@@ -24,10 +23,10 @@ BackgroundSubtraction::BackgroundSubtraction()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 2 outputs
-    SetOutputCount_( 2, {"out", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetOutputCount_(2, {"out", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     detect_shadows_ = false;
     threshold_ = 40;
@@ -39,14 +38,13 @@ BackgroundSubtraction::BackgroundSubtraction()
     bg_subtractor_knn_ = cv::createBackgroundSubtractorKNN();
 
     SetEnabled(true);
-
 }
 
-void BackgroundSubtraction::Process_( SignalBus const& inputs, SignalBus& outputs )
+void BackgroundSubtraction::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -70,20 +68,20 @@ void BackgroundSubtraction::Process_( SignalBus const& inputs, SignalBus& output
             }
             if (bkg_sub_mode_ == 0) {
                 bg_subtractor_mog2_->apply(frame, mask);
-                masked_frame.setTo(cv::Scalar(0,0,0));
+                masked_frame.setTo(cv::Scalar(0, 0, 0));
                 cv::bitwise_and(frame, frame, masked_frame, mask);
             }
             else if (bkg_sub_mode_ == 1) {
                 bg_subtractor_knn_->apply(frame, mask);
-                masked_frame.setTo(cv::Scalar(0,0,0));
+                masked_frame.setTo(cv::Scalar(0, 0, 0));
                 cv::bitwise_and(frame, frame, masked_frame, mask);
             }
             if (!masked_frame.empty())
                 outputs.SetValue(0, masked_frame);
             if (!mask.empty())
                 outputs.SetValue(1, mask);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -118,7 +116,6 @@ void BackgroundSubtraction::UpdateGui(void *context, int interface)
         if (ImGui::Checkbox(CreateControlString("Detect Shadows", GetInstanceName()).c_str(), &detect_shadows_))
             update_settings_ = true;
     }
-
 }
 
 std::string BackgroundSubtraction::GetState()
@@ -151,7 +148,6 @@ void BackgroundSubtraction::SetState(std::string &&json_serialized)
         threshold_ = state["threshold"].get<float>();
     if (state.contains("detect_shadows"))
         detect_shadows_ = state["detect_shadows"].get<bool>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

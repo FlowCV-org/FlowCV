@@ -23,7 +23,7 @@ class ScaleAbs final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     float alpha_;
@@ -32,4 +32,4 @@ class ScaleAbs final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SCALE_ABS_HPP_
+#endif  // FLOWCV_PLUGIN_SCALE_ABS_HPP_

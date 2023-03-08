@@ -23,13 +23,12 @@ class Bitwise final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int bitwise_mode_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_BITWISE_HPP_
+#endif  // FLOWCV_PLUGIN_BITWISE_HPP_

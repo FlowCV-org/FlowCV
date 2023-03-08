@@ -23,7 +23,7 @@ class BackgroundSubtraction final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     cv::Ptr<cv::BackgroundSubtractorMOG2> bg_subtractor_mog2_;
@@ -33,9 +33,8 @@ class BackgroundSubtraction final : public Component
     bool detect_shadows_;
     float threshold_;
     int history_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_BACKGROUND_SUBTRACTION_HPP_
+#endif  // FLOWCV_PLUGIN_BACKGROUND_SUBTRACTION_HPP_

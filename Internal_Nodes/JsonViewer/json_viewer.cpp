@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-JsonViewer::JsonViewer()
-    : Component( ProcessOrder::OutOfOrder )
+JsonViewer::JsonViewer() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Json_Viewer");
@@ -24,7 +23,7 @@ JsonViewer::JsonViewer()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"JSON"}, {DSPatch::IoType::Io_Type_JSON} );
+    SetInputCount_(1, {"JSON"}, {DSPatch::IoType::Io_Type_JSON});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -32,18 +31,17 @@ JsonViewer::JsonViewer()
     show_raw_out_ = false;
 
     SetEnabled(true);
-
 }
 
-void JsonViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
+void JsonViewer::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    std::lock_guard<std::mutex> lck (io_mutex_);
+    std::lock_guard<std::mutex> lck(io_mutex_);
     if (!IsEnabled())
         SetEnabled(true);
 
     // Input 1 Handler
-    auto in1 = inputs.GetValue<nlohmann::json>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<nlohmann::json>(0);
+    if (!in1) {
         return;
     }
 
@@ -51,7 +49,6 @@ void JsonViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
         // Process JSON
         json_data_ = *in1;
     }
-
 }
 
 bool JsonViewer::HasGui(int interface)
@@ -67,7 +64,7 @@ bool JsonViewer::HasGui(int interface)
 
 void JsonViewer::UpdateGui(void *context, int interface)
 {
-    std::lock_guard<std::mutex> lck (io_mutex_);
+    std::lock_guard<std::mutex> lck(io_mutex_);
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
 
@@ -101,7 +98,7 @@ void JsonViewer::UpdateGui(void *context, int interface)
                                 ImGui::NextColumn();
                             }
                             ImGui::Separator();
-                            for (auto &d: json_data_["data"]) {
+                            for (auto &d : json_data_["data"]) {
                                 for (nlohmann::json::iterator it = d.begin(); it != d.end(); ++it) {
                                     std::string value;
                                     if (it->is_number_float())
@@ -135,7 +132,6 @@ void JsonViewer::UpdateGui(void *context, int interface)
         }
         ImGui::End();
     }
-
 }
 
 std::string JsonViewer::GetState()
@@ -154,8 +150,6 @@ void JsonViewer::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

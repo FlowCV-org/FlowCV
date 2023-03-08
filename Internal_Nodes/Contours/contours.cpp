@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Contours::Contours()
-    : Component( ProcessOrder::OutOfOrder )
+Contours::Contours() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Contours");
@@ -24,10 +23,10 @@ Contours::Contours()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 2, {"viz", "in"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(2, {"viz", "in"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 2 outputs
-    SetOutputCount_( 2, {"out", "contours"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "contours"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     mode_ = 2;
     method_ = 1;
@@ -41,18 +40,17 @@ Contours::Contours()
     bbox_color_ = ImVec4(0.0f, 0.0f, 1.0f, 0.0f);
 
     SetEnabled(true);
-
 }
 
-void Contours::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Contours::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(1);
+    if (!in1) {
         return;
     }
 
-    auto in2 = inputs.GetValue<cv::Mat>( 0 );
+    auto in2 = inputs.GetValue<cv::Mat>(0);
 
     if (!in1->empty()) {
         if (IsEnabled()) {
@@ -62,7 +60,7 @@ void Contours::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             // Process Image
             if (in1->type() == CV_8UC1 && in1->channels() == 1)
-                cv::findContours( *in1, contours, hierarchy, mode_, method_ + 1 );
+                cv::findContours(*in1, contours, hierarchy, mode_, method_ + 1);
 
             int thickness = 2;
             if (fill_contours_)
@@ -86,12 +84,14 @@ void Contours::Process_( SignalBus const& inputs, SignalBus& outputs )
                 if (!hierarchy.empty()) {
                     for (int idx = 0; idx >= 0; idx = hierarchy[idx][0]) {
                         if (idx < contours.size()) {
-                            float area = (float) cv::contourArea(contours[idx]);
+                            float area = (float)cv::contourArea(contours[idx]);
                             if (filter_by_area_) {
                                 if (area > area_min_ && area < area_max_) {
                                     nlohmann::json jCont;
                                     if (draw_contours_) {
-                                        cv::drawContours(frame, contours, idx, cv::Scalar(contour_color_.z * 255, contour_color_.y * 255, contour_color_.x * 255), thickness, cv::LINE_8, hierarchy);
+                                        cv::drawContours(frame, contours, idx,
+                                            cv::Scalar(contour_color_.z * 255, contour_color_.y * 255, contour_color_.x * 255), thickness, cv::LINE_8,
+                                            hierarchy);
                                         nlohmann::json cTmp1;
                                         for (auto &pt : contours.at(idx)) {
                                             nlohmann::json cTmp2;
@@ -113,10 +113,12 @@ void Contours::Process_( SignalBus const& inputs, SignalBus& outputs )
                                     }
                                     jContours.emplace_back(jCont);
                                 }
-                            } else {
+                            }
+                            else {
                                 nlohmann::json jCont;
                                 if (draw_contours_) {
-                                    cv::drawContours(frame, contours, idx, cv::Scalar(contour_color_.z * 255, contour_color_.y * 255, contour_color_.x * 255), thickness, cv::LINE_8, hierarchy);
+                                    cv::drawContours(frame, contours, idx, cv::Scalar(contour_color_.z * 255, contour_color_.y * 255, contour_color_.x * 255),
+                                        thickness, cv::LINE_8, hierarchy);
                                     nlohmann::json cTmp1;
                                     for (auto &pt : contours.at(idx)) {
                                         nlohmann::json cTmp2;
@@ -147,11 +149,11 @@ void Contours::Process_( SignalBus const& inputs, SignalBus& outputs )
                     outputs.SetValue(1, json_out);
                 }
             }
-            catch (const std::exception& e) {
+            catch (const std::exception &e) {
                 std::cout << e.what() << std::endl;
             }
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -189,15 +191,14 @@ void Contours::UpdateGui(void *context, int interface)
         ImGui::Checkbox(CreateControlString("Draw Contours", GetInstanceName()).c_str(), &draw_contours_);
         if (draw_contours_) {
             ImGui::Checkbox(CreateControlString("Fill Contours", GetInstanceName()).c_str(), &fill_contours_);
-            ImGui::ColorEdit3(CreateControlString("Contour Color", GetInstanceName()).c_str(), (float*)&contour_color_);
+            ImGui::ColorEdit3(CreateControlString("Contour Color", GetInstanceName()).c_str(), (float *)&contour_color_);
         }
         ImGui::Separator();
         ImGui::Checkbox(CreateControlString("Draw BBox", GetInstanceName()).c_str(), &draw_bbox_);
         if (draw_bbox_) {
-            ImGui::ColorEdit3(CreateControlString("BBox Color", GetInstanceName()).c_str(), (float*)&bbox_color_);
+            ImGui::ColorEdit3(CreateControlString("BBox Color", GetInstanceName()).c_str(), (float *)&bbox_color_);
         }
     }
-
 }
 
 std::string Contours::GetState()
@@ -261,7 +262,6 @@ void Contours::SetState(std::string &&json_serialized)
         fill_contours_ = state["fill_contours"].get<bool>();
     if (state.contains("draw_bbox"))
         draw_bbox_ = state["draw_bbox"].get<bool>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

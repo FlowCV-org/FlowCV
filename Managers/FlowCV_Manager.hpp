@@ -12,14 +12,17 @@
 #include "Plugin_Manager.hpp"
 #include "json.hpp"
 
-namespace FlowCV {
+namespace FlowCV
+{
 
-struct IoInfo {
+struct IoInfo
+{
     uint64_t id = 0;
     uint32_t index = 0;
 };
 
-struct NodeInfo {
+struct NodeInfo
+{
     uint64_t id;
     bool showControlUI;
     std::shared_ptr<DSPatch::Component> node_ptr;
@@ -27,13 +30,15 @@ struct NodeInfo {
     NodeDescription desc;
 };
 
-struct Wire {
+struct Wire
+{
     uint64_t id{};
     IoInfo from;
     IoInfo to;
 };
 
-class FlowCV_Manager {
+class FlowCV_Manager
+{
   public:
     FlowCV_Manager();
     ~FlowCV_Manager();
@@ -85,5 +90,5 @@ class FlowCV_Manager {
     std::shared_ptr<PluginManager> plugin_manager_;
     std::shared_ptr<InternalNodeManager> internal_node_manager_;
 };
-} // End Namespace FlowCV
-#endif //FLOWCV_MANAGER_HPP_
+}  // End Namespace FlowCV
+#endif  // FLOWCV_MANAGER_HPP_

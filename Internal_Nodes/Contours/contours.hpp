@@ -23,7 +23,7 @@ class Contours final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int mode_;
@@ -40,4 +40,4 @@ class Contours final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_CONTOURS_HPP_
+#endif  // FLOWCV_PLUGIN_CONTOURS_HPP_

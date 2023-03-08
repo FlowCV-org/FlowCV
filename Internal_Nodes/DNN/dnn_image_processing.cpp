@@ -14,8 +14,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-ImageProcessing::ImageProcessing()
-    : Component( ProcessOrder::OutOfOrder )
+ImageProcessing::ImageProcessing() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Image_Processing");
@@ -26,10 +25,10 @@ ImageProcessing::ImageProcessing()
     global_inst_counter++;
 
     // 1 input
-    SetInputCount_( 1, {"in1"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in1"}, {IoType::Io_Type_CvMat});
 
     // 1 output
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     // Set Defaults
     scale_ = 1.0f;
@@ -48,7 +47,6 @@ ImageProcessing::ImageProcessing()
     target_list_ = dnn_backend_helper_.GetTargetList();
 
     SetEnabled(true);
-
 }
 
 void ImageProcessing::InitDnn_()
@@ -72,10 +70,10 @@ void ImageProcessing::InitDnn_()
     needs_reinit_ = false;
 }
 
-void ImageProcessing::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ImageProcessing::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -88,7 +86,7 @@ void ImageProcessing::Process_( SignalBus const& inputs, SignalBus& outputs )
             in1->copyTo(orig);
 
             try {
-                if (img_proc_init_mode_ == 0) { // Style Transfer
+                if (img_proc_init_mode_ == 0) {  // Style Transfer
                     blob = cv::dnn::blobFromImage(orig, scale_, modelSize, cv::Scalar(mean_[0], mean_[1], mean_[2]), swap_rb_, false);
                     net_->setInput(blob);
                     cv::Mat result = net_->forward();
@@ -100,7 +98,7 @@ void ImageProcessing::Process_( SignalBus const& inputs, SignalBus& outputs )
                     for (int y = 0; y < H; y++) {
                         for (int x = 0; x < W; x++) {
                             for (int c = 0; c < C; c++) {
-                                out.emplace_back(cv::saturate_cast<uchar>(data[c*H*W + y*W + x] + (float)mean_[c]));
+                                out.emplace_back(cv::saturate_cast<uchar>(data[c * H * W + y * W + x] + (float)mean_[c]));
                             }
                         }
                     }
@@ -115,8 +113,8 @@ void ImageProcessing::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
 
             outputs.SetValue(0, orig);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -158,11 +156,13 @@ void ImageProcessing::UpdateGui(void *context, int interface)
                 InitDnn_();
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Backend", GetInstanceName()).c_str(),
-                             &dnn_backend_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&backend_list_, (int)backend_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Backend", GetInstanceName()).c_str(), &dnn_backend_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Backend>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&backend_list_, (int)backend_list_.size())) {
                 // Update and get Target List
                 current_backend_ = backend_list_.at(dnn_backend_idx_).second;
                 dnn_backend_helper_.UpdateTargetList(backend_list_.at(dnn_backend_idx_).second);
@@ -172,11 +172,13 @@ void ImageProcessing::UpdateGui(void *context, int interface)
                 needs_reinit_ = true;
             }
             ImGui::SetNextItemWidth(120);
-            if (ImGui::Combo(CreateControlString("Target", GetInstanceName()).c_str(),
-                             &dnn_target_idx_, [](void* data, int idx, const char** out_text) {
-                    *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>>*)data)->at(idx).first.c_str();
-                    return true;
-                }, (void*)&target_list_, (int)target_list_.size())) {
+            if (ImGui::Combo(
+                    CreateControlString("Target", GetInstanceName()).c_str(), &dnn_target_idx_,
+                    [](void *data, int idx, const char **out_text) {
+                        *out_text = ((const std::vector<std::pair<std::string, cv::dnn::Target>> *)data)->at(idx).first.c_str();
+                        return true;
+                    },
+                    (void *)&target_list_, (int)target_list_.size())) {
                 current_target_ = target_list_.at(dnn_target_idx_).second;
                 needs_reinit_ = true;
             }
@@ -203,14 +205,11 @@ void ImageProcessing::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", model_path_.c_str());
 
-        if(show_model_dialog_)
+        if (show_model_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Model", GetInstanceName()).c_str());
 
-        if(model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()),
-                                        imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                        ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net",
-                                        &show_model_dialog_))
-        {
+        if (model_dialog_.showFileDialog(CreateControlString("Set Model", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".caffemodel,.bin,.onnx,.pb,.pth,.weights,.t7,.net", &show_model_dialog_)) {
             model_path_ = model_dialog_.selected_path;
             show_model_dialog_ = false;
             needs_reinit_ = true;
@@ -225,14 +224,11 @@ void ImageProcessing::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", config_path_.c_str());
 
-        if(show_config_dialog_)
+        if (show_config_dialog_)
             ImGui::OpenPopup(CreateControlString("Set Config", GetInstanceName()).c_str());
 
-        if(config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()),
-                                        imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
-                                        ImVec2(700, 310), ".txt",
-                                        &show_config_dialog_))
-        {
+        if (config_dialog_.showFileDialog(CreateControlString("Set Config", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::OPEN,
+                ImVec2(700, 310), ".txt", &show_config_dialog_)) {
             config_path_ = config_dialog_.selected_path;
             show_config_dialog_ = false;
             needs_reinit_ = true;
@@ -254,7 +250,6 @@ void ImageProcessing::UpdateGui(void *context, int interface)
         ImGui::Separator();
         ImGui::Checkbox(CreateControlString("RGB", GetInstanceName()).c_str(), &swap_rb_);
     }
-
 }
 
 std::string ImageProcessing::GetState()
@@ -349,7 +344,6 @@ void ImageProcessing::SetState(std::string &&json_serialized)
         std::lock_guard<std::mutex> lk(io_mutex_);
         InitDnn_();
     }
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-HistogramViewer::HistogramViewer()
-    : Component( ProcessOrder::OutOfOrder )
+HistogramViewer::HistogramViewer() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Histogram");
@@ -24,7 +23,7 @@ HistogramViewer::HistogramViewer()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 0 outputs
     SetOutputCount_(0);
@@ -33,20 +32,19 @@ HistogramViewer::HistogramViewer()
     is_color_ = true;
 
     SetEnabled(true);
-
 }
 
-void HistogramViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
+void HistogramViewer::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     if (!IsEnabled())
         SetEnabled(true);
 
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
-    std::lock_guard<std::mutex> lck (io_mutex_);
+    std::lock_guard<std::mutex> lck(io_mutex_);
 
     if (!in1->empty()) {
         has_input_ = true;
@@ -56,8 +54,8 @@ void HistogramViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
             is_color_ = false;
 
         int hist_size = 256;
-        float range[] = { 0, 256 }; //the upper boundary is exclusive
-        const float* hist_range = { range };
+        float range[] = {0, 256};  // the upper boundary is exclusive
+        const float *hist_range = {range};
         bool uniform = true, accumulate = false;
         std::vector<cv::Mat> bgr_planes;
         x_range_.clear();
@@ -65,7 +63,7 @@ void HistogramViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
         values_g_.clear();
         values_b_.clear();
 
-        split( *in1, bgr_planes );
+        split(*in1, bgr_planes);
         cv::Mat b_hist, g_hist, r_hist;
 
         calcHist(&bgr_planes[0], 1, 0, cv::Mat(), b_hist, 1, &hist_size, &hist_range, uniform, accumulate);
@@ -77,10 +75,9 @@ void HistogramViewer::Process_( SignalBus const& inputs, SignalBus& outputs )
             normalize(r_hist, r_hist, 0, bgr_planes[2].rows, cv::NORM_MINMAX, -1, cv::Mat());
         }
 
-        for( int i = 1; i < hist_size; i++ )
-        {
+        for (int i = 1; i < hist_size; i++) {
             x_range_.emplace_back((float)i);
-            values_b_.emplace_back(b_hist.at<float>(i-1));
+            values_b_.emplace_back(b_hist.at<float>(i - 1));
             if (is_color_) {
                 values_r_.emplace_back(r_hist.at<float>(i - 1));
                 values_g_.emplace_back(g_hist.at<float>(i - 1));
@@ -107,12 +104,12 @@ void HistogramViewer::UpdateGui(void *context, int interface)
     ImGui::SetCurrentContext(imCurContext);
 
     if (interface == (int)FlowCV::GuiInterfaceType_Main) {
-        std::lock_guard<std::mutex> lck (io_mutex_);
+        std::lock_guard<std::mutex> lck(io_mutex_);
         std::string title = "Histogram_" + std::to_string(GetInstanceCount());
         ImGui::Begin(CreateControlString(title.c_str(), GetInstanceName()).c_str());
         if (ImPlot::BeginPlot(CreateControlString("Histogram View", GetInstanceName()).c_str(), ImVec2(-1, -1))) {
-            ImPlot::SetupAxes("Range","Value");
-            ImPlot::SetupAxesLimits(0,255,0,1024);
+            ImPlot::SetupAxes("Range", "Value");
+            ImPlot::SetupAxesLimits(0, 255, 0, 1024);
             if (has_input_ && !x_range_.empty()) {
                 std::string singleChannelName = "Gray";
                 ImVec4 singleChannelColor = ImVec4(0.75, 0.75, 0.75, 0.75);
@@ -154,8 +151,6 @@ void HistogramViewer::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

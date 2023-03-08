@@ -27,7 +27,7 @@ class DLLEXPORT ShapeCounter final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::ShapeCounter> p;
@@ -42,8 +42,8 @@ class DLLEXPORT ShapeCounter final : public Component
     int text_font_;
 };
 
-EXPORT_PLUGIN( ShapeCounter )
+EXPORT_PLUGIN(ShapeCounter)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SHAPE_COUNTER_HPP_
+#endif  // FLOWCV_PLUGIN_SHAPE_COUNTER_HPP_

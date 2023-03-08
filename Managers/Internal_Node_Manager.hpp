@@ -8,9 +8,11 @@
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
 
-namespace FlowCV {
+namespace FlowCV
+{
 
-class InternalNodeManager {
+class InternalNodeManager
+{
   public:
     InternalNodeManager();
     ~InternalNodeManager() = default;
@@ -19,11 +21,10 @@ class InternalNodeManager {
     bool GetNodeDescription(const char *name, NodeDescription &nodeDesc);
     std::shared_ptr<DSPatch::Component> CreateNodeInstance(const char *name);
     bool HasNode(const char *name);
-  protected:
 
+  protected:
   private:
     std::vector<NodeDescription> node_list_;
-
 };
-} // End Namespace FlowCV
-#endif //FLOWCV_INTERNAL_NODE_MANAGER_HPP_
+}  // End Namespace FlowCV
+#endif  // FLOWCV_INTERNAL_NODE_MANAGER_HPP_

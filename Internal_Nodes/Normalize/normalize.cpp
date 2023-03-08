@@ -12,10 +12,9 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-static int NormTypeValues[9] = {1,2,4,32};
+static int NormTypeValues[9] = {1, 2, 4, 32};
 
-Normalize::Normalize()
-    : Component( ProcessOrder::OutOfOrder )
+Normalize::Normalize() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Normalize");
@@ -26,25 +25,24 @@ Normalize::Normalize()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(2, {"in", "mask"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     norm_type_ = 0;
     alpha_ = 1;
     beta_ = 10;
 
     SetEnabled(true);
-
 }
 
-void Normalize::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Normalize::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<cv::Mat>( 1 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<cv::Mat>(1);
+    if (!in1) {
         return;
     }
 
@@ -67,7 +65,8 @@ void Normalize::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             if (!frame.empty())
                 outputs.SetValue(0, frame);
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -97,9 +96,7 @@ void Normalize::UpdateGui(void *context, int interface)
             ImGui::SetNextItemWidth(100);
             ImGui::DragFloat(CreateControlString("Beta (Max)", GetInstanceName()).c_str(), &beta_, 0.01f, 0.0f, 500.0f, "%.2f");
         }
-
     }
-
 }
 
 std::string Normalize::GetState()
@@ -129,7 +126,6 @@ void Normalize::SetState(std::string &&json_serialized)
         alpha_ = state["alpha"].get<float>();
     if (state.contains("beta"))
         beta_ = state["beta"].get<float>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

@@ -23,7 +23,7 @@ class Crop final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     cv::Rect crop_area_;
@@ -32,9 +32,8 @@ class Crop final : public Component
     int json_bbox_index_;
     int adjust_size_x_;
     int adjust_size_y_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_CROP_HPP_
+#endif  // FLOWCV_PLUGIN_CROP_HPP_

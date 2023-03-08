@@ -23,7 +23,7 @@ class SobelFilter final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int out_depth_;
@@ -35,4 +35,4 @@ class SobelFilter final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_SOBEL_FILTER_HPP_
+#endif  // FLOWCV_PLUGIN_SOBEL_FILTER_HPP_

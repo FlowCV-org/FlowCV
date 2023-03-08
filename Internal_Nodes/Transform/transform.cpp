@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Transform::Transform()
-    : Component( ProcessOrder::OutOfOrder )
+Transform::Transform() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Transform");
@@ -24,10 +23,10 @@ Transform::Transform()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {DSPatch::IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {DSPatch::IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {DSPatch::IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {DSPatch::IoType::Io_Type_CvMat});
 
     // Add Node Properties
     props_.AddInt("trans_x", "Translate X", 0, -4000, 4000, 0.5f);
@@ -48,11 +47,11 @@ Transform::Transform()
     SetEnabled(true);
 }
 
-void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Transform::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -70,13 +69,13 @@ void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             // Flip
             switch (props_.Get<int>("flip_mode")) {
-                case 1: // Horizontal
+                case 1:  // Horizontal
                     cv::flip(frame_, frame_, 0);
                     break;
-                case 2: // Vertical
+                case 2:  // Vertical
                     cv::flip(frame_, frame_, 1);
                     break;
-                case 3: // Both
+                case 3:  // Both
                     cv::flip(frame_, frame_, -1);
                     break;
             }
@@ -95,7 +94,7 @@ void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
                 case 4:
                     auto ang = props_.Get<float>("angle");
                     if (ang > 0 || ang < 0) {
-                        cv::Point2f center((float) (frame_.cols - 1) / 2.0f, (float) (frame_.rows - 1) / 2.0f);
+                        cv::Point2f center((float)(frame_.cols - 1) / 2.0f, (float)(frame_.rows - 1) / 2.0f);
                         cv::Mat rotation_matix = getRotationMatrix2D(center, ang, 1.0);
                         warpAffine(frame_, frame_, rotation_matix, frame_.size());
                     }
@@ -157,8 +156,8 @@ void Transform::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
             if (!frame_.empty())
                 outputs.SetValue(0, frame_);
-
-        } else {
+        }
+        else {
             // Copy Original to Output (pass thru)
             outputs.SetValue(0, *in1);
         }
@@ -201,7 +200,8 @@ void Transform::UpdateGui(void *context, int interface)
                 props_.SetStep("scale_y", 0.1f);
                 props_.Set("aspect_mode", 0);
                 props_.SetVisibility("aspect_mode", false);
-            } else {
+            }
+            else {
                 props_.Set("scale_x", (float)props_.GetW<int>("res_x"));
                 props_.Set("scale_y", (float)props_.GetW<int>("res_y"));
                 props_.SetMax("scale_x", 8000.0f);
@@ -213,7 +213,8 @@ void Transform::UpdateGui(void *context, int interface)
         }
         if (props_.GetW<int>("aspect_mode") == 1) {
             props_.Set("scale_y", props_.GetW<float>("scale_x") * props_.GetW<float>("aspect_ratio"));
-        } else if (props_.GetW<int>("aspect_mode") == 2) {
+        }
+        else if (props_.GetW<int>("aspect_mode") == 2) {
             if (props_.GetW<float>("aspect_ratio") > 0.0f) {
                 props_.Set("scale_x", props_.GetW<float>("scale_y") / props_.GetW<float>("aspect_ratio"));
             }
@@ -258,4 +259,4 @@ void Transform::SetState(std::string &&json_serialized)
     }
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

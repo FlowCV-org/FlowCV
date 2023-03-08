@@ -11,7 +11,8 @@
 #include "imgui_3d_opengl.hpp"
 #include "json.hpp"
 
-struct colorVertNorm {
+struct colorVertNorm
+{
     GLfloat x;
     GLfloat y;
     GLfloat z;
@@ -37,7 +38,7 @@ class DepthViewer3D final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void InitOpenGLWin_();
     void InitPointCloud_();
 
@@ -60,4 +61,4 @@ class DepthViewer3D final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_DEPTH_VIEWER_3D_HPP_
+#endif  // FLOWCV_PLUGIN_DEPTH_VIEWER_3D_HPP_

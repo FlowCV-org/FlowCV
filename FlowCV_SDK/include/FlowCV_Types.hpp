@@ -5,7 +5,8 @@
 #ifndef FLOWCV_TYPES_HPP_
 #define FLOWCV_TYPES_HPP_
 
-namespace FlowCV {
+namespace FlowCV
+{
 
 enum GuiInterfaceType
 {
@@ -14,7 +15,8 @@ enum GuiInterfaceType
     GuiInterfaceType_Other
 };
 
-struct NodeDescription {
+struct NodeDescription
+{
     int input_count{};
     int output_count{};
     std::string name{};
@@ -22,11 +24,11 @@ struct NodeDescription {
     std::string author{};
     std::string version{};
 };
-} // End Namespace FlowCV
+}  // End Namespace FlowCV
 
 namespace DSPatch
 {
-const std::map<DSPatch::Category, const char *>& getCategories();
+const std::map<DSPatch::Category, const char *> &getCategories();
 }
 
-#endif //FLOWCV_TYPES_HPP_
+#endif  // FLOWCV_TYPES_HPP_

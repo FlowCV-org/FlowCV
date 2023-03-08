@@ -11,7 +11,8 @@
 #include <map>
 #include <json.hpp>
 
-namespace FlowCV {
+namespace FlowCV
+{
 
 enum class PropertyDataTypes
 {
@@ -48,10 +49,10 @@ class FlowCV_Properties
 {
   public:
     FlowCV_Properties();
-    void AddBool(std::string &&key, std::string&& desc, bool value, bool visible = true);
-    void AddInt(std::string &&key, std::string&& desc, int value, int min = 0, int max = 100, float step = 0.5f, bool visible = true);
-    void AddFloat(std::string &&key, std::string&& desc, float value, float min = 0.0f, float max = 100.0f, float step = 0.1f, bool visible = true);
-    void AddOption(std::string &&key, std::string&& desc, int value, std::vector<std::string> options, bool visible = true);
+    void AddBool(std::string &&key, std::string &&desc, bool value, bool visible = true);
+    void AddInt(std::string &&key, std::string &&desc, int value, int min = 0, int max = 100, float step = 0.5f, bool visible = true);
+    void AddFloat(std::string &&key, std::string &&desc, float value, float min = 0.0f, float max = 100.0f, float step = 0.1f, bool visible = true);
+    void AddOption(std::string &&key, std::string &&desc, int value, std::vector<std::string> options, bool visible = true);
     void Remove(std::string &&key);
     void RemoveAll();
     void Set(std::string &&key, bool value);
@@ -63,7 +64,7 @@ class FlowCV_Properties
     void SetMax(std::string &&key, float value);
     void SetStep(std::string &&key, float value);
     void SetVisibility(std::string &&key, bool show);
-    void SetDescription(std::string &&key, std::string&& desc);
+    void SetDescription(std::string &&key, std::string &&desc);
     void SetToDefault(std::string &&key);
     void SetAllToDefault();
     bool Exists(const std::string &key);
@@ -75,7 +76,7 @@ class FlowCV_Properties
     template<typename T> T GetMin(const std::string &key);
     template<typename T> T GetMax(const std::string &key);
     template<typename T> T GetStep(const std::string &key);
-    void DrawUi(const char* inst_id);
+    void DrawUi(const char *inst_id);
     void ToJson(nlohmann::json &j);
     void FromJson(nlohmann::json &j);
     const std::vector<std::string> &GetOptions(std::string &&key);
@@ -87,6 +88,6 @@ class FlowCV_Properties
     std::unordered_map<std::string, int> prop_idx;
     std::mutex mutex_lock_;
 
-}; // End Class Node_Properties
-} // End Namespace FlowCV
-#endif //FLOWCV_PROPERTY_MANAGER_HPP_
+};  // End Class Node_Properties
+}  // End Namespace FlowCV
+#endif  // FLOWCV_PROPERTY_MANAGER_HPP_

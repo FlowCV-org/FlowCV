@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class ShapeCounter
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-ShapeCounter::ShapeCounter()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::ShapeCounter() )
+ShapeCounter::ShapeCounter() : Component(ProcessOrder::OutOfOrder), p(new internal::ShapeCounter())
 {
     // Name and Category
     SetComponentName_("Shape_Counter");
@@ -29,10 +27,10 @@ ShapeCounter::ShapeCounter()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "shapes"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(2, {"in", "shapes"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 1 outputs
-    SetOutputCount_( 2, {"out", "counts"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "counts"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     size_match_ = 100;
     size_threshold_ = 5;
@@ -45,15 +43,14 @@ ShapeCounter::ShapeCounter()
     text_font_ = 0;
 
     SetEnabled(true);
-
 }
 
-void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void ShapeCounter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<nlohmann::json>( 1 );
-    if ( !in1 || !in2 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<nlohmann::json>(1);
+    if (!in1 || !in2) {
         return;
     }
 
@@ -77,7 +74,7 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
             }
             if (!json_data.empty()) {
                 if (json_data.contains("data")) {
-                    for (auto &d: json_data["data"]) {
+                    for (auto &d : json_data["data"]) {
                         if (counting_mode_ == 0) {
                             if (d.contains("size")) {
                                 int shapeSize = (int)d["size"].get<float>();
@@ -111,7 +108,7 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
 
                     // Add Frame Overlays
                     if (show_overlay_) {
-                        if (counting_mode_ == 0) { // By Size
+                        if (counting_mode_ == 0) {  // By Size
                             int baseline = 0;
                             int txtOffset = 12;
                             std::string countStr = "Count: ";
@@ -144,14 +141,14 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
                             cv::Mat roi = frame(roiRect);
                             cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(80, 80, 80));
                             double alpha = text_color_.w;
-                            cv::addWeighted(color, alpha, roi, 1.0 - alpha , 0.0, roi);
+                            cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
                             cv::rectangle(frame, roiRect, cv::Scalar(40, 40, 40), 1);
                             cv::putText(frame, sizeStr, cv::Point(text_pos_.x, text_pos_.y), text_font_, text_scale_,
-                                        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+                                cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
                             cv::putText(frame, countStr, cv::Point(text_pos_.x, text_pos_.y + txtSize.height + txtOffset), text_font_, text_scale_,
-                                        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+                                cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
                         }
-                        else if (counting_mode_ == 1) { // By ID
+                        else if (counting_mode_ == 1) {  // By ID
                             if (!classCount.empty()) {
                                 int baseline = 0;
                                 int txtOffset = 12;
@@ -192,7 +189,7 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
                                 cv::Mat roi = frame(roiRect);
                                 cv::Mat color(roi.size(), CV_8UC3, cv::Scalar(80, 80, 80));
                                 double alpha = text_color_.w;
-                                cv::addWeighted(color, alpha, roi, 1.0 - alpha , 0.0, roi);
+                                cv::addWeighted(color, alpha, roi, 1.0 - alpha, 0.0, roi);
                                 cv::rectangle(frame, roiRect, cv::Scalar(40, 40, 40), 1);
                                 int startY = text_pos_.y;
                                 for (auto &cnt : classCount) {
@@ -201,7 +198,7 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
                                     sizeStr += ", Count: ";
                                     sizeStr += std::to_string(cnt.second);
                                     cv::putText(frame, sizeStr, cv::Point(text_pos_.x, startY), text_font_, text_scale_,
-                                                cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
+                                        cv::Scalar(text_color_.z * 255, text_color_.y * 255, text_color_.x * 255), text_thickness_);
                                     startY += (txtSize.height + txtOffset);
                                 }
                             }
@@ -214,7 +211,8 @@ void ShapeCounter::Process_( SignalBus const& inputs, SignalBus& outputs )
                 json_out["data"] = data;
                 outputs.SetValue(1, json_out);
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -238,7 +236,7 @@ void ShapeCounter::UpdateGui(void *context, int interface)
 
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         ImGui::Combo(CreateControlString("Font", GetInstanceName()).c_str(), &text_font_,
-                     "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
+            "Simplex\0Plain\0Duplex\0Complex\0Triplex\0Complex Small\0Script Simplex\0Script Complex\0\0");
         ImGui::Separator();
         ImGui::Text("Position:");
         ImGui::SetNextItemWidth(80);
@@ -259,7 +257,7 @@ void ShapeCounter::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Thickness", GetInstanceName()).c_str(), &text_thickness_, 0.1f, 1, 100);
         ImGui::Separator();
-        ImGui::ColorEdit4(CreateControlString("Color", GetInstanceName()).c_str(), (float*)&text_color_);
+        ImGui::ColorEdit4(CreateControlString("Color", GetInstanceName()).c_str(), (float *)&text_color_);
         ImGui::Separator();
         ImGui::Combo(CreateControlString("Counting Mode", GetInstanceName()).c_str(), &counting_mode_, "By Size\0By ID\0\0");
         ImGui::Checkbox(CreateControlString("Show Overlay", GetInstanceName()).c_str(), &show_overlay_);
@@ -270,7 +268,6 @@ void ShapeCounter::UpdateGui(void *context, int interface)
             ImGui::DragInt(CreateControlString("Size Threshold", GetInstanceName()).c_str(), &size_threshold_, 0.5f, 0, 1000);
         }
     }
-
 }
 
 std::string ShapeCounter::GetState()

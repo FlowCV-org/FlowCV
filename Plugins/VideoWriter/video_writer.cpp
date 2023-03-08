@@ -16,35 +16,15 @@ class VideoWriter
 };
 }  // namespace DSPatch::DSPatchables::internal
 
-const std::vector<std::pair<const std::string, const std::string>>& GetCodecList()
+const std::vector<std::pair<const std::string, const std::string>> &GetCodecList()
 {
-    static const auto* codec_list = new std::vector<std::pair<const std::string, const std::string>>{
-        {"H264", ".mp4"},
-        {"I420", ".mp4"},
-        {"IYUV", ".mp4"},
-        {"M4S2", ".mp4"},
-        {"MP4S", ".mp4"},
-        {"MP4V", ".mp4"},
-        {"MJPG", ".avi"},
-        {"UYVY", ".avi"},
-        {"WMV1", ".wmv"},
-        {"WMV2", ".wmv"},
-        {"WMV3", ".wmv"},
-        {"WMVA", ".wmv"},
-        {"WMVP", ".wmv"},
-        {"WVC1", ".wmv"},
-        {"WVP2", ".wmv"},
-        {"YUY2", ".mpg"},
-        {"YV12", ".mpg"},
-        {"YVU9", ".mpg"},
-        {"YVYU", ".mpg"}
-    };
+    static const auto *codec_list = new std::vector<std::pair<const std::string, const std::string>>{{"H264", ".mp4"}, {"I420", ".mp4"}, {"IYUV", ".mp4"},
+        {"M4S2", ".mp4"}, {"MP4S", ".mp4"}, {"MP4V", ".mp4"}, {"MJPG", ".avi"}, {"UYVY", ".avi"}, {"WMV1", ".wmv"}, {"WMV2", ".wmv"}, {"WMV3", ".wmv"},
+        {"WMVA", ".wmv"}, {"WMVP", ".wmv"}, {"WVC1", ".wmv"}, {"WVP2", ".wmv"}, {"YUY2", ".mpg"}, {"YV12", ".mpg"}, {"YVU9", ".mpg"}, {"YVYU", ".mpg"}};
     return *codec_list;
 }
 
-VideoWriter::VideoWriter()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::VideoWriter() )
+VideoWriter::VideoWriter() : Component(ProcessOrder::OutOfOrder), p(new internal::VideoWriter())
 {
 
     // Name and Category
@@ -56,10 +36,10 @@ VideoWriter::VideoWriter()
     global_inst_counter++;
 
     // add 2 inputs
-    SetInputCount_( 3, {"in", "fps", "start"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int, IoType::Io_Type_Bool} );
+    SetInputCount_(3, {"in", "fps", "start"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int, IoType::Io_Type_Bool});
 
     // add 1 output
-    SetOutputCount_( 0 );
+    SetOutputCount_(0);
 
     save_new_file_ = false;
     show_file_dialog_ = false;
@@ -77,7 +57,6 @@ VideoWriter::VideoWriter()
     fps_time_ = (1.0f / (float)fps_) * 1000.0f;
 
     SetEnabled(true);
-
 }
 
 VideoWriter::~VideoWriter()
@@ -104,24 +83,23 @@ void VideoWriter::SaveSource()
                 out_filename_ += outExt;
             }
         }
-        //using namespace std::literals;
+        // using namespace std::literals;
         fps_time_ = (1.0f / (float)fps_) * 1000.0f;
         video_writer_.open(out_filename_, fourcc, (float)fps_, cv::Size(frame_.cols, frame_.rows), true);
         save_new_file_ = false;
         last_fps_ = fps_;
         last_codec_ = codec_;
-
     }
 }
 
-void VideoWriter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void VideoWriter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     static int cnt = 0;
 
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
+    auto in1 = inputs.GetValue<cv::Mat>(0);
     auto in2 = inputs.GetValue<int>(1);
     auto inStart = inputs.GetValue<bool>(2);
-    if ( !in1 )
+    if (!in1)
         return;
 
     if (in2) {
@@ -157,12 +135,13 @@ void VideoWriter::Process_( SignalBus const& inputs, SignalBus& outputs )
 
             if (!video_writer_.isOpened()) {
                 SaveSource();
-            } else {
+            }
+            else {
                 current_time_ = std::chrono::steady_clock::now();
-                //auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
-                //if ((float) delta >= fps_time_) {
-                    video_writer_.write(frame_);
-                    last_time_ = current_time_;
+                // auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(current_time_ - last_time_).count();
+                // if ((float) delta >= fps_time_) {
+                video_writer_.write(frame_);
+                last_time_ = current_time_;
                 //}
             }
         }
@@ -206,16 +185,20 @@ void VideoWriter::UpdateGui(void *context, int interface)
         ImGui::Separator();
         ImGui::SetNextItemWidth(100);
         auto FourCCList = GetCodecList();
-        if (ImGui::Combo(CreateControlString("Video File Codec", GetInstanceName()).c_str(), &codec_, [](void* data, int idx, const char** out_text) {
-            *out_text = ((const std::vector<std::pair<std::string, std::string>>*)data)->at(idx).first.c_str();
-            return true;
-        }, (void*)&FourCCList, (int)FourCCList.size())) {
+        if (ImGui::Combo(
+                CreateControlString("Video File Codec", GetInstanceName()).c_str(), &codec_,
+                [](void *data, int idx, const char **out_text) {
+                    *out_text = ((const std::vector<std::pair<std::string, std::string>> *)data)->at(idx).first.c_str();
+                    return true;
+                },
+                (void *)&FourCCList, (int)FourCCList.size())) {
             codec_str_ = FourCCList[codec_].first;
         }
         if (!has_fps_in_) {
             ImGui::SetNextItemWidth(80);
             const int fpsValues[] = {1, 3, 5, 10, 15, 20, 25, 30, 60, 120};
-            if (ImGui::Combo(CreateControlString("Video File FPS", GetInstanceName()).c_str(), &fps_index_, " 1\0 3\0 5\0 10\0 15\0 20\0 25\0 30\0 60\0 120\0\0")) {
+            if (ImGui::Combo(
+                    CreateControlString("Video File FPS", GetInstanceName()).c_str(), &fps_index_, " 1\0 3\0 5\0 10\0 15\0 20\0 25\0 30\0 60\0 120\0\0")) {
                 fps_ = fpsValues[fps_index_];
             }
         }
@@ -229,11 +212,11 @@ void VideoWriter::UpdateGui(void *context, int interface)
         else
             ImGui::TextWrapped("%s", out_filename_.c_str());
 
-        if(show_file_dialog_)
+        if (show_file_dialog_)
             ImGui::OpenPopup(CreateControlString("Save Movie", GetInstanceName()).c_str());
 
-        if(file_dialog_.showFileDialog(CreateControlString("Save Movie", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE, ImVec2(700, 310), ".avi,.mpg,.mp4,.mjpg,.mkv,.wmv", &show_file_dialog_))
-        {
+        if (file_dialog_.showFileDialog(CreateControlString("Save Movie", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE,
+                ImVec2(700, 310), ".avi,.mpg,.mp4,.mjpg,.mkv,.wmv", &show_file_dialog_)) {
             std::string outExt = FourCCList[codec_].second;
             auto loc = file_dialog_.selected_path.find_last_of('.');
             if (loc == std::string::npos) {
@@ -247,7 +230,6 @@ void VideoWriter::UpdateGui(void *context, int interface)
             save_new_file_ = true;
         }
     }
-
 }
 
 std::string VideoWriter::GetState()
@@ -286,5 +268,4 @@ void VideoWriter::SetState(std::string &&json_serialized)
         fps_index_ = state["fps_index"].get<int>();
     if (state.contains("auto_ext"))
         auto_ext_ = state["auto_ext"].get<bool>();
-
 }

@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-Mean::Mean()
-    : Component( ProcessOrder::OutOfOrder )
+Mean::Mean() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Mean");
@@ -24,24 +23,23 @@ Mean::Mean()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"json"}, {IoType::Io_Type_JSON} );
+    SetOutputCount_(1, {"json"}, {IoType::Io_Type_JSON});
 
     scale_ = 1.0f;
     calc_mean_ = true;
     calc_std_dev_ = false;
 
     SetEnabled(true);
-
 }
 
-void Mean::Process_( SignalBus const& inputs, SignalBus& outputs )
+void Mean::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -63,11 +61,11 @@ void Mean::Process_( SignalBus const& inputs, SignalBus& outputs )
                 mean *= scale_;
                 stdDev *= scale_;
                 for (int i = 0; i < stdDev.rows; i++) {
-                    data["std_dev"].emplace_back((float)stdDev.at<double>(i,0));
+                    data["std_dev"].emplace_back((float)stdDev.at<double>(i, 0));
                 }
                 if (calc_mean_) {
                     for (int i = 0; i < mean.rows; i++) {
-                        data["mean"].emplace_back((float)mean.at<double>(i,0));
+                        data["mean"].emplace_back((float)mean.at<double>(i, 0));
                     }
                 }
             }
@@ -111,7 +109,6 @@ void Mean::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(80);
         ImGui::DragFloat(CreateControlString("Scale", GetInstanceName()).c_str(), &scale_, 0.001f, 0.001f, 10000.0f);
     }
-
 }
 
 std::string Mean::GetState()
@@ -141,7 +138,6 @@ void Mean::SetState(std::string &&json_serialized)
         calc_mean_ = state["calc_mean"].get<bool>();
     if (state.contains("calc_std_dev"))
         calc_std_dev_ = state["calc_std_dev"].get<bool>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

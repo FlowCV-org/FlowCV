@@ -17,18 +17,20 @@
 #include <devguid.h>
 // clang-format on
 
-namespace SerialDeviceEnum {
+namespace SerialDeviceEnum
+{
 
-struct SerialPortInfo {
+struct SerialPortInfo
+{
     std::string port;
     std::string description;
     std::string hardware_id;
 };
 
-class DeviceEnumerator {
- public:
+class DeviceEnumerator
+{
+  public:
     std::vector<SerialPortInfo> GetSerialPortList();
-
 };
-} // End Namespace SerialDeviceEnum
-#endif //FLOWCV_SERIAL_PORTS_WIN_HPP_
+}  // End Namespace SerialDeviceEnum
+#endif  // FLOWCV_SERIAL_PORTS_WIN_HPP_

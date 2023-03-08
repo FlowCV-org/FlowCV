@@ -16,31 +16,30 @@ struct Line
     cv::Point end;
 };
 
-static std::optional<cv::Point> GetLineIntersection(const Line& l1, const Line& l2)
+static std::optional<cv::Point> GetLineIntersection(const Line &l1, const Line &l2)
 {
     cv::Point pInter = {0, 0};
 
     double a1 = l1.end.y - l1.start.y;
     double b1 = l1.start.x - l1.end.x;
-    double c1 = a1*(l1.start.x) + b1*(l1.start.y);
+    double c1 = a1 * (l1.start.x) + b1 * (l1.start.y);
 
     double a2 = l2.end.y - l2.start.y;
     double b2 = l2.start.x - l2.end.x;
-    double c2 = a2*(l2.start.x) + b2*(l2.start.y);
+    double c2 = a2 * (l2.start.x) + b2 * (l2.start.y);
 
-    double determinant = a1*b2 - a2*b1;
+    double determinant = a1 * b2 - a2 * b1;
 
-    if (determinant != 0)
-    {
-        pInter.x = (b2*c1 - b1*c2)/determinant;
-        pInter.y = (a1*c2 - a2*c1)/determinant;
+    if (determinant != 0) {
+        pInter.x = (b2 * c1 - b1 * c2) / determinant;
+        pInter.y = (a1 * c2 - a2 * c1) / determinant;
         return pInter;
     }
 
     return std::nullopt;
 }
 
-static std::optional<Line> GetInsideLine(const Line& l1, int width, int height)
+static std::optional<Line> GetInsideLine(const Line &l1, int width, int height)
 {
     Line innerLine;
 
@@ -105,14 +104,12 @@ static std::optional<Line> GetInsideLine(const Line& l1, int width, int height)
     }
 
     return std::nullopt;
-
 }
 
 namespace DSPatch::DSPatchables
 {
 
-HoughLines::HoughLines()
-    : Component( ProcessOrder::OutOfOrder )
+HoughLines::HoughLines() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Hough_Lines");
@@ -123,10 +120,10 @@ HoughLines::HoughLines()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 2 outputs
-    SetOutputCount_( 2, {"out", "lines"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"out", "lines"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     SetEnabled(true);
 
@@ -146,13 +143,13 @@ HoughLines::HoughLines()
     line_thickness_ = 3;
 }
 
-void HoughLines::Process_( SignalBus const& inputs, SignalBus& outputs )
+void HoughLines::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    static const float DEG_TO_RAD = CV_PI/180;
+    static const float DEG_TO_RAD = CV_PI / 180;
 
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         has_input_ = false;
         return;
     }
@@ -186,7 +183,7 @@ void HoughLines::Process_( SignalBus const& inputs, SignalBus& outputs )
 
                 cv::cvtColor(frame, outFrame, cv::COLOR_GRAY2BGR);
                 if (hough_mode_ == 0) {
-                    for (auto & found_line : found_lines) {
+                    for (auto &found_line : found_lines) {
                         float rho = found_line[0], theta = found_line[1];
                         double a = cos(theta), b = sin(theta);
                         double x0 = a * rho, y0 = b * rho;
@@ -206,13 +203,13 @@ void HoughLines::Process_( SignalBus const& inputs, SignalBus& outputs )
                             jLine["line"] = cTmp;
                             jLines.emplace_back(jLine);
                             if (draw_lines_)
-                                line(outFrame, lInt->start, lInt->end, cv::Scalar(line_color_.z * 255, line_color_.y * 255, line_color_.x * 255), line_thickness_, cv::LINE_AA);
+                                line(outFrame, lInt->start, lInt->end, cv::Scalar(line_color_.z * 255, line_color_.y * 255, line_color_.x * 255),
+                                    line_thickness_, cv::LINE_AA);
                         }
                     }
                 }
                 else if (hough_mode_ == 1) {
-                    for(auto & found_p_line : found_p_lines)
-                    {
+                    for (auto &found_p_line : found_p_lines) {
                         nlohmann::json cTmp;
                         nlohmann::json jLine;
                         cTmp["x0"] = found_p_line[0];
@@ -222,9 +219,8 @@ void HoughLines::Process_( SignalBus const& inputs, SignalBus& outputs )
                         jLine["line"] = cTmp;
                         jLines.emplace_back(jLine);
                         if (draw_lines_) {
-                            line(outFrame, cv::Point(found_p_line[0], found_p_line[1]),
-                                 cv::Point(found_p_line[2], found_p_line[3]),
-                                 cv::Scalar(line_color_.z * 255, line_color_.y * 255, line_color_.x * 255), line_thickness_, cv::LINE_AA);
+                            line(outFrame, cv::Point(found_p_line[0], found_p_line[1]), cv::Point(found_p_line[2], found_p_line[3]),
+                                cv::Scalar(line_color_.z * 255, line_color_.y * 255, line_color_.x * 255), line_thickness_, cv::LINE_AA);
                         }
                     }
                 }
@@ -234,7 +230,8 @@ void HoughLines::Process_( SignalBus const& inputs, SignalBus& outputs )
                     outputs.SetValue(1, json_out);
                 }
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -257,7 +254,7 @@ void HoughLines::UpdateGui(void *context, int interface)
 
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
         if (has_input_ && !valid_format_) {
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f),"Invalid Input Image Format");
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Invalid Input Image Format");
             ImGui::Separator();
         }
         ImGui::SetNextItemWidth(120);
@@ -285,11 +282,9 @@ void HoughLines::UpdateGui(void *context, int interface)
         if (draw_lines_) {
             ImGui::SetNextItemWidth(100);
             ImGui::DragInt(CreateControlString("Line Thickness", GetInstanceName()).c_str(), &line_thickness_, 0.1f, 1, 25);
-            ImGui::ColorEdit3(CreateControlString("Line Color", GetInstanceName()).c_str(), (float*)&line_color_);
+            ImGui::ColorEdit3(CreateControlString("Line Color", GetInstanceName()).c_str(), (float *)&line_color_);
         }
-
     }
-
 }
 
 std::string HoughLines::GetState()
@@ -347,7 +342,6 @@ void HoughLines::SetState(std::string &&json_serialized)
     }
     if (state.contains("line_thickness"))
         line_thickness_ = state["line_thickness"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

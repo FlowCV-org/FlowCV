@@ -78,10 +78,10 @@ int main(int argc, char *argv[])
 #ifdef _WINDOWS
     appDir = std::filesystem::current_path().string();
     size_t requiredSize;
-    getenv_s( &requiredSize, nullptr, 0, "APPDATA");
+    getenv_s(&requiredSize, nullptr, 0, "APPDATA");
     if (requiredSize != 0) {
         char *libVar = new char[requiredSize];
-        getenv_s( &requiredSize, libVar, requiredSize, "APPDATA" );
+        getenv_s(&requiredSize, libVar, requiredSize, "APPDATA");
         cfgDir = libVar;
         cfgDir += std::filesystem::path::preferred_separator;
         cfgDir += "FlowCV";
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     // Start Multi-Threaded Flow Processing in Background
     flowMan.StartAutoTick();
 
-    while(!g_bTerminate) {
+    while (!g_bTerminate) {
         // You Can do other things here while the Circuit Flow is running, for now we'll just sleep
         this_thread::sleep_for(chrono::seconds(1));
     }

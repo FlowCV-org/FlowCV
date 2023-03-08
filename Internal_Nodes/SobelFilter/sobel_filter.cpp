@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-SobelFilter::SobelFilter()
-    : Component( ProcessOrder::OutOfOrder )
+SobelFilter::SobelFilter() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Sobel");
@@ -24,26 +23,25 @@ SobelFilter::SobelFilter()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
-    out_depth_ = 2; // -1/CV_16S/CV_32F/CV_64F
-    derivative_order_ = 0; // X
+    out_depth_ = 2;         // -1/CV_16S/CV_32F/CV_64F
+    derivative_order_ = 0;  // X
     scale_ = 1.0f;
     delta_ = 0.0f;
     ksize_ = 3;
 
     SetEnabled(true);
-
 }
 
-void SobelFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
+void SobelFilter::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -76,10 +74,10 @@ void SobelFilter::Process_( SignalBus const& inputs, SignalBus& outputs )
             else
                 cv::Sobel(sobel_frame, frame, depth_mode, 0, 1, ksize_, scale_, delta_, cv::BORDER_DEFAULT);
 
-            if(!frame.empty())
+            if (!frame.empty())
                 outputs.SetValue(0, frame);
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -103,10 +101,8 @@ void SobelFilter::UpdateGui(void *context, int interface)
     // When Creating Strings for Controls use: CreateControlString("Text Here", GetInstanceCount()).c_str()
     // This will ensure a unique control name for ImGui with multiple instance of the Plugin
     if (interface == (int)FlowCV::GuiInterfaceType_Controls) {
-        ImGui::Combo(CreateControlString("Derivative Order", GetInstanceName()).c_str(), &derivative_order_,
-                     "X\0Y\0\0");
-        ImGui::Combo(CreateControlString("Depth Out", GetInstanceName()).c_str(), &out_depth_,
-                     "Auto\0CV_16S\0CV_32F\0CV_64F\0\0");
+        ImGui::Combo(CreateControlString("Derivative Order", GetInstanceName()).c_str(), &derivative_order_, "X\0Y\0\0");
+        ImGui::Combo(CreateControlString("Depth Out", GetInstanceName()).c_str(), &out_depth_, "Auto\0CV_16S\0CV_32F\0CV_64F\0\0");
         ImGui::Separator();
         ImGui::SetNextItemWidth(100);
         if (ImGui::InputInt(CreateControlString("Kernel Size", GetInstanceName()).c_str(), &ksize_, 2, 2)) {
@@ -123,7 +119,6 @@ void SobelFilter::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Delta", GetInstanceName()).c_str(), &delta_, 0.01f);
     }
-
 }
 
 std::string SobelFilter::GetState()
@@ -159,7 +154,6 @@ void SobelFilter::SetState(std::string &&json_serialized)
         delta_ = state["delta"].get<float>();
     if (state.contains("ksize"))
         ksize_ = state["ksize"].get<int>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-BlobDetector::BlobDetector()
-    : Component( ProcessOrder::OutOfOrder )
+BlobDetector::BlobDetector() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Blob_Detector");
@@ -24,10 +23,10 @@ BlobDetector::BlobDetector()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {DSPatch::IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {DSPatch::IoType::Io_Type_CvMat});
 
     // 2 outputs
-    SetOutputCount_( 2, {"viz", "blobs"}, {DSPatch::IoType::Io_Type_CvMat, DSPatch::IoType::Io_Type_JSON} );
+    SetOutputCount_(2, {"viz", "blobs"}, {DSPatch::IoType::Io_Type_CvMat, DSPatch::IoType::Io_Type_JSON});
 
     blob_param_color_ = 255;
     blob_params_.blobColor = blob_param_color_;
@@ -54,11 +53,11 @@ BlobDetector::BlobDetector()
     SetEnabled(true);
 }
 
-void BlobDetector::Process_( SignalBus const& inputs, SignalBus& outputs )
+void BlobDetector::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Input 1 Handler
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    if ( !in1 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    if (!in1) {
         return;
     }
 
@@ -71,9 +70,8 @@ void BlobDetector::Process_( SignalBus const& inputs, SignalBus& outputs )
             std::vector<cv::KeyPoint> keypoints;
             detector->detect(frame, keypoints);
 
-            cv::drawKeypoints(frame, keypoints, frame,
-                              cv::Scalar(blob_viz_color_.z * 255, blob_viz_color_.y * 255, blob_viz_color_.x * 255),
-                              cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+            cv::drawKeypoints(frame, keypoints, frame, cv::Scalar(blob_viz_color_.z * 255, blob_viz_color_.y * 255, blob_viz_color_.x * 255),
+                cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
             nlohmann::json json_out;
             nlohmann::json jBlobs;
@@ -98,7 +96,8 @@ void BlobDetector::Process_( SignalBus const& inputs, SignalBus& outputs )
                 outputs.SetValue(0, frame);
 
             detector.release();
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
@@ -134,7 +133,8 @@ void BlobDetector::UpdateGui(void *context, int interface)
             blob_params_.thresholdStep = 1;
         ImGui::Separator();
         ImGui::SetNextItemWidth(80);
-        ImGui::DragFloat(CreateControlString("Min Distance Between Blobs", GetInstanceName()).c_str(), &blob_params_.minDistBetweenBlobs, 0.1f, 0.0f, 5000.0f, "%.1f");
+        ImGui::DragFloat(
+            CreateControlString("Min Distance Between Blobs", GetInstanceName()).c_str(), &blob_params_.minDistBetweenBlobs, 0.1f, 0.0f, 5000.0f, "%.1f");
         ImGui::Separator();
         ImGui::SetNextItemWidth(80);
         ImGui::DragInt(CreateControlString("Min Repeatability", GetInstanceName()).c_str(), &blob_param_repeat_, 0.25f, 0, 255);
@@ -188,9 +188,8 @@ void BlobDetector::UpdateGui(void *context, int interface)
         ImGui::Separator();
         ImGui::Text("Visualization Settings");
         ImGui::Separator();
-        ImGui::ColorEdit3(CreateControlString("Blob Color", GetInstanceName()).c_str(), (float*)&blob_viz_color_);
+        ImGui::ColorEdit3(CreateControlString("Blob Color", GetInstanceName()).c_str(), (float *)&blob_viz_color_);
     }
-
 }
 
 std::string BlobDetector::GetState()
@@ -285,4 +284,4 @@ void BlobDetector::SetState(std::string &&json_serialized)
         blob_params_.thresholdStep = state["threshold_step"].get<float>();
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

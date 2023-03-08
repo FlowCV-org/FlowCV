@@ -23,7 +23,7 @@ class Normalize final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     int norm_type_;
@@ -33,4 +33,4 @@ class Normalize final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_NORMALIZE_HPP_
+#endif  // FLOWCV_PLUGIN_NORMALIZE_HPP_

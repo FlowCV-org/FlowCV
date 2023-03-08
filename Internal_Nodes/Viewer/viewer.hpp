@@ -23,7 +23,7 @@ class Viewer final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     cv::Mat frame_;
@@ -35,4 +35,4 @@ class Viewer final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_VIEWER_HPP_
+#endif  // FLOWCV_VIEWER_HPP_

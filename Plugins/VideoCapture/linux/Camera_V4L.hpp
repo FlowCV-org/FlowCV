@@ -9,17 +9,21 @@
 #include <fstream>
 #include <filesystem>
 
-namespace camv4l {
+namespace camv4l
+{
 
-struct Device {
-    int id; // This can be used to open the device in OpenCV
-    std::string deviceName; // This can be used to show the devices to the user
+struct Device
+{
+    int id;                  // This can be used to open the device in OpenCV
+    std::string deviceName;  // This can be used to show the devices to the user
 };
 
-class Camera_V4L_Enumerator {
+class Camera_V4L_Enumerator
+{
   public:
     std::map<int, Device> getVideoDevicesMap();
+
   private:
 };
-} // End camv4l namespace
-#endif //FLOWCV_CAMERA_V4L_HPP_
+}  // namespace camv4l
+#endif  // FLOWCV_CAMERA_V4L_HPP_

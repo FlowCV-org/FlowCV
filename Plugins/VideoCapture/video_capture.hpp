@@ -43,7 +43,7 @@ class DLLEXPORT VideoCapture final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     void OpenSource();
     void GetCameraProperties();
     void SetCameraProperties();
@@ -70,8 +70,8 @@ class DLLEXPORT VideoCapture final : public Component
     bool force_index_;
 };
 
-EXPORT_PLUGIN( VideoCapture )
+EXPORT_PLUGIN(VideoCapture)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_VIDEO_CAPTURE_HPP_
+#endif  // FLOWCV_VIDEO_CAPTURE_HPP_

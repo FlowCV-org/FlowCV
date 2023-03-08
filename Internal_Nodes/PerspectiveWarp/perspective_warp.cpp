@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-PerspectiveWarp::PerspectiveWarp()
-    : Component( ProcessOrder::OutOfOrder )
+PerspectiveWarp::PerspectiveWarp() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Perspective_Warp");
@@ -24,10 +23,10 @@ PerspectiveWarp::PerspectiveWarp()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "points"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON} );
+    SetInputCount_(2, {"in", "points"}, {IoType::Io_Type_CvMat, IoType::Io_Type_JSON});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     corner_count_ = 0;
     is_poly_ = false;
@@ -38,14 +37,13 @@ PerspectiveWarp::PerspectiveWarp()
     interp_mode_ = 1;
 
     SetEnabled(true);
-
 }
 
-void sortCorners(std::vector<cv::Point2f>& corners, const cv::Point2f& center)
+void sortCorners(std::vector<cv::Point2f> &corners, const cv::Point2f &center)
 {
     std::vector<cv::Point2f> top, bot;
 
-    for(auto &corner : corners) {
+    for (auto &corner : corners) {
         if (corner.y < center.y)
             top.emplace_back(corner);
         else
@@ -53,7 +51,7 @@ void sortCorners(std::vector<cv::Point2f>& corners, const cv::Point2f& center)
     }
     corners.clear();
 
-    if (top.size() == 2 && bot.size() == 2){
+    if (top.size() == 2 && bot.size() == 2) {
         cv::Point2f tl = top[0].x > top[1].x ? top[1] : top[0];
         cv::Point2f tr = top[0].x > top[1].x ? top[0] : top[1];
         cv::Point2f bl = bot[0].x > bot[1].x ? bot[1] : bot[0];
@@ -66,11 +64,11 @@ void sortCorners(std::vector<cv::Point2f>& corners, const cv::Point2f& center)
     }
 }
 
-void PerspectiveWarp::Process_( SignalBus const& inputs, SignalBus& outputs )
+void PerspectiveWarp::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in_img = inputs.GetValue<cv::Mat>( 0 );
-    auto in_json = inputs.GetValue<nlohmann::json>( 1 );
-    if ( !in_img  || !in_json) {
+    auto in_img = inputs.GetValue<cv::Mat>(0);
+    auto in_json = inputs.GetValue<nlohmann::json>(1);
+    if (!in_img || !in_json) {
         is_poly_ = false;
         return;
     }
@@ -81,7 +79,7 @@ void PerspectiveWarp::Process_( SignalBus const& inputs, SignalBus& outputs )
             nlohmann::json json_data = *in_json;
             std::vector<cv::Point2f> corners;
             if (json_data.contains("data_type")) {
-                if(json_data["data_type"].get<std::string>() != "points") {
+                if (json_data["data_type"].get<std::string>() != "points") {
                     is_poly_ = false;
                     return;
                 }
@@ -99,8 +97,8 @@ void PerspectiveWarp::Process_( SignalBus const& inputs, SignalBus& outputs )
                 std::vector<cv::Point2f> approx;
                 cv::approxPolyDP(cv::Mat(corners), approx, cv::arcLength(cv::Mat(corners), true) * 0.02, true);
                 if (approx.size() == 4) {
-                    cv::Point2f center(0,0);
-                    for (auto & corner : corners)
+                    cv::Point2f center(0, 0);
+                    for (auto &corner : corners)
                         center += corner;
                     center *= (1.0f / (float)corners.size());
                     sortCorners(corners, center);
@@ -109,15 +107,15 @@ void PerspectiveWarp::Process_( SignalBus const& inputs, SignalBus& outputs )
                         int w = fixed_width_;
                         int h = fixed_height_;
                         if (!use_fixed_res_) {
-                            int w1 = (int) cv::norm(corners.at(0) - corners.at(1));
-                            int w2 = (int) cv::norm(corners.at(2) - corners.at(3));
-                            int h1 = (int) cv::norm(corners.at(0) - corners.at(3));
-                            int h2 = (int) cv::norm(corners.at(1) - corners.at(2));
+                            int w1 = (int)cv::norm(corners.at(0) - corners.at(1));
+                            int w2 = (int)cv::norm(corners.at(2) - corners.at(3));
+                            int h1 = (int)cv::norm(corners.at(0) - corners.at(3));
+                            int h2 = (int)cv::norm(corners.at(1) - corners.at(2));
                             w = (w1 + w2) / 2;
                             h = (h1 + h2) / 2;
-                            float ratio = (float) h / (float) w;
+                            float ratio = (float)h / (float)w;
                             ratio += ratio_adjustment_;
-                            h = (int) ((float) w * ratio);
+                            h = (int)((float)w * ratio);
                         }
                         if (w < 2)
                             w = 2;
@@ -138,7 +136,8 @@ void PerspectiveWarp::Process_( SignalBus const& inputs, SignalBus& outputs )
                     }
                 }
             }
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in_img);
         }
     }
@@ -218,4 +217,4 @@ void PerspectiveWarp::SetState(std::string &&json_serialized)
         fixed_height_ = state["fixed_height"].get<int>();
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

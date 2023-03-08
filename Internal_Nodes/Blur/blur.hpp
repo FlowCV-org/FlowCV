@@ -24,14 +24,13 @@ class Blur final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::mutex mutex_lock_;
     FlowCV::FlowCV_Properties props_;
-
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_GAUSSIAN_BLUR_HPP_
+#endif  // FLOWCV_GAUSSIAN_BLUR_HPP_

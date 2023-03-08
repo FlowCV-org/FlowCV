@@ -28,12 +28,12 @@ class DLLEXPORT UdpSend final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     bool IsValidIP_();
     void OpenSocket_();
     void CloseSocket_();
     void SetEOLSeq_();
-    template <typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
+    template<typename T> std::vector<uint8_t> GenerateOutBuffer_(T data);
 
   private:
     std::unique_ptr<internal::UdpSend> p;
@@ -48,17 +48,16 @@ class DLLEXPORT UdpSend final : public Component
     bool is_valid_ip;
     bool send_as_binary_;
     float rate_val_{};
-    int rate_selection_[9] = {0,60,30,20,15,10,5,2,1};
+    int rate_selection_[9] = {0, 60, 30, 20, 15, 10, 5, 2, 1};
     std::chrono::steady_clock::time_point current_time_;
     std::chrono::steady_clock::time_point last_time_;
     asio::io_service io_service_;
     std::unique_ptr<asio::ip::udp::socket> socket_;
     std::unique_ptr<asio::ip::udp::endpoint> remote_endpoint_;
-
 };
 
-EXPORT_PLUGIN( UdpSend )
+EXPORT_PLUGIN(UdpSend)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_UDP_SEND_HPP_
+#endif  // FLOWCV_PLUGIN_UDP_SEND_HPP_

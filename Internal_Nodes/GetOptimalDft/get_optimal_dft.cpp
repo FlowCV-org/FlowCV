@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-GetOptimalDft::GetOptimalDft()
-    : Component( ProcessOrder::OutOfOrder )
+GetOptimalDft::GetOptimalDft() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Get_Optimal_DFT_Size");
@@ -24,10 +23,10 @@ GetOptimalDft::GetOptimalDft()
     global_inst_counter++;
 
     // 2 inputs
-    SetInputCount_( 2, {"in", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array} );
+    SetInputCount_(2, {"in", "size"}, {IoType::Io_Type_CvMat, IoType::Io_Type_Int_Array});
 
     // 1 outputs
-    SetOutputCount_( 1, {"size"}, {IoType::Io_Type_Int_Array} );
+    SetOutputCount_(1, {"size"}, {IoType::Io_Type_Int_Array});
 
     has_size_input_ = false;
     has_frame_input_ = false;
@@ -35,13 +34,12 @@ GetOptimalDft::GetOptimalDft()
     height_ = 1;
 
     SetEnabled(true);
-
 }
 
-void GetOptimalDft::Process_( SignalBus const& inputs, SignalBus& outputs )
+void GetOptimalDft::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<std::vector<int>>( 1 );
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<std::vector<int>>(1);
 
     if (!in1) {
         has_frame_input_ = false;
@@ -87,7 +85,6 @@ void GetOptimalDft::Process_( SignalBus const& inputs, SignalBus& outputs )
             outputs.SetValue(0, dft_size);
         }
     }
-
 }
 
 bool GetOptimalDft::HasGui(int interface)
@@ -100,8 +97,6 @@ void GetOptimalDft::UpdateGui(void *context, int interface)
 {
     auto *imCurContext = (ImGuiContext *)context;
     ImGui::SetCurrentContext(imCurContext);
-
-
 }
 
 std::string GetOptimalDft::GetState()
@@ -120,8 +115,6 @@ void GetOptimalDft::SetState(std::string &&json_serialized)
     using namespace nlohmann;
 
     json state = json::parse(json_serialized);
-
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables

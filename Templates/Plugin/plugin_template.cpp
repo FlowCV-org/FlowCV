@@ -14,11 +14,9 @@ namespace DSPatch::DSPatchables::internal
 class PluginName
 {
 };
-}  // namespace DSPatch
+}  // namespace DSPatch::DSPatchables::internal
 
-PluginName::PluginName()
-    : Component( ProcessOrder::OutOfOrder )
-    , p( new internal::PluginName() )
+PluginName::PluginName() : Component(ProcessOrder::OutOfOrder), p(new internal::PluginName())
 {
     // Name and Category
     SetComponentName_("Plugin_Name");
@@ -29,10 +27,10 @@ PluginName::PluginName()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 1, {"in"}, {IoType::Io_Type_CvMat} );
+    SetInputCount_(1, {"in"}, {IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     // Add Props Here, Bool (checkbox), Int, Float, Options (ComboBox)
     // Example:
@@ -41,7 +39,7 @@ PluginName::PluginName()
     SetEnabled(true);
 }
 
-void PluginName::Process_( SignalBus const& inputs, SignalBus& outputs )
+void PluginName::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
     // Handle Input Code Here
 
@@ -49,7 +47,6 @@ void PluginName::Process_( SignalBus const& inputs, SignalBus& outputs )
     props_.Sync();
 
     // Handle Output Code Here
-
 }
 
 bool PluginName::HasGui(int interface)
@@ -75,7 +72,6 @@ void PluginName::UpdateGui(void *context, int interface)
 
         // Add additional UI property logic here
     }
-
 }
 
 std::string PluginName::GetState()
@@ -100,5 +96,4 @@ void PluginName::SetState(std::string &&json_serialized)
 
     // Set Properties from JSON
     props_.FromJson(state);
-
 }

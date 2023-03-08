@@ -24,7 +24,7 @@ class PluginName final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     FlowCV::FlowCV_Properties props_;
@@ -32,4 +32,4 @@ class PluginName final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_TEMPLATE_HPP_
+#endif  // FLOWCV_PLUGIN_TEMPLATE_HPP_

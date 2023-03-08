@@ -22,19 +22,19 @@ struct JsonOutItem
 
 class DrawJson final : public Component
 {
- public:
+  public:
     DrawJson();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
     void SetState(std::string &&json_serialized) override;
 
- protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+  protected:
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
     std::string JsonTreeToStringList_(const nlohmann::json::iterator &it, std::string &curDepth);
     bool IsInList_(const std::string &key_path);
 
- private:
+  private:
     nlohmann::json json_data_;
     cv::Point2i text_pos_;
     int json_data_index_;
@@ -50,4 +50,4 @@ class DrawJson final : public Component
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_DRAW_JSON_HPP_
+#endif  // FLOWCV_PLUGIN_DRAW_JSON_HPP_

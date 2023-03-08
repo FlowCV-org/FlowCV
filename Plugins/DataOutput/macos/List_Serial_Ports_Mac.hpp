@@ -18,21 +18,20 @@
 namespace SerialDeviceEnum
 {
 
-    struct SerialPortInfo
-    {
-        std::string port;
-        std::string description;
-        std::string hardware_id;
-    };
+struct SerialPortInfo
+{
+    std::string port;
+    std::string description;
+    std::string hardware_id;
+};
 
-    class DeviceEnumerator
-    {
+class DeviceEnumerator
+{
 
-        public:
-            std::vector<SerialPortInfo> GetSerialPortList();
+  public:
+    std::vector<SerialPortInfo> GetSerialPortList();
+};
 
-    };
+}  // End Namespace SerialDeviceEnum
 
-} // End Namespace SerialDeviceEnum
-
-#endif //FLOWCV_SERIAL_PORTS_MAC_HPP_
+#endif  // FLOWCV_SERIAL_PORTS_MAC_HPP_

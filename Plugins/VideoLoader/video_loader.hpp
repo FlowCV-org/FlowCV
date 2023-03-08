@@ -29,7 +29,7 @@ class DLLEXPORT VideoLoader final : public Component
     void SetState(std::string &&json_serialized) override;
 
   protected:
-    void Process_( SignalBus const& inputs, SignalBus& outputs ) override;
+    void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
     std::unique_ptr<internal::VideoLoader> p;
@@ -52,8 +52,8 @@ class DLLEXPORT VideoLoader final : public Component
     imgui_addons::ImGuiFileBrowser file_dialog_;
 };
 
-EXPORT_PLUGIN( VideoLoader )
+EXPORT_PLUGIN(VideoLoader)
 
 }  // namespace DSPatch::DSPatchables
 
-#endif //FLOWCV_PLUGIN_MEDIA_READER_HPP_
+#endif  // FLOWCV_PLUGIN_MEDIA_READER_HPP_

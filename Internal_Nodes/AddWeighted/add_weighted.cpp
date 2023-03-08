@@ -12,8 +12,7 @@ static int32_t global_inst_counter = 0;
 namespace DSPatch::DSPatchables
 {
 
-AddWeighted::AddWeighted()
-    : Component( ProcessOrder::OutOfOrder )
+AddWeighted::AddWeighted() : Component(ProcessOrder::OutOfOrder)
 {
     // Name and Category
     SetComponentName_("Add_Weighted");
@@ -24,45 +23,41 @@ AddWeighted::AddWeighted()
     global_inst_counter++;
 
     // 1 inputs
-    SetInputCount_( 2, {"in1", "in2"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat} );
+    SetInputCount_(2, {"in1", "in2"}, {IoType::Io_Type_CvMat, IoType::Io_Type_CvMat});
 
     // 1 outputs
-    SetOutputCount_( 1, {"out"}, {IoType::Io_Type_CvMat} );
+    SetOutputCount_(1, {"out"}, {IoType::Io_Type_CvMat});
 
     alpha_ = 0.5f;
     beta_ = 0.5f;
     gamma_ = 0.0f;
 
     SetEnabled(true);
-
 }
 
-void AddWeighted::Process_( SignalBus const& inputs, SignalBus& outputs )
+void AddWeighted::Process_(SignalBus const &inputs, SignalBus &outputs)
 {
-    auto in1 = inputs.GetValue<cv::Mat>( 0 );
-    auto in2 = inputs.GetValue<cv::Mat>( 1 );
-    if ( !in1 || !in2 ) {
+    auto in1 = inputs.GetValue<cv::Mat>(0);
+    auto in2 = inputs.GetValue<cv::Mat>(1);
+    if (!in1 || !in2) {
         return;
     }
 
     if (!in1->empty() && !in2->empty()) {
         if (IsEnabled()) {
             // Process Image
-            if (in1->type() == in2->type() &&
-            in1->channels() == in2->channels() &&
-            in1->size == in2->size) {
+            if (in1->type() == in2->type() && in1->channels() == in2->channels() && in1->size == in2->size) {
                 cv::Mat frame;
                 cv::addWeighted(*in1, alpha_, *in2, beta_, gamma_, frame);
 
                 if (!frame.empty())
                     outputs.SetValue(0, frame);
             }
-
-        } else {
+        }
+        else {
             outputs.SetValue(0, *in1);
         }
     }
-
 }
 
 bool AddWeighted::HasGui(int interface)
@@ -90,7 +85,6 @@ void AddWeighted::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::DragFloat(CreateControlString("Gamma", GetInstanceName()).c_str(), &gamma_, 0.05f);
     }
-
 }
 
 std::string AddWeighted::GetState()
@@ -120,7 +114,6 @@ void AddWeighted::SetState(std::string &&json_serialized)
         beta_ = state["beta"].get<float>();
     if (state.contains("gamma"))
         gamma_ = state["gamma"].get<float>();
-
 }
 
-} // End Namespace DSPatch::DSPatchables
+}  // End Namespace DSPatch::DSPatchables
