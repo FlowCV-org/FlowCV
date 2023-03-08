@@ -6,6 +6,7 @@
 #ifndef FLOWCV_SERIAL_PORTS_WIN_HPP_
 #define FLOWCV_SERIAL_PORTS_WIN_HPP_
 
+// clang-format off
 #include <iostream>
 #include <string>
 #include <tchar.h>
@@ -14,6 +15,7 @@
 #include <setupapi.h>
 #include <initguid.h>
 #include <devguid.h>
+// clang-format on
 
 namespace SerialDeviceEnum {
 
