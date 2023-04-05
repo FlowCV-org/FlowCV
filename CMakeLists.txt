@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 # Options
 option(DOWNLOAD_OPENCV_PACKAGE "Download OpenCV Package" ON)
 option(BUILD_EXAMPLES "Build Examples" OFF)
-option(BUILD_PLUGINS "Build Plugins" OFF)
-option(BUILD_EDITOR "Build Editor" OFF)
-option(BUILD_ENGINE "Build Engine" OFF)
+option(BUILD_PLUGINS "Build Plugins" ON)
+option(BUILD_EDITOR "Build Editor" ON)
+option(BUILD_ENGINE "Build Engine" ON)
 
 # Include all modules by default, modify based on your project needs
 include(${CMAKE_SOURCE_DIR}/CMake/ImGuiOpenCvConfig.cmake)
