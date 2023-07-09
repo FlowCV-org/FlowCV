@@ -4,7 +4,7 @@ project(OpenCV_Dataflow_Framework)
 set(CMAKE_CXX_STANDARD 17)
 
 # Options
-option(DOWNLOAD_OPENCV_PACKAGE "Download OpenCV Package" ON)
+option(USE_LOCAL_OPENCV_PACKAGE "Use locally OpenCV Package" ON)
 option(BUILD_EXAMPLES "Build Examples" OFF)
 option(BUILD_PLUGINS "Build Plugins" ON)
 option(BUILD_EDITOR "Build Editor" ON)
