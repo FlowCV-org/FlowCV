@@ -88,7 +88,7 @@ void ApplicationSettingsDialog(AppSettings &settings, bool &windowState)
             sel = ImGui::Selectable(settings.extPluginDir.at(i).c_str(), false);
 
         if (sel) {
-            std::cout << i << std::endl;
+            LOG_INFO("{}",i);
             plugin_path_select = i;
         }
     }
@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
             bool res = Application_SetState(flowMan, state);
             appGlobals->showLoadDialog = false;
             if (!res) {
-                std::cout << "Error!" << std::endl;
+                LOG_ERROR("Error!");
                 errorMsg = "There Were Errors Loading FLow";
                 ImGui::OpenPopup("Error Dialog");
             }

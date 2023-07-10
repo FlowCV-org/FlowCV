@@ -3,6 +3,7 @@
 //
 
 #include "FlowCV_Manager.hpp"
+#include "FlowLogger.hpp"
 
 namespace FlowCV
 {
@@ -219,7 +220,7 @@ bool FlowCV_Manager::SetState(nlohmann::json &state)
                     ni.node_ptr->SetInstanceCount(inst_num);
                     ni.node_ptr->SetEnabled(enabled);
                     CheckInstCountValue(ni);
-                    // std::cout << "Adding Node Instance (Plugin): " << name << ", " << id << std::endl;
+                    LOG_DEBUG("Adding Node Instance (Plugin): {}, {}", name, id);
                     if (node.contains("params")) {
                         ni.node_ptr->SetState(node["params"].dump());
                     }
@@ -232,13 +233,13 @@ bool FlowCV_Manager::SetState(nlohmann::json &state)
                         ni.node_ptr->SetInstanceCount(inst_num);
                         ni.node_ptr->SetEnabled(enabled);
                         CheckInstCountValue(ni);
-                        // std::cout << "Adding Node Instance (Internal): " << name << ", " << id << std::endl;
+                        LOG_DEBUG("Adding Node Instance (Plugin): {}, {}", name, id);
                         if (node.contains("params")) {
                             ni.node_ptr->SetState(node["params"].dump());
                         }
                     }
                     else {
-                        // std::cout << "Node Name: " << name.c_str() << " Not Found" << std::endl;
+                        LOG_DEBUG("Node Name: {} Not Found", name);
                         res = false;
                     }
                 }

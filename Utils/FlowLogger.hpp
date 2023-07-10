@@ -17,18 +17,24 @@
 #ifndef LOG_WARN
 #define LOG_WARN(...) SPDLOG_WARN(__VA_ARGS__)
 #endif
+#ifndef LOG_ERROR
+#define LOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#endif
 #else
 #ifndef LOGGER_INIT
 #define LOGGER_INIT (void)0
 #endif
 #ifndef LOG_DEBUG
-#define LOG_DEBUG(...) (void)0;
+#define LOG_DEBUG(...) (void)0
 #endif
 #ifndef LOG_INFO
 #define LOG_INFO(...) (void)0
 #endif
 #ifndef LOG_WARN
 #define LOG_WARN(...) (void)0
+#endif
+#ifndef LOG_ERROR
+#define LOG_ERROR(...) (void)0
 #endif
 #endif
 

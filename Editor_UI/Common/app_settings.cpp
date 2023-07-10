@@ -4,6 +4,8 @@
 
 #include "app_settings.h"
 
+#include "FlowLogger.hpp"
+
 void ApplicationLoadSettings(AppSettings &settings)
 {
     if (std::filesystem::exists(settings.configPath)) {
@@ -32,7 +34,7 @@ void ApplicationLoadSettings(AppSettings &settings)
                 settings.flowBufferCount = j["buffer_count"].get<int>();
         }
         catch (const std::exception &e) {
-            std::cout << "Error Loading Application Settings" << std::endl;
+            LOG_ERROR("Error Loading Application Settings");
             std::cerr << e.what();
         }
     }
