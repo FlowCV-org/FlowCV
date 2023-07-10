@@ -1,3 +1,6 @@
 [submodule "Docs"]
 	path = Docs
 	url = https://github.com/FlowCV-org/FlowCV_Documentation.git
+[submodule "FlowCV_SDK/third-party/spdlog"]
+	path = FlowCV_SDK/third-party/spdlog
+	url = https://github.com/gabime/spdlog.git

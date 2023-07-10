@@ -11,6 +11,8 @@
 #include <mach-o/dyld.h>
 #endif
 
+#include "FlowLogger.hpp"
+
 using namespace TCLAP;
 
 ApplicationGlobals* GetApplicationGlobals()
@@ -155,6 +157,8 @@ std::string SaveFlowFile(ImGuiWrapper &imgui, FlowCV::FlowCV_Manager &flowMan, s
 
 int main(int argc, char *argv[])
 {
+    LOGGER_INIT;
+    
     FlowCV::FlowCV_Manager flowMan;
     ImGuiWrapper imgui;
     std::string pluginDir;

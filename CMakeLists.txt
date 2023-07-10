@@ -24,7 +24,10 @@ include(${CMAKE_SOURCE_DIR}/CMake/FlowCVConfig.cmake)
 # JSON
 include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/nlohmann)
 
-if (BUILD_PLUGINS)
+# log
+include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/spdlog/include)
+
+if(BUILD_PLUGINS)
     # FlowCV Plugin Modules
     add_subdirectory(./Plugins/VideoCapture)
     add_subdirectory(./Plugins/VideoWriter)
@@ -35,21 +38,19 @@ if (BUILD_PLUGINS)
     add_subdirectory(./Plugins/SimpleBlobTracker)
     add_subdirectory(./Plugins/DataOutput)
     add_subdirectory(./Plugins/ImageWriter)
-
-
 endif()
 
-if (BUILD_ENGINE)
+if(BUILD_ENGINE)
     # OpenCV DSPatch Standalone Processing Engine
     add_subdirectory(Processing_Engine)
 endif()
 
-if (BUILD_EDITOR)
+if(BUILD_EDITOR)
     # OpenCV DSPatch Node Editor UI
     add_subdirectory(Editor_UI)
 endif()
 
-if (BUILD_EXAMPLES)
+if(BUILD_EXAMPLES)
     # Build Examples
     add_subdirectory(Examples/FlowCV_Dataflow_Test)
 endif()
