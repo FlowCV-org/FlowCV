@@ -5,6 +5,9 @@
 #ifndef FLOWCV_TYPES_HPP_
 #define FLOWCV_TYPES_HPP_
 
+#include <map>
+#include <string>
+
 namespace FlowCV
 {
 

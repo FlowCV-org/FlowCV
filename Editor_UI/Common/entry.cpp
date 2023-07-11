@@ -1,3 +1,4 @@
+#include "imgui.h"
 #include <application.h>
 #include <cstdio>
 #include <iomanip>
@@ -75,6 +76,11 @@ void ApplicationSettingsDialog(AppSettings &settings, bool &windowState)
             glfwSwapInterval(0);
     }
     ImGui::Checkbox("Show FPS", &settings.showFPS);
+    ImGui::Separator();
+    ImGui::Combo("Log Level",&settings.logLevel,"debug\0info\0warnning\0off\0\0");
+    if (FlowCV::FlowLogger::getLevel() != settings.logLevel) {
+        FlowCV::FlowLogger::setLevel((FlowCV::FlowLogger::Level)settings.logLevel);
+    }
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
     ImGui::BeginChild("ChildR", ImVec2(-1, 260), true, ImGuiWindowFlags_None);
@@ -171,6 +177,7 @@ int main(int argc, char *argv[])
     appSettings.flowBufferCount = 1;
     appSettings.showFPS = false;
     appSettings.useVSync = false;
+    appSettings.logLevel = FlowCV::FlowLogger::getLevel();
 
     CmdLine cmd("FlowCV Node Editor", ' ', FLOWCV_EDITOR_VERSION_STR);
     ValueArg<std::string> cfg_file_arg("c", "cfg", "Default Config File Override", false, "", "string");

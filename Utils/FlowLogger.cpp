@@ -6,6 +6,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+namespace FlowCV
+{
+
 FlowLogger::FlowLogger()
 {
     spdlog::init_thread_pool(8192, 1);
@@ -43,15 +46,19 @@ void FlowLogger::setLevel(Level l)
     switch (l) {
         case Level::debug:
             level = spdlog::level::level_enum::debug;
+            LOG_INFO("set log level to debug");
             break;
         case Level::info:
             level = spdlog::level::level_enum::info;
+            LOG_INFO("set log level to info");
             break;
         case Level::warn:
             level = spdlog::level::level_enum::warn;
+            LOG_INFO("set log level to warn");
             break;
         case Level::off:
             level = spdlog::level::level_enum::off;
+            LOG_INFO("set log level to off");
             break;
 
         default:
@@ -59,3 +66,5 @@ void FlowLogger::setLevel(Level l)
     }
     spdlog::set_level(level);
 }
+
+}  // namespace FlowCV

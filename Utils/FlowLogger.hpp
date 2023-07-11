@@ -4,9 +4,12 @@
 
 #include <string>
 
+namespace FlowCV
+{
+
 #ifdef SPDLOG_H
 #ifndef LOGGER_INIT
-#define LOGGER_INIT FlowLogger();
+#define LOGGER_INIT FlowCV::FlowLogger();
 #endif
 #ifndef LOG_DEBUG
 #define LOG_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
@@ -54,3 +57,5 @@ class FlowLogger
     static Level getLevel();
     static void setLevel(Level l);
 };
+
+}  // namespace FlowCV
