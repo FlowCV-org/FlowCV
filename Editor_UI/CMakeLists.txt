@@ -40,6 +40,7 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME}
         ${IMGUI_LIBS}
         ${OpenCV_LIBS}
+        spdlog::spdlog
     )
 else()
     target_link_libraries(${PROJECT_NAME}
@@ -47,6 +48,7 @@ else()
         ${OpenCV_LIBS}
         ${STB_IMAGE_LIB}
         pthread
+        spdlog::spdlog
     )
 endif()
 

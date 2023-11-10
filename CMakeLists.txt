@@ -20,12 +20,10 @@ include(${CMAKE_SOURCE_DIR}/CMake/ImGuiNodeEditorConfig.cmake)
 include(${CMAKE_SOURCE_DIR}/CMake/ImGuiFileDialogConfig.cmake)
 include(${CMAKE_SOURCE_DIR}/CMake/DSPatchConfig.cmake)
 include(${CMAKE_SOURCE_DIR}/CMake/FlowCVConfig.cmake)
+include(${CMAKE_SOURCE_DIR}/CMake/spdlogSetupConfig.cmake)
 
 # JSON
 include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/nlohmann)
-
-# log
-include_directories(${CMAKE_SOURCE_DIR}/FlowCV_SDK/third-party/spdlog/include)
 
 if(BUILD_PLUGINS)
     # FlowCV Plugin Modules
