@@ -15,6 +15,7 @@ CTestTestfile.cmake
 _deps
 .vs/
 .vscode/
+.cache
 *.pdb
 *.vcxproj
 *.vcxproj.filters
@@ -25,3 +26,5 @@ _deps
 *.recipe
 x64/
 ?ebug/
+
+.DS_Store

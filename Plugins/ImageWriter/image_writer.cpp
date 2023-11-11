@@ -3,6 +3,7 @@
 //
 
 #include "image_writer.hpp"
+#include "FlowLogger.hpp"
 
 using namespace DSPatch;
 using namespace DSPatchables;
@@ -95,9 +96,11 @@ void ImageWriter::UpdateGui(void *context, int interface)
 
         if (file_dialog_.showFileDialog(CreateControlString("Save Image", GetInstanceName()), imgui_addons::ImGuiFileBrowser::DialogMode::SAVE,
                 ImVec2(700, 310), "*.*", &show_file_dialog_)) {
-            std::cout << file_dialog_.selected_path << std::endl;
-            std::cout << file_dialog_.selected_fn << std::endl;
-            std::cout << file_dialog_.ext << std::endl;
+
+            LOG_INFO("{}", file_dialog_.selected_path);
+            LOG_INFO("{}", file_dialog_.selected_fn);
+            LOG_INFO("{}", file_dialog_.ext);
+
             image_file_ = file_dialog_.selected_path;
             show_file_dialog_ = false;
         }

@@ -4,6 +4,8 @@
 
 #include "app_settings.h"
 
+#include "FlowLogger.hpp"
+
 void ApplicationLoadSettings(AppSettings &settings)
 {
     if (std::filesystem::exists(settings.configPath)) {
@@ -28,11 +30,13 @@ void ApplicationLoadSettings(AppSettings &settings)
                 settings.useVSync = j["use_vsync"].get<bool>();
             if (j.contains("show_fps"))
                 settings.showFPS = j["show_fps"].get<bool>();
+            if (j.contains("log_level"))
+                settings.logLevel = j["log_level"].get<int>();
             if (j.contains("buffer_count"))
                 settings.flowBufferCount = j["buffer_count"].get<int>();
         }
         catch (const std::exception &e) {
-            std::cout << "Error Loading Application Settings" << std::endl;
+            LOG_ERROR("Error Loading Application Settings");
             std::cerr << e.what();
         }
     }
@@ -57,6 +61,9 @@ void ApplicationSaveSettings(const AppSettings &settings)
 
     if (settings.showFPS)
         j["show_fps"] = settings.showFPS;
+
+    if (settings.logLevel)
+        j["log_level"] = settings.logLevel;
 
     if (settings.useVSync)
         j["use_vsync"] = settings.useVSync;

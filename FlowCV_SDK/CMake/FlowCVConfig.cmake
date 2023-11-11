@@ -1,4 +1,4 @@
-#FlowCV Config
+# FlowCV Config
 message(STATUS "Adding FlowCV CMake Config")
 
 # FlowCV Managers
@@ -9,4 +9,4 @@ list(APPEND FlowCV_SRC ${FLOWCV_PROJ_DIR}/src/FlowCV_Properties.cpp)
 # Third Party
 include_directories(${FLOWCV_PROJ_DIR}/third-party)
 include_directories(${FLOWCV_PROJ_DIR}/third-party/nlohmann)
-
+include_directories(${FLOWCV_PROJ_DIR}/third-party/spdlog/include)

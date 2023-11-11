@@ -20,6 +20,7 @@ struct AppSettings
     bool showFPS;
     bool useVSync;
     int flowBufferCount;
+    int logLevel;
 };
 
 

@@ -11,6 +11,8 @@
 #include "json.hpp"
 #include <ImGuiFileBrowser.h>
 
+#include "FlowLogger.hpp"
+
 namespace DSPatch::DSPatchables
 {
 namespace internal

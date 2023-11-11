@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <algorithm>
 
+#include "FlowLogger.hpp"
+
 namespace FlowCV
 {
 PluginManager::~PluginManager()
@@ -33,7 +35,7 @@ void PluginManager::ScanDirForPlugins(const char *dir_path, bool recursive)
             int extLen = ext.size();
             std::string ending = filename.substr(filename.size() - extLen, extLen);
             if (ending == ext) {
-                std::cout << entry.path() << std::endl;
+                LOG_INFO("{}", entry.path().string());
                 PluginInfo pi;
                 pi.plugin_handle = new DSPatch::Plugin(filename);
                 if (pi.plugin_handle->IsLoaded()) {
@@ -58,7 +60,7 @@ void PluginManager::ScanDirForPlugins(const char *dir_path, bool recursive)
 void PluginManager::LoadPlugins(const char *plugin_path, bool recursive)
 {
     plugin_path_ = plugin_path;
-    std::cout << "Looking for Plugins in: " << plugin_path << std::endl;
+    LOG_INFO("Looking for Plugins in: {}", plugin_path);
     ScanDirForPlugins(plugin_path_.c_str());
 }
 

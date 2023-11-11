@@ -1,3 +1,4 @@
+#include "imgui.h"
 #include <application.h>
 #include <cstdio>
 #include <iomanip>
@@ -10,6 +11,8 @@
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
+
+#include "FlowLogger.hpp"
 
 using namespace TCLAP;
 
@@ -74,6 +77,11 @@ void ApplicationSettingsDialog(AppSettings &settings, bool &windowState)
     }
     ImGui::Checkbox("Show FPS", &settings.showFPS);
     ImGui::Separator();
+    ImGui::Combo("Log Level",&settings.logLevel,"debug\0info\0warnning\0off\0\0");
+    if (FlowCV::FlowLogger::getLevel() != settings.logLevel) {
+        FlowCV::FlowLogger::setLevel((FlowCV::FlowLogger::Level)settings.logLevel);
+    }
+    ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
     ImGui::BeginChild("ChildR", ImVec2(-1, 260), true, ImGuiWindowFlags_None);
     ImGui::Text("Extra Plugin Paths:");
@@ -86,7 +94,7 @@ void ApplicationSettingsDialog(AppSettings &settings, bool &windowState)
             sel = ImGui::Selectable(settings.extPluginDir.at(i).c_str(), false);
 
         if (sel) {
-            std::cout << i << std::endl;
+            LOG_INFO("{}",i);
             plugin_path_select = i;
         }
     }
@@ -155,6 +163,8 @@ std::string SaveFlowFile(ImGuiWrapper &imgui, FlowCV::FlowCV_Manager &flowMan, s
 
 int main(int argc, char *argv[])
 {
+    LOGGER_INIT;
+    
     FlowCV::FlowCV_Manager flowMan;
     ImGuiWrapper imgui;
     std::string pluginDir;
@@ -167,6 +177,7 @@ int main(int argc, char *argv[])
     appSettings.flowBufferCount = 1;
     appSettings.showFPS = false;
     appSettings.useVSync = false;
+    appSettings.logLevel = FlowCV::FlowLogger::getLevel();
 
     CmdLine cmd("FlowCV Node Editor", ' ', FLOWCV_EDITOR_VERSION_STR);
     ValueArg<std::string> cfg_file_arg("c", "cfg", "Default Config File Override", false, "", "string");
@@ -486,7 +497,7 @@ int main(int argc, char *argv[])
             bool res = Application_SetState(flowMan, state);
             appGlobals->showLoadDialog = false;
             if (!res) {
-                std::cout << "Error!" << std::endl;
+                LOG_ERROR("Error!");
                 errorMsg = "There Were Errors Loading FLow";
                 ImGui::OpenPopup("Error Dialog");
             }

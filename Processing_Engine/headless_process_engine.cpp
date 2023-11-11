@@ -19,6 +19,8 @@
 #include <mach-o/dyld.h>
 #endif
 
+#include "FlowLogger.hpp"
+
 #define APP_VERSION "0.1.3"
 
 using namespace TCLAP;
@@ -58,9 +60,7 @@ int main(int argc, char *argv[])
     cmd.add(cfg_file_arg);
     cmd.parse(argc, argv);
 
-    cout << endl;
-    cout << "FlowCV Processing Engine - v" << APP_VERSION << endl;
-    cout << endl;
+    LOG_INFO("\nFlowCV Processing Engine - v{}\n", APP_VERSION);
 
     FlowCV::FlowCV_Manager flowMan;
 
@@ -133,19 +133,19 @@ int main(int argc, char *argv[])
                 flowMan.plugin_manager_->LoadPlugins(path.c_str(), false);
         }
     }
-    cout << flowMan.plugin_manager_->PluginCount() << " Plugin(s) Loaded" << endl;
+    LOG_INFO("{} Plugin(s) Loaded", flowMan.plugin_manager_->PluginCount());
 
-    cout << "Loading Flow File: " << flow_file_arg.getValue().c_str() << endl;
+    LOG_INFO("Loading Flow File: {}", flow_file_arg.getValue());
     if (!flowMan.LoadState(flow_file_arg.getValue().c_str())) {
-        cout << "Error Loading Flow File" << endl;
+        LOG_ERROR("Error Loading Flow File");
         return EXIT_FAILURE;
     }
-    cout << "Flow State Loaded, " << flowMan.GetNodeCount() << " Nodes Loaded and Configured" << endl;
+    LOG_INFO("Flow State Loaded, {} Nodes Loaded and Configured", flowMan.GetNodeCount());
 
     // Init Signal Handling (Cntrl-C, Cntrl-X to clean exit)
     Init_Signal();
 
-    cout << "Flow Processing Started" << endl;
+    LOG_INFO("Flow Processing Started");
     // Start Multi-Threaded Flow Processing in Background
     flowMan.StartAutoTick();
 
@@ -157,8 +157,7 @@ int main(int argc, char *argv[])
     // Stop Flow Before Going Out of Scope and Cleanup
     flowMan.StopAutoTick();
 
-    cout << "Flow Processing Stopped" << endl;
-    cout << "Exiting" << endl;
+    LOG_INFO("Flow Processing Stopped\nExiting");
 
     return EXIT_SUCCESS;
 }

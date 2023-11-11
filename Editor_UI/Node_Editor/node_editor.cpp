@@ -6,6 +6,8 @@
 #include <vector>
 #include <chrono>
 
+#include "FlowLogger.hpp"
+
 #define IN_OFFSET 99
 #define OUT_OFFSET 199
 
@@ -247,7 +249,7 @@ void PasteNodes(FlowCV::FlowCV_Manager &flowMan)
         flowMan.StartAutoTick();
     }
     catch (const std::exception &e) {
-        std::cout << e.what() << std::endl;
+        LOG_ERROR("{}", e.what());
     }
 }
 
