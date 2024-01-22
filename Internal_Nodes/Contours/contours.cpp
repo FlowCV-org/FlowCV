@@ -34,6 +34,10 @@ Contours::Contours() : Component(ProcessOrder::OutOfOrder)
     area_min_ = 100;
     area_max_ = 1000;
     draw_contours_ = true;
+    use_approximation_ = false;
+    use_convex_hull_ = false;
+    approx_closed_ = true;
+    approx_accuracy_ = 10.0f;
     draw_bbox_ = false;
     fill_contours_ = false;
     contour_color_ = ImVec4(0.0f, 1.0f, 0.0f, 0.0f);
@@ -54,13 +58,24 @@ void Contours::Process_(SignalBus const &inputs, SignalBus &outputs)
 
     if (!in1->empty()) {
         if (IsEnabled()) {
-            std::vector<std::vector<cv::Point> > contours;
+            std::vector<std::vector<cv::Point>> contours;
             std::vector<cv::Vec4i> hierarchy;
             cv::Mat frame;
 
             // Process Image
-            if (in1->type() == CV_8UC1 && in1->channels() == 1)
+            if (in1->type() == CV_8UC1 && in1->channels() == 1) {
                 cv::findContours(*in1, contours, hierarchy, mode_, method_ + 1);
+                if (use_approximation_) {
+                    std::vector<std::vector<cv::Point>> contours0(contours);
+                    for (size_t k = 0; k < contours0.size(); k++)
+                        approxPolyDP(cv::Mat(contours0[k]), contours[k], approx_accuracy_, approx_closed_);
+                }
+                if (use_convex_hull_) {
+                    std::vector<std::vector<cv::Point>> contours0(contours);
+                    for (size_t k = 0; k < contours0.size(); k++)
+                        cv::convexHull(contours0[k], contours[k]);
+                }
+            }
 
             int thickness = 2;
             if (fill_contours_)
@@ -180,6 +195,15 @@ void Contours::UpdateGui(void *context, int interface)
         ImGui::SetNextItemWidth(100);
         ImGui::Combo(CreateControlString("Contour Method", GetInstanceName()).c_str(), &method_, "None\0Simple\0TC89_L1\0TC89_KCOS\0\0");
         ImGui::Separator();
+        ImGui::Checkbox(CreateControlString("Use Approximation", GetInstanceName()).c_str(), &use_approximation_);
+        if (use_approximation_) {
+            ImGui::SetNextItemWidth(100);
+            ImGui::DragFloat(CreateControlString("Approx. Accuracy", GetInstanceName()).c_str(), &approx_accuracy_, 0.1f, 1, 100);
+            ImGui::Checkbox(CreateControlString("Closed Curve", GetInstanceName()).c_str(), &approx_closed_);
+        }
+        ImGui::Separator();
+        ImGui::Checkbox(CreateControlString("Use Convex Hull", GetInstanceName()).c_str(), &use_convex_hull_);
+        ImGui::Separator();
         ImGui::Checkbox(CreateControlString("Filter by Area", GetInstanceName()).c_str(), &filter_by_area_);
         if (filter_by_area_) {
             ImGui::SetNextItemWidth(100);
@@ -210,6 +234,10 @@ std::string Contours::GetState()
     state["mode"] = mode_;
     state["method"] = method_;
     state["filter_by_area"] = filter_by_area_;
+    state["approx_accuracy"] = approx_accuracy_;
+    state["approx_closed"] = approx_closed_;
+    state["use_convex_hull"] = use_convex_hull_;
+    state["use_approximation"] = use_approximation_;
     state["area_min"] = area_min_;
     state["area_max"] = area_max_;
     state["draw_contours"] = draw_contours_;
@@ -246,6 +274,14 @@ void Contours::SetState(std::string &&json_serialized)
         bbox_color_.y = state["bbox_color"]["G"].get<float>();
         bbox_color_.z = state["bbox_color"]["B"].get<float>();
     }
+    if (state.contains("approx_accuracy"))
+        approx_accuracy_ = state["approx_accuracy"].get<float>();
+    if (state.contains("approx_closed"))
+        approx_closed_ = state["approx_closed"].get<bool>();
+    if (state.contains("use_convex_hull"))
+        use_convex_hull_ = state["use_convex_hull"].get<bool>();
+    if (state.contains("use_approximation"))
+        use_approximation_ = state["use_approximation"].get<bool>();
     if (state.contains("mode"))
         mode_ = state["mode"].get<int>();
     if (state.contains("method"))

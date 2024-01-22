@@ -61,5 +61,6 @@
 #include "DNN/dnn_text_detection.hpp"
 #include "DNN/dnn_text_recognition.hpp"
 #include "DNN/dnn_image_processing.hpp"
+#include "BoundingRegion/bounding_region.hpp"
 
 #endif  // FLOWCV_INTERNAL_NODES_HPP_

@@ -206,6 +206,9 @@ InternalNodeManager::InternalNodeManager()
     // DNN - Image Processing
     node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::ImageProcessing>(DSPatch::DSPatchables::ImageProcessing()));
 
+    // Bounding Region
+    node_list_.emplace_back(GetCompInfo<DSPatch::DSPatchables::BoundingRegion>(DSPatch::DSPatchables::BoundingRegion()));
+
     // ...
 
     // Sort Nodes
@@ -500,6 +503,10 @@ std::shared_ptr<DSPatch::Component> InternalNodeManager::CreateNodeInstance(cons
             // DNN - Image Processing
             if (p.name == "Image_Processing")
                 return std::make_shared<DSPatch::DSPatchables::ImageProcessing>();
+
+            // Bounding Region
+            if (p.name == "Bounding_Region")
+                return std::make_shared<DSPatch::DSPatchables::BoundingRegion>();
 
             // ...
         }

@@ -78,21 +78,89 @@ void PerspectiveWarp::Process_(SignalBus const &inputs, SignalBus &outputs)
             cv::Mat frame;
             nlohmann::json json_data = *in_json;
             std::vector<cv::Point2f> corners;
+            // 0 = points, 1 = bbox, 2 = rotated rectangle, 3 = contours
+            uint8_t dType = 0;
             if (json_data.contains("data_type")) {
-                if (json_data["data_type"].get<std::string>() != "points") {
+                bool is_known_type = false;
+                if (json_data["data_type"].get<std::string>() == "points") {
+                    is_known_type = true;
+                    dType = 0;
+                }
+                else if (json_data["data_type"].get<std::string>() == "bbox" || json_data["data_type"].get<std::string>() == "objects") {
+                    is_known_type = true;
+                    dType = 1;
+                }
+                else if (json_data["data_type"].get<std::string>() == "rot_rect") {
+                    is_known_type = true;
+                    dType = 2;
+                }
+                else if (json_data["data_type"].get<std::string>() == "contours") {
+                    is_known_type = true;
+                    dType = 3;
+                }
+
+                if (!is_known_type) {
                     is_poly_ = false;
                     return;
                 }
             }
             if (json_data.contains("data")) {
-                corner_count_ = (int)json_data["data"].size();
-                for (const auto &data : json_data["data"]) {
-                    cv::Point2f pt;
-                    pt.x = data["x"];
-                    pt.y = data["y"];
-                    corners.emplace_back(pt);
+                if (dType == 0) {
+                    corner_count_ = (int)json_data["data"].size();
+                    for (const auto &data : json_data["data"]) {
+                        cv::Point2f pt;
+                        pt.x = data["x"];
+                        pt.y = data["y"];
+                        corners.emplace_back(pt);
+                    }
+                }
+                else if (dType == 1) {
+                    if (!json_data["data"].empty()) {
+                        if (json_data["data"][0].contains("bbox")) {
+                            corner_count_ = (int)json_data["data"][0]["bbox"].size();
+                            auto x = json_data["data"][0]["bbox"]["x"].get<float>();
+                            auto y = json_data["data"][0]["bbox"]["y"].get<float>();
+                            auto w = json_data["data"][0]["bbox"]["w"].get<float>();
+                            auto h = json_data["data"][0]["bbox"]["h"].get<float>();
+                            corners.emplace_back(x, y);
+                            corners.emplace_back(x + w, y);
+                            corners.emplace_back(x + w, y + h);
+                            corners.emplace_back(x, y + h);
+                        }
+                    }
+                }
+                else if (dType == 2) {
+                    if (!json_data["data"].empty()) {
+                        if (json_data["data"][0].contains("rot_rect")) {
+                            if (json_data["data"][0]["rot_rect"].contains("points")) {
+                                corner_count_ = (int)json_data["data"][0]["rot_rect"]["points"].size();
+                                for (const auto &data : json_data["data"][0]["rot_rect"]["points"]) {
+                                    cv::Point2f pt;
+                                    pt.x = data["x"];
+                                    pt.y = data["y"];
+                                    corners.emplace_back(pt);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (dType == 3) {
+                    if (!json_data["data"].empty()) {
+                        if (json_data["data"][0].contains("contour")) {
+                            if (!json_data["data"][0]["contour"].empty()) {
+                                corner_count_ = (int)json_data["data"][0]["contour"].size();
+                                for (const auto &data : json_data["data"][0]["contour"]) {
+                                    cv::Point2f pt;
+                                    pt.x = data["x"];
+                                    pt.y = data["y"];
+                                    corners.emplace_back(pt);
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
             if (corner_count_ == 4) {
                 std::vector<cv::Point2f> approx;
                 cv::approxPolyDP(cv::Mat(corners), approx, cv::arcLength(cv::Mat(corners), true) * 0.02, true);
@@ -125,9 +193,9 @@ void PerspectiveWarp::Process_(SignalBus const &inputs, SignalBus &outputs)
 
                         std::vector<cv::Point2f> quad_pts;
                         quad_pts.emplace_back(0.0f, 0.0f);
-                        quad_pts.emplace_back(cv::Point2f((float)quad.cols, 0.0f));
-                        quad_pts.emplace_back(cv::Point2f((float)quad.cols, (float)quad.rows));
-                        quad_pts.emplace_back(cv::Point2f(0.0f, (float)quad.rows));
+                        quad_pts.emplace_back((float)quad.cols, 0.0f);
+                        quad_pts.emplace_back((float)quad.cols, (float)quad.rows);
+                        quad_pts.emplace_back(0.0f, (float)quad.rows);
 
                         cv::Mat transmtx = cv::getPerspectiveTransform(corners, quad_pts);
                         cv::warpPerspective(*in_img, frame, transmtx, quad.size(), interp_mode_);

@@ -1,11 +1,12 @@
 //
-// Plugin Contours
+// Plugin BoundingRegion
 //
 
-#ifndef FLOWCV_PLUGIN_CONTOURS_HPP_
-#define FLOWCV_PLUGIN_CONTOURS_HPP_
+#ifndef FLOWCV_PLUGIN_BOUNDING_REGION_HPP_
+#define FLOWCV_PLUGIN_BOUNDING_REGION_HPP_
 #include <DSPatch.h>
 #include "FlowCV_Types.hpp"
+#include "FlowCV_Properties.hpp"
 #include "imgui_wrapper.hpp"
 #include "imgui_opencv.hpp"
 #include "json.hpp"
@@ -13,10 +14,10 @@
 namespace DSPatch::DSPatchables
 {
 
-class Contours final : public Component
+class BoundingRegion final : public Component
 {
   public:
-    Contours();
+    BoundingRegion();
     void UpdateGui(void *context, int interface) override;
     bool HasGui(int interface) override;
     std::string GetState() override;
@@ -26,22 +27,10 @@ class Contours final : public Component
     void Process_(SignalBus const &inputs, SignalBus &outputs) override;
 
   private:
-    int mode_;
-    int method_;
-    bool filter_by_area_;
-    bool use_approximation_;
-    float approx_accuracy_;
-    bool approx_closed_;
-    bool use_convex_hull_;
-    float area_min_;
-    float area_max_;
-    bool draw_contours_;
-    bool fill_contours_;
-    bool draw_bbox_;
-    ImVec4 contour_color_;
+    FlowCV::FlowCV_Properties props_;
     ImVec4 bbox_color_;
 };
 
 }  // namespace DSPatch::DSPatchables
 
-#endif  // FLOWCV_PLUGIN_CONTOURS_HPP_
+#endif  // FLOWCV_PLUGIN_BOUNDING_REGION_HPP_
